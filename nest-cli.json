@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/aleva-api-gateway/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/aleva-api-gateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/aleva-api-gateway",
+  "projects": {
+    "aleva-api-gateway": {
+      "type": "application",
+      "root": "apps/aleva-api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/aleva-api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/aleva-api-gateway/tsconfig.app.json"
+      }
+    },
+    "auth": {
+      "type": "application",
+      "root": "apps/auth",
+      "entryFile": "main",
+      "sourceRoot": "apps/books/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/books/tsconfig.app.json"
+      }
+    },
+    "test": {
+      "type": "application",
+      "root": "apps/test",
+      "entryFile": "main",
+      "sourceRoot": "apps/test/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/test/tsconfig.app.json"
+      }
+    },
+    "forms": {
+      "type": "application",
+      "root": "apps/forms",
+      "entryFile": "main",
+      "sourceRoot": "apps/forms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/forms/tsconfig.app.json"
+      }
+    },
+    "contracts": {
+      "type": "library",
+      "root": "libs/contracts",
+      "entryFile": "index",
+      "sourceRoot": "libs/contracts/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/contracts/tsconfig.lib.json"
+      }
+    }
+  }
+}
