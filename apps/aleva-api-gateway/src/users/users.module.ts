@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { USERS_CLIENT } from '../constants';
+import { RBAC_CLIENT } from '../common/utils/constants';
 
 // services
 import { UsersService } from './users.service';
@@ -11,7 +11,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
 // config
-import { ClientConfigModule, ClientConfigService } from '../../../client-config';
+import { ClientConfigModule, ClientConfigService } from '../../../common/config';
 
 @Module({
   imports: [ClientConfigModule],
@@ -19,9 +19,9 @@ import { ClientConfigModule, ClientConfigService } from '../../../client-config'
   providers: [
     UsersService,
     {
-      provide: USERS_CLIENT,
+      provide: RBAC_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.usersClientOptions;
+        const clientOptions = configService.rbacClientOptions;
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]

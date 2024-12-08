@@ -1,8 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, Type } from '@nestjs/common';
+import { RouterModule, RouteTree } from '@nestjs/core';
+import { Controller } from '@nestjs/common/interfaces';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { FORMS_CLIENT } from '../constants';
+import { FORMS_CLIENT } from '../common/utils/constants';
 
 // services
 import { FormsService } from './forms.service';
@@ -11,14 +13,37 @@ import { FormsService } from './forms.service';
 import { FormsController } from './forms.controller';
 
 // config
-import { ClientConfigModule, ClientConfigService } from '../../../client-config';
+import { ClientConfigModule, ClientConfigService } from '../../../common/config';
 
 // module
 import { AnswersModule } from './modules/answers/answers.module';
 import { QuestionsModule } from './modules/questions/questions.module';
 
+function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controller>[]): RouteTree[] {
+  return controllers.map((controller) => {
+    const controllerPath = Reflect.getMetadata('path', controller);
+
+    return {
+      path: `${basePath}`,
+      module: controller as Type<Controller>,
+    };
+  });
+}
+
 @Module({
-  imports: [ClientConfigModule, QuestionsModule, AnswersModule],
+  imports: [
+    ClientConfigModule, 
+    AnswersModule,
+    QuestionsModule,
+    RouterModule.register([
+      {
+        path: 'forms',
+        children: [
+          ...appendSubPathsToBaseModule('/', [AnswersModule, QuestionsModule]),
+        ],
+      },
+    ]),
+  ],
   controllers: [FormsController],
   providers: [FormsService,
     {

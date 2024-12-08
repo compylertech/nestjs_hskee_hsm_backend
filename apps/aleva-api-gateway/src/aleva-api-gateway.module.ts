@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { RouterModule } from '@nestjs/core';
 
 // controllers
 import { AlevaApiGatewayController } from './aleva-api-gateway.controller';
@@ -7,13 +8,18 @@ import { AlevaApiGatewayController } from './aleva-api-gateway.controller';
 import { AlevaApiGatewayService } from './aleva-api-gateway.service';
 
 // modules
+import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/users.module';
 import { FormsModule } from './forms/forms.module';
-import { AuthModule } from 'apps/auth/src/core/auth.module';
-import { FormsAppModule } from 'apps/forms/src/forms-app.module';
-
 @Module({
-  imports: [UserModule, FormsAppModule, AuthModule],
+  imports: [AuthModule, UserModule, FormsModule,
+    RouterModule.register([
+      {
+        path: 'forms',
+        module: FormsModule,
+      },
+    ]),
+  ],
   controllers: [AlevaApiGatewayController],
   providers: [AlevaApiGatewayService],
 })

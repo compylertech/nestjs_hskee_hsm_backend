@@ -23,18 +23,9 @@
       "type": "application",
       "root": "apps/auth",
       "entryFile": "main",
-      "sourceRoot": "apps/books/src",
+      "sourceRoot": "apps/auth/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/books/tsconfig.app.json"
-      }
-    },
-    "test": {
-      "type": "application",
-      "root": "apps/test",
-      "entryFile": "main",
-      "sourceRoot": "apps/test/src",
-      "compilerOptions": {
-        "tsConfigPath": "apps/test/tsconfig.app.json"
+        "tsConfigPath": "apps/auth/tsconfig.app.json"
       }
     },
     "forms": {

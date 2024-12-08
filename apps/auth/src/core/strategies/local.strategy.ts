@@ -10,7 +10,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     constructor(private authService: AuthService) {
         // super();
 
-        // If we want to change the login credentials fields.
+        // Override the login credentials fields.
         super({
             usernameField: 'email',
             passwordField: 'password'
@@ -18,7 +18,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     }
 
     async validate(email: string, password: string): Promise<any> {
-        const user = await this.authService.validateUser({ username: email, password: password });
+        const user = await this.authService.validateUser({ email: email, password: password });
 
         if (!user) {
             throw new UnauthorizedException();
