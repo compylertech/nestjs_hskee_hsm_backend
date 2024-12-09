@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { FORMS_CLIENT } from '../../../constants';
+import { FORMS_CLIENT } from '../../../common/utils/constants';
 
 // services
 import { QuestionsService } from './questions.service';
@@ -11,7 +11,7 @@ import { QuestionsService } from './questions.service';
 import { QuestionsController } from './questions.controller';
 
 // config
-import { ClientConfigModule, ClientConfigService } from 'apps/client-config';
+import { ClientConfigModule, ClientConfigService } from 'apps/common/config';
 
 @Module({
   imports: [ClientConfigModule],
