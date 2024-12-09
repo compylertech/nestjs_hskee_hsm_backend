@@ -20,7 +20,8 @@ export class CreateUserDto {
 
   @ApiProperty({ description: 'Date of birth', example: '2024-11-26' })
   @IsDate()
-  @Transform(({ value }) => new Date(value)) 
+  // @Transform(({ value }) => new Date(value)) 
+  @Type(() => Date)
   date_of_birth: Date;
 
   @ApiProperty({ description: 'Email address of the user', example: 'johndoe@compyler.io' })

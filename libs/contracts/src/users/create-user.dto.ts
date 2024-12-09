@@ -2,7 +2,7 @@ export class CreateUserDto {
   first_name: string;
   last_name: string;
   gender: string;
-  date_of_birth?: string;
+  date_of_birth?: string|Date;
   email: string;
   phone_number: string;
   identification_number: string;
