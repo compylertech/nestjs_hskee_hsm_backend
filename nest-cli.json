@@ -21,29 +21,29 @@
     },
     "auth": {
       "type": "application",
-      "root": "apps/auth",
+      "root": "apps/modules/auth",
       "entryFile": "main",
-      "sourceRoot": "apps/auth/src",
+      "sourceRoot": "apps/modules/auth/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/auth/tsconfig.app.json"
+        "tsConfigPath": "apps/modules/auth/tsconfig.app.json"
       }
     },
     "address": {
       "type": "application",
-      "root": "apps/address",
+      "root": "apps/modules/address",
       "entryFile": "main",
-      "sourceRoot": "apps/address/src",
+      "sourceRoot": "apps/modules/address/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/address/tsconfig.app.json"
+        "tsConfigPath": "apps/modules/address/tsconfig.app.json"
       }
     },
     "forms": {
       "type": "application",
-      "root": "apps/forms",
+      "root": "apps/modules/forms",
       "entryFile": "main",
-      "sourceRoot": "apps/forms/src",
+      "sourceRoot": "apps/modules/forms/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/forms/tsconfig.app.json"
+        "tsConfigPath": "apps/modules/forms/tsconfig.app.json"
       }
     },
     "contracts": {
