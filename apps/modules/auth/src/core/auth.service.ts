@@ -1,3 +1,4 @@
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 
@@ -34,7 +35,7 @@ export class AuthService {
     async validateUser(input: AuthDto): Promise<AuthSignInDto | null> {
         const user = await this.usersService.findUserByEmail(input.email)
 
-        if (user && user.password === input.password) {
+        if (user && bcrypt.compareSync(input.password, user.password)) {
             return {
                 userId: user.user_id,
                 email: user.email
