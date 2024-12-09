@@ -11,8 +11,9 @@ import { AlevaApiGatewayService } from './aleva-api-gateway.service';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/users.module';
 import { FormsModule } from './forms/forms.module';
+import { AddressModule } from './address/address.module';
 @Module({
-  imports: [AuthModule, UserModule, FormsModule,
+  imports: [AuthModule, AddressModule, UserModule, FormsModule,
     RouterModule.register([
       {
         path: 'forms',

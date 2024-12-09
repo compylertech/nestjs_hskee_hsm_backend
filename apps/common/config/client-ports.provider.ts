@@ -18,4 +18,8 @@ export class ClientPortsProvider {
     getRbacClientPort(): number {
         return this.config.get<number>('RBAC_CLIENT_PORT');
     }
+
+    getAddressClientPort(): number {
+        return this.config.get<number>('ADDRESS_CLIENT_PORT');
+    }
 }

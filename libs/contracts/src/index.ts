@@ -15,3 +15,8 @@ export * from '@app/contracts/users/update-user.dto'
 
 export * from '@app/contracts/auth/auth.dto'
 export * from '@app/contracts/auth/auth.patterns'
+
+export * from '@app/contracts/address/address.dto'
+export * from '@app/contracts/address/create-address.dto'
+export * from '@app/contracts/address/update-address.dto'
+export * from '@app/contracts/address/address.patterns'

@@ -26,12 +26,13 @@ export class UsersService {
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
+    const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
     queryBuilder
       .orderBy('user.created_at', pageOptionsDto.order)
-      .skip(pageOptionsDto.skip)
-      .take(pageOptionsDto.limit);
+      .skip(options.skip)
+      .take(options.limit);
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
