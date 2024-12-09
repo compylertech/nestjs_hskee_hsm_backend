@@ -27,6 +27,10 @@ export class ClientConfigService {
         return this.optionsProvider.createClientOptions(this.portsProvider.getFormsClientPort());
     }
 
+    get addressClientOptions() {
+        return this.optionsProvider.createClientOptions(this.portsProvider.getAddressClientPort());
+    }
+
     get rbacClientOptions() {
         return this.optionsProvider.createClientOptions(this.portsProvider.getRbacClientPort());
     }

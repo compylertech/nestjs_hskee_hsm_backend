@@ -1,6 +1,8 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
+
+// enums
 import { Order } from '../utils/enums';
 
 export class PageOptionsDto {

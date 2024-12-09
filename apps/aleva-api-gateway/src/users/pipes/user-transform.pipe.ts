@@ -1,9 +1,8 @@
 import { map } from 'rxjs';
-import { format } from 'date-fns';
 import { plainToInstance } from 'class-transformer';
 
 // entity
-import { User } from '../../../../auth/src/users/entities/user.entity';
+import { User } from '../../../../modules/auth/src/users/entities/user.entity';
 
 // dto
 import { UserAuthInfoDto, UserEmergencyInfoDto } from '../dto/user-utils.dto';
@@ -75,6 +74,7 @@ export function transformGatewayUserDto(dto: GatewayCreateUserDto | GatewayUpdat
         last_name: dto.last_name,
         gender: dto.gender,
         email: dto.email,
+        date_of_birth: dto.date_of_birth,
         phone_number: dto.phone_number,
         identification_number: dto.identification_number,
         photo_url: dto.photo_url,
@@ -100,10 +100,7 @@ export function transformGatewayUserDto(dto: GatewayCreateUserDto | GatewayUpdat
         emergency_contact_number: dto.user_emergency_info?.emergency_contact_number,
 
         // add password if it exists
-        ...(dto.password ? { password: dto.password } : {}),
-
-        // handle date time
-        ...(dto.date_of_birth ? { date_of_birth: format(new Date(dto?.date_of_birth), 'yyyy-MM-dd') } : {}), // new Date(dto.date_of_birth).toISOString().split('T')[0]
+        ...(dto.password ? { password: dto.password } : {})
     };
 }
 

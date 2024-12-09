@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 import { IsDate, IsEmail, IsOptional, IsString } from 'class-validator';
 
 // dto
@@ -26,7 +26,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiProperty({ description: 'Date of birth', example: '2024-11-26' })
   @IsOptional()
   @IsDate()
-  @Transform(({ value }) => new Date(value)) 
+  @Type(() => Date)
   date_of_birth: Date;
 
   @ApiProperty({ description: 'Email address of the user', example: 'johndoe@compyler.io' })

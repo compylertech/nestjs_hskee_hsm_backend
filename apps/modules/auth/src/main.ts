@@ -9,7 +9,7 @@ import { CoreModule } from './core.module';
 import { ClientConfigService } from 'apps/common/config/client-config.service';
 
 // filters
-import { GlobalRpcExceptionFilter } from '../../common/filters/global-rpc-exception.filter';
+import { GlobalRpcExceptionFilter } from '../../../common/filters/global-rpc-exception.filter';
 
 
 async function bootstrap() {
