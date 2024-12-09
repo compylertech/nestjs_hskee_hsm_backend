@@ -33,7 +33,7 @@ export class UsersController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async findAll(@Query() pageOptionsDto: PageOptionsDto) {
     let query = await this.usersService.findAll(pageOptionsDto);
-    query.data = query.data.map((user) => transformUserToDto(user))
+    query["data"] = query["data"].map((user) => transformUserToDto(user))
     return query;
   }
 

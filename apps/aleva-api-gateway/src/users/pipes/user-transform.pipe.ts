@@ -14,7 +14,7 @@ import { UpdateUserDto as GatewayUpdateUserDto } from '../dto/update-user.dto';
 import { UserDto, CreateUserDto as MicroserviceCreateUserDto } from '@app/contracts';
 
 
-export function transformUserToDto(user: User): UserDto|{} {
+export function transformUserToDto(user: User | UserDto): UserDto|{} {
     if (!user && typeof user !== 'object') {
         throw new Error('User entity is required for transformation.');
     }
