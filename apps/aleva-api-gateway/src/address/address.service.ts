@@ -53,7 +53,7 @@ export class AddressService {
   }
 
   async remove(addressId: string): Promise<void> {
-    return this.addressClient.send<ClientAddressDto>(
+    this.addressClient.send<ClientAddressDto>(
       ADDRESS_PATTERN.REMOVE,
       addressId
     ).toPromise();
