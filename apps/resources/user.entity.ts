@@ -14,6 +14,7 @@ import {
   import { AttendanceLog } from './attendance-log.entity';
   import { Account } from './account.entity';
   import { Questionnaire } from './questionnaire.entity';
+  import { CalendarEvent } from './calendar-event.entity';
   
   @Entity('users')
   export class User {
@@ -109,6 +110,9 @@ import {
     @OneToMany(() => Questionnaire, (questionnaire) => questionnaire.user, { cascade: true })
     questionnaires: Questionnaire[];
   
+    @OneToMany(() => CalendarEvent, (calendarEvent) => calendarEvent.user, { cascade: true })
+    calendarEvent: Account[];
+
     @CreateDateColumn()
     created_at: Date;
   

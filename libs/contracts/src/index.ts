@@ -20,3 +20,8 @@ export * from '@app/contracts/address/address.dto'
 export * from '@app/contracts/address/create-address.dto'
 export * from '@app/contracts/address/update-address.dto'
 export * from '@app/contracts/address/address.patterns'
+
+export * from '@app/contracts/calendar-event/calendarEvent.dto'
+export * from '@app/contracts/calendar-event/create-calendarEvent.dto'
+export * from '@app/contracts/calendar-event/update-calendarEvent.dto'
+export * from '@app/contracts/calendar-event/calendarEvent.pattern'
