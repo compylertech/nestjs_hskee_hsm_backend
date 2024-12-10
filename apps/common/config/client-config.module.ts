@@ -14,7 +14,8 @@ import { ClientConfigService } from './client-config.service'
                 AUTH_CLIENT_PORT: joi.number().default(3001),
                 RBAC_CLIENT_PORT: joi.number().default(3002),
                 FORMS_CLIENT_PORT: joi.number().default(3003),
-                ADDRESS_CLIENT_PORT: joi.number().default(3004)
+                ADDRESS_CLIENT_PORT: joi.number().default(3004),
+                BOOKING_CLIENT_PORT: joi.number().default(3005)
             })
         })
     ],

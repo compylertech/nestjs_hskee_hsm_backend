@@ -46,6 +46,15 @@
         "tsConfigPath": "apps/modules/forms/tsconfig.app.json"
       }
     },
+    "booking": {
+      "type": "application",
+      "root": "apps/modules/booking",
+      "entryFile": "main",
+      "sourceRoot": "apps/modules/booking/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/modules/booking/tsconfig.app.json"
+      }
+    },
     "contracts": {
       "type": "library",
       "root": "libs/contracts",

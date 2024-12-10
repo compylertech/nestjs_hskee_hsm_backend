@@ -12,12 +12,17 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/users.module';
 import { FormsModule } from './forms/forms.module';
 import { AddressModule } from './address/address.module';
+import { BookingModule } from './booking/booking.module';
 @Module({
-  imports: [AuthModule, AddressModule, UserModule, FormsModule,
+  imports: [AuthModule, AddressModule, UserModule, FormsModule, BookingModule,
     RouterModule.register([
       {
         path: 'forms',
         module: FormsModule,
+      },
+      {
+        path: 'booking',
+        module: BookingModule,
       },
     ]),
   ],

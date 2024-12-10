@@ -34,4 +34,8 @@ export class ClientConfigService {
     get rbacClientOptions() {
         return this.optionsProvider.createClientOptions(this.portsProvider.getRbacClientPort());
     }
+
+    get bookingClientOptions() {
+        return this.optionsProvider.createClientOptions(this.portsProvider.getBookingClientPort());
+    }
 }
