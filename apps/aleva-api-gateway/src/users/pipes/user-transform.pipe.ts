@@ -1,4 +1,5 @@
 import { map } from 'rxjs';
+import { format } from 'date-fns';
 import { plainToInstance } from 'class-transformer';
 
 // entity
@@ -13,7 +14,7 @@ import { UpdateUserDto as GatewayUpdateUserDto } from '../dto/update-user.dto';
 import { UserDto, CreateUserDto as MicroserviceCreateUserDto } from '@app/contracts';
 
 
-export function transformUserToDto(user: User): UserDto|{} {
+export function transformUserToDto(user: User | UserDto): UserDto|{} {
     if (!user && typeof user !== 'object') {
         throw new Error('User entity is required for transformation.');
     }
@@ -74,7 +75,7 @@ export function transformGatewayUserDto(dto: GatewayCreateUserDto | GatewayUpdat
         last_name: dto.last_name,
         gender: dto.gender,
         email: dto.email,
-        date_of_birth: dto.date_of_birth,
+        // date_of_birth: dto.date_of_birth,
         phone_number: dto.phone_number,
         identification_number: dto.identification_number,
         photo_url: dto.photo_url,
@@ -100,7 +101,8 @@ export function transformGatewayUserDto(dto: GatewayCreateUserDto | GatewayUpdat
         emergency_contact_number: dto.user_emergency_info?.emergency_contact_number,
 
         // add password if it exists
-        ...(dto.password ? { password: dto.password } : {})
+        ...(dto.password ? { password: dto.password } : {}),
+        ...(dto.date_of_birth ? { date_of_birth: format(new Date(dto?.date_of_birth), 'yyyy-MM-dd') } : {}),
     };
 }
 
