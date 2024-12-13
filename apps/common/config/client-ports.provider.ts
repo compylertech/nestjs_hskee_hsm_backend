@@ -26,4 +26,8 @@ export class ClientPortsProvider {
     getBookingClientPort(): number {
         return this.config.get<number>('BOOKING_CLIENT_PORT');
     }
+
+    getBillingClientPort(): number {
+        return this.config.get<number>('BILLING_CLIENT_PORT');
+    }
 }

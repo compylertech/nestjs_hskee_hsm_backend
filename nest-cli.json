@@ -55,6 +55,15 @@
         "tsConfigPath": "apps/modules/booking/tsconfig.app.json"
       }
     },
+    "billing": {
+      "type": "application",
+      "root": "apps/modules/billing",
+      "entryFile": "main",
+      "sourceRoot": "apps/modules/billing/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/modules/billing/tsconfig.app.json"
+      }
+    },
     "contracts": {
       "type": "library",
       "root": "libs/contracts",

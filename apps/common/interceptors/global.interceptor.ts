@@ -4,6 +4,7 @@ import {
     ExecutionContext,
     CallHandler,
 } from '@nestjs/common';
+import { number } from 'joi';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -15,7 +16,7 @@ export class GlobalResponseInterceptor implements NestInterceptor {
 
         return next.handle().pipe(
             map((data) => {
-                if (data && typeof data === 'object' && 'status' in data) {
+                if (data && typeof data === 'object' && 'status' in data && typeof data['status'] !== 'string') {
                     response.status(data.status);
                     return data;
                 }

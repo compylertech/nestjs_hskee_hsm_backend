@@ -13,8 +13,9 @@ import { UserModule } from './users/users.module';
 import { FormsModule } from './forms/forms.module';
 import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
+import { BillingModule } from './billing/billing.module';
 @Module({
-  imports: [AuthModule, AddressModule, UserModule, FormsModule, BookingModule,
+  imports: [AuthModule, AddressModule, UserModule, FormsModule, BookingModule, BillingModule,
     RouterModule.register([
       {
         path: 'forms',
@@ -23,6 +24,10 @@ import { BookingModule } from './booking/booking.module';
       {
         path: 'booking',
         module: BookingModule,
+      },
+      {
+        path: 'billing',
+        module: BillingModule,
       },
     ]),
   ],
