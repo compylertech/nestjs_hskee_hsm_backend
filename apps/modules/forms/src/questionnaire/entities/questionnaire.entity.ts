@@ -2,6 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 // entity
 import { Question } from '../../questions/entities/questions.entity';
+import { EntityQuestionnaire } from './entity-questionnaire.entity';
 
 @Entity('questionnaire')
 export class Questionnaire {
@@ -14,9 +15,6 @@ export class Questionnaire {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToMany(() => Question, (question) => question.questionnaire, { cascade: true })
-  questions: Question[];
-
   @Column({ type: 'boolean', default: false })
   publish_for_registration: boolean;
 
@@ -25,6 +23,12 @@ export class Questionnaire {
 
   @Column({ type: 'int', default: 0 })
   number_of_responses: number;
+  
+  @OneToMany(() => Question, (question) => question.questionnaire, { cascade: true })
+  questions: Question[];
+
+  @OneToMany(() => EntityQuestionnaire, (entityQuestionnaire) => entityQuestionnaire.questionnaire, { cascade: true })
+  entity_questionnaire: EntityQuestionnaire[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;

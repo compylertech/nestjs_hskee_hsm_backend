@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { RBAC_CLIENT } from '../common/utils/constants';
+import { RBAC_CLIENT } from '../../../common/utils/constants';
 
 // services
 import { UsersService } from './users.service';
@@ -11,7 +11,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 
 // config
-import { ClientConfigModule, ClientConfigService } from '../../../common/config';
+import { ClientConfigModule, ClientConfigService } from '../../../../../common/config';
 
 @Module({
   imports: [ClientConfigModule],

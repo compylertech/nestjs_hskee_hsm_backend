@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 // constants
-import { RBAC_CLIENT } from '../common/utils/constants';
+import { RBAC_CLIENT } from '../../../common/utils/constants';
 
 // contracts
 import {

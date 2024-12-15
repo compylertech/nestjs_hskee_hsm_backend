@@ -3,7 +3,7 @@ import { format } from 'date-fns';
 import { plainToInstance } from 'class-transformer';
 
 // entity
-import { User } from '../../../../modules/auth/src/users/entities/user.entity';
+import { User } from '../../../../../../modules/auth/src/users/entities/user.entity';
 
 // dto
 import { UserAuthInfoDto, UserEmergencyInfoDto } from '../dto/user-utils.dto';

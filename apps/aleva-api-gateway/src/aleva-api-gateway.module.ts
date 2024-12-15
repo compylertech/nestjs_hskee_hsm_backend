@@ -9,7 +9,7 @@ import { AlevaApiGatewayService } from './aleva-api-gateway.service';
 
 // modules
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './users/users.module';
+import { UserModule } from './auth/modules/users/users.module';
 import { FormsModule } from './forms/forms.module';
 import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';

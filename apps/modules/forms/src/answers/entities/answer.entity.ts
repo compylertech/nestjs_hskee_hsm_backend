@@ -1,10 +1,11 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 // enum
 import { AnswerType } from '@app/contracts';
 
 // entity
 import { Question } from '../../questions/entities/questions.entity';
+import { EntityQuestionnaire } from '../../questionnaire/entities/entity-questionnaire.entity';
 
 @Entity('answer')
 export class Answer {
@@ -21,6 +22,9 @@ export class Answer {
   @ManyToOne(() => Question, (question) => question.answers, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'question_id' })
   question: Question;
+
+  @OneToMany(() => EntityQuestionnaire, (entityQuestionnaire) => entityQuestionnaire.question, { cascade: true })
+  entity_questionnaire: EntityQuestionnaire[];
   
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;

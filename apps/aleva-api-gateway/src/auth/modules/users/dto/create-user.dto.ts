@@ -4,7 +4,7 @@ import { IsArray, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from '
 
 // dtos
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
-import { CreateAttendanceLogDto } from '@app/contracts';
+import { CreateAttendanceLogDto } from '../../attendance_log/dto/create-attendance-log.dto';
 
 export class CreateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })

@@ -6,6 +6,7 @@ import { QuestionType } from '@app/contracts';
 // entity
 import { Answer } from '../../answers/entities/answer.entity';
 import { Questionnaire } from '../../questionnaire/entities/questionnaire.entity';
+import { EntityQuestionnaire } from '../../questionnaire/entities/entity-questionnaire.entity';
 
 
 @Entity('question')
@@ -32,6 +33,9 @@ export class Question {
   })
   @JoinColumn({ name: 'questionnaire_id' })
   questionnaire: Questionnaire;
+
+  @OneToMany(() => EntityQuestionnaire, (entityQuestionnaire) => entityQuestionnaire.answer, { cascade: true })
+  entity_questionnaire: EntityQuestionnaire[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
