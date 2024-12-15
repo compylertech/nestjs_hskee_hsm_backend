@@ -1,0 +1,3 @@
+node scripts/runner.js --module forms --base apps --submodule questions --microservice all
+
+node scripts/runner.js --module forms --base apps --submodule answer --gateway all

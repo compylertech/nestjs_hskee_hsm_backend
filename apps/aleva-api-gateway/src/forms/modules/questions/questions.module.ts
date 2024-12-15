@@ -11,7 +11,7 @@ import { QuestionsService } from './questions.service';
 import { QuestionsController } from './questions.controller';
 
 // config
-import { ClientConfigModule, ClientConfigService } from 'apps/common/config';
+import { ClientConfigModule, ClientConfigService } from '../../../../../common/config';
 
 @Module({
   imports: [ClientConfigModule],
@@ -24,8 +24,8 @@ import { ClientConfigModule, ClientConfigService } from 'apps/common/config';
         const clientOptions = configService.formClientOptions;
         return ClientProxyFactory.create(clientOptions);
       },
-      inject: [ClientConfigService],
-    },
-  ],
+      inject: [ClientConfigService]
+    }
+  ]
 })
 export class QuestionsModule {}

@@ -1,38 +1,69 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 
 // services
-import { AnswersService } from './answers.service';
+import { AnswerService } from './answers.service';
 
 // contracts
-import { CreateAnswerDto, UpdateAnswerDto, ANSWERS_PATTERNS } from '@app/contracts';
+import { CreateAnswerDto, UpdateAnswerDto, ANSWER_PATTERN } from '@app/contracts';
 
-@Controller('answers')
-export class AnswersController {
-  constructor(private readonly answersService: AnswersService) {}
+// dto
+import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
-  @MessagePattern(ANSWERS_PATTERNS.CREATE)
-  create(@Payload() createAnswerDto: CreateAnswerDto) {
-    return this.answersService.create(createAnswerDto);
+@Controller('answer')
+export class AnswerController {
+  constructor(private readonly answerService: AnswerService) { }
+
+  @MessagePattern(ANSWER_PATTERN.CREATE)
+  async create(@Payload() createAnswerDto: CreateAnswerDto) {
+    try {
+      return await this.answerService.create(createAnswerDto);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || 'Error creating answer!',
+      });
+    }
   }
 
-  @MessagePattern(ANSWERS_PATTERNS.FIND_ALL)
-  findAll() {
-    return this.answersService.findAll();
+  @MessagePattern(ANSWER_PATTERN.FIND_ALL)
+  async findAll(@Payload() pageOptionsDto: PageOptionsDto) {
+    try {
+      return await this.answerService.findAll(pageOptionsDto);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || 'Error fetching answer!',
+      });
+    }
   }
 
-  @MessagePattern(ANSWERS_PATTERNS.FIND_ONE)
-  findOne(@Payload() id: number) {
-    return this.answersService.findOne(id);
+  @MessagePattern(ANSWER_PATTERN.FIND_ONE)
+  async findOne(@Payload() id: string) {
+    try {
+      return await this.answerService.findOne(id);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error fetching answer with id: ${id}`,
+      });
+    }
   }
 
-  @MessagePattern(ANSWERS_PATTERNS.UPDATE)
+  @MessagePattern(ANSWER_PATTERN.UPDATE)
   update(@Payload() updateAnswerDto: UpdateAnswerDto) {
-    return this.answersService.update(updateAnswerDto.id, updateAnswerDto);
+    try {
+      return this.answerService.update(updateAnswerDto.answer_id, updateAnswerDto);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error updating answer with id: ${updateAnswerDto.answer_id}`,
+      });
+    }
   }
 
-  @MessagePattern(ANSWERS_PATTERNS.REMOVE)
-  remove(@Payload() id: number) {
-    return this.answersService.remove(id);
+  @MessagePattern(ANSWER_PATTERN.REMOVE)
+  remove(@Payload() id: string) {
+    return this.answerService.remove(id);
   }
 }

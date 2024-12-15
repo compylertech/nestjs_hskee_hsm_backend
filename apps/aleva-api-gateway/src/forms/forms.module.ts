@@ -18,6 +18,7 @@ import { ClientConfigModule, ClientConfigService } from '../../../common/config'
 // module
 import { AnswersModule } from './modules/answers/answers.module';
 import { QuestionsModule } from './modules/questions/questions.module';
+import { QuestionnaireModule } from './modules/questionnaire/questionnaire.module';
 
 function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controller>[]): RouteTree[] {
   return controllers.map((controller) => {
@@ -33,13 +34,14 @@ function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controll
 @Module({
   imports: [
     ClientConfigModule, 
-    AnswersModule,
+    QuestionnaireModule,
     QuestionsModule,
+    AnswersModule,
     RouterModule.register([
       {
         path: 'forms',
         children: [
-          ...appendSubPathsToBaseModule('/', [AnswersModule, QuestionsModule]),
+          ...appendSubPathsToBaseModule('/', [AnswersModule, QuestionsModule, QuestionnaireModule]),
         ],
       },
     ]),

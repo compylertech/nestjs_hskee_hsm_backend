@@ -5,19 +5,19 @@ import { ClientProxyFactory } from '@nestjs/microservices';
 import { FORMS_CLIENT } from '../../../common/utils/constants';
 
 // services
-import { AnswerService } from './answers.service';
+import { QuestionnaireService } from './questionnaire.service';
 
 // controller
-import { AnswerController } from './answers.controller';
+import { QuestionnaireController } from './questionnaire.controller';
 
 // config
 import { ClientConfigModule, ClientConfigService } from '../../../../../common/config';
 
 @Module({
   imports: [ClientConfigModule],
-  controllers: [AnswerController],
+  controllers: [QuestionnaireController],
   providers: [
-    AnswerService,
+    QuestionnaireService,
     {
       provide: FORMS_CLIENT,
       useFactory(configService: ClientConfigService) {
@@ -28,4 +28,4 @@ import { ClientConfigModule, ClientConfigService } from '../../../../../common/c
     }
   ]
 })
-export class AnswersModule {}
+export class QuestionnaireModule {}

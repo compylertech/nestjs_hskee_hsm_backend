@@ -1,4 +1,4 @@
-export const ANSWERS_PATTERNS = {
+export const ANSWER_PATTERN = {
     FIND_ALL: 'answers.findAll',
     FIND_ONE: 'answers.findOne',
     CREATE: 'answers.create',

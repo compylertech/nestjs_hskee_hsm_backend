@@ -13,9 +13,10 @@ import { UserModule } from './users/users.module';
 import { FormsModule } from './forms/forms.module';
 import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
-import { BillingModule } from './billing/billing.module';
+// import { BillingModule } from './billing/billing.module';
 @Module({
-  imports: [AuthModule, AddressModule, UserModule, FormsModule, BookingModule, BillingModule,
+  imports: [AuthModule, AddressModule, UserModule, FormsModule, BookingModule,
+    // BillingModule,
     RouterModule.register([
       {
         path: 'forms',
@@ -25,10 +26,10 @@ import { BillingModule } from './billing/billing.module';
         path: 'booking',
         module: BookingModule,
       },
-      {
-        path: 'billing',
-        module: BillingModule,
-      },
+      // {
+      //   path: 'billing',
+      //   module: BillingModule,
+      // },
     ]),
   ],
   controllers: [AlevaApiGatewayController],

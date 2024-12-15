@@ -1,49 +1,80 @@
-import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { isUUID } from 'class-validator';
+import { InjectRepository } from '@nestjs/typeorm';
+import { plainToInstance } from 'class-transformer';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+
+// entity
+import { Question } from './entities/questions.entity';
 
 // contracts
 import { QuestionDto, CreateQuestionDto, UpdateQuestionDto } from '@app/contracts';
 
+// page-meta
+import { PageDto } from 'apps/common/dto/page.dto';
+import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
+import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+
 @Injectable()
 export class QuestionsService {
-  private forms: QuestionDto[] = [
-    {
-      id: 1,
-      title: 'Question 1',
-      author: 'Author 1',
-      rating: 3.9
-    },
-    {
-      id: 2,
-      title: 'Question 2',
-      author: 'Author 2',
-      rating: 4.7
+  constructor(@InjectRepository(Question) private questionsRepository: Repository<Question>) { }
+
+
+  async create(createQuestionDto: CreateQuestionDto): Promise<Question> {
+    const newQuestions = this.questionsRepository.create(createQuestionDto);
+
+    return this.questionsRepository.save(newQuestions);
+  }
+
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<QuestionDto>> {
+    const options = plainToInstance(PageOptionsDto, pageOptionsDto);
+    const queryBuilder = this.questionsRepository.createQueryBuilder('questions');
+    
+    queryBuilder
+      .orderBy('questions.created_at', pageOptionsDto.order)
+      .skip(options.skip)
+      .take(options.limit);
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    const transformedEntities = plainToInstance(QuestionDto, entities, { excludeExtraneousValues: false });
+
+    return new PageDto(transformedEntities, pageMetaDto);
+  }
+
+  async findOne(id: string): Promise<QuestionDto> {
+    const questions = await this.findEntityById(id);
+
+    return plainToInstance(QuestionDto, questions, { excludeExtraneousValues: false });
+  }
+
+  async update(id: string, updateQuestionDto: UpdateQuestionDto): Promise<QuestionDto> {
+    const questions = await this.findEntityById(id);
+
+    // merge the updates into the questions entity
+    const updateQuestions = this.questionsRepository.merge(questions, updateQuestionDto);
+    await this.questionsRepository.save(updateQuestions);
+
+    return plainToInstance(QuestionDto, updateQuestions, { excludeExtraneousValues: false });
+  }
+
+  async remove(id: string): Promise<void> {
+    const questions = await this.findEntityById(id);
+    await this.questionsRepository.remove(questions);
+  }
+
+  private async findEntityById(id: string): Promise<Question> {
+    if (!isUUID(id)) {
+      throw new BadRequestException(`Invalid UUID: ${id}`);
     }
-  ]
 
-  create(createQuestionDto: CreateQuestionDto) {
-    const newQuestion: QuestionDto = {
-      ...createQuestionDto,
-      id: this.forms.length + 1
+    const questions = await this.questionsRepository.findOne({ where: { question_id: id } });
+
+    if (!questions) {
+      throw new NotFoundException(`Questions with ID ${id} not found`);
     }
 
-    this.forms.push(newQuestion);
-
-    return newQuestion;
-  }
-
-  findAll() {
-    return this.forms;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} question`;
-  }
-
-  update(id: number, updateQuestionDto: UpdateQuestionDto) {
-    return `This action updates a #${id} question`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} question`;
+    return questions;
   }
 }

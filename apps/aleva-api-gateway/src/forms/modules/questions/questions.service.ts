@@ -1,5 +1,4 @@
-import { map } from 'rxjs';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 // constants
@@ -7,66 +6,57 @@ import { FORMS_CLIENT } from '../../../common/utils/constants';
 
 // contracts
 import {
-  QUESTIONS_PATTERNS,
+  QUESTION_PATTERN,
   QuestionDto as ClientQuestionDto,
   CreateQuestionDto as ClientCreateQuestionDto,
-  UpdateQuestionDto as ClientUpdateQuestionDto,
+  UpdateQuestionDto as ClientUpdateQuestionDto
 } from '@app/contracts';
 
 // dto
-import { QuestionDto } from './dto/question.dto';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+
 
 @Injectable()
 export class QuestionsService {
-  constructor(@Inject(FORMS_CLIENT) private questionsClient: ClientProxy) {}
+  constructor(@Inject(FORMS_CLIENT) private readonly questionsClient: ClientProxy) { }
 
-  private mapQuestionDto(questionDto: ClientQuestionDto): QuestionDto {
-    return {
-      id: questionDto.id,
-      title: questionDto.title,
-      author: questionDto.author,
-      rating: questionDto.rating,
-    };
+  async create(createQuestionDto: CreateQuestionDto): Promise<ClientQuestionDto> {
+    const createQuestionsContract: CreateQuestionDto = { ...createQuestionDto };
+
+    return this.questionsClient.send<ClientQuestionDto, ClientCreateQuestionDto>(
+      QUESTION_PATTERN.CREATE, createQuestionsContract
+    ).toPromise();
   }
 
-  create(createQuestionDto: CreateQuestionDto) {
-    return this.questionsClient
-      .send<ClientQuestionDto, ClientCreateQuestionDto>(
-        QUESTIONS_PATTERNS.CREATE,
-        createQuestionDto,
-      )
-      .pipe(map(this.mapQuestionDto));
-  }
-
-  findAll() {
+  async findAll(pageOptionsDto: PageOptionsDto): Promise<ClientQuestionDto[]> {
     return this.questionsClient.send<ClientQuestionDto[]>(
-      QUESTIONS_PATTERNS.FIND_ALL,
-      {},
-    );
+      QUESTION_PATTERN.FIND_ALL,
+      pageOptionsDto
+    ).toPromise();
   }
 
-  findOne(id: number) {
-    return this.questionsClient.send<ClientQuestionDto>(
-      QUESTIONS_PATTERNS.FIND_ONE,
-      { id },
-    );
-  }
-
-  update(id: number, updateQuestionDto: UpdateQuestionDto) {
+  async findOne(questionsId: string): Promise<ClientQuestionDto> {
     return this.questionsClient
-      .send<ClientQuestionDto, ClientUpdateQuestionDto>(
-        QUESTIONS_PATTERNS.UPDATE,
-        { id, ...updateQuestionDto },
-      )
-      .pipe(map(this.mapQuestionDto));
+      .send<ClientQuestionDto>(QUESTION_PATTERN.FIND_ONE, questionsId)
+      .toPromise();
   }
 
-  remove(id: number) {
+  async update(questionsId: string, updateQuestionDto: UpdateQuestionDto): Promise<ClientQuestionDto> {
+    const updateQuestionsContract: UpdateQuestionDto = { ...updateQuestionDto };
+
+    return this.questionsClient.send<ClientQuestionDto, ClientUpdateQuestionDto>(
+      QUESTION_PATTERN.UPDATE,
+      { question_id: questionsId, ...updateQuestionsContract }
+    ).toPromise();
+  }
+
+  async remove(questionsId: string): Promise<void> {
     return this.questionsClient.send<ClientQuestionDto>(
-      QUESTIONS_PATTERNS.REMOVE,
-      { id },
-    );
+      QUESTION_PATTERN.DELETE,
+      questionsId
+    ).toPromise();
   }
 }
+
