@@ -1,3 +1,6 @@
+import { CreateAttendanceLogDto } from "../auth/attendance-log/create-attendance-log.dto";
+
+
 export class UserDto {
   user_id: string;
   first_name: string;
@@ -31,4 +34,6 @@ export class UserDto {
   emergency_contact_number?: string;
   created_at?: string;
   updated_at?: string;
+
+  attendance_logs?: CreateAttendanceLogDto[];
 }

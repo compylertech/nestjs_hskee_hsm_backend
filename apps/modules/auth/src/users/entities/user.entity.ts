@@ -8,6 +8,7 @@ import {
     ManyToMany,
     JoinTable,
   } from 'typeorm';
+import { AttendanceLog } from '../../attendance_log/entities/attendance-log.entity';
 //   import { Address } from './address.entity';
 //   import { Role } from './role.entity';
 //   import { Media } from './media.entity';
@@ -109,8 +110,8 @@ import {
     // @OneToMany(() => Account, (account) => account.user, { cascade: true })
     // accounts: Account[];
   
-    // @OneToMany(() => AttendanceLog, (attendanceLog) => attendanceLog.user, { cascade: true })
-    // attendance_logs: AttendanceLog[];
+    @OneToMany(() => AttendanceLog, (attendanceLog) => attendanceLog.user, { cascade: true })
+    attendance_logs: AttendanceLog[];
   
     // @OneToMany(() => Questionnaire, (questionnaire) => questionnaire.user, { cascade: true })
     // questionnaires: Questionnaire[];

@@ -1,11 +1,16 @@
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
-import { IsDate, IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsString, IsDate, IsOptional } from 'class-validator';
 
 // dtos
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
+import { AttendanceLogDto } from '@app/contracts';
 
-export class CreateUserDto {
+export class UserDto {
+  @ApiProperty({ description: 'User ID', example: '5c3e3e10-0467-4466-86db-412987e75b0e' })
+  @IsString()
+  user_id: string;
+
   @ApiProperty({ description: 'First name of the user', example: 'John' })
   @IsString()
   first_name: string;
@@ -19,40 +24,42 @@ export class CreateUserDto {
   gender: string;
 
   @ApiProperty({ description: 'Date of birth', example: '2024-11-26' })
-  @IsDate()
-  // @Transform(({ value }) => new Date(value)) 
   @Type(() => Date)
+  @IsDate()
   date_of_birth: Date;
 
   @ApiProperty({ description: 'Email address of the user', example: 'johndoe@compyler.io' })
-  @IsEmail()
+  @IsString()
   email: string;
 
   @ApiProperty({ description: 'Phone number of the user', example: '233123456789' })
   @IsString()
   phone_number: string;
-  
+
   @ApiProperty({ description: 'Identification number of the user', example: 'GHA-123456789-0' })
   @IsString()
   identification_number: string;
 
-  @ApiProperty({ description: 'URL of the user photo', example: '', nullable: true })
-  @IsOptional()
+  @ApiProperty({ description: 'URL of the user photo', example: 'https://example.com/photo.jpg', nullable: true })
   @IsString()
+  @IsOptional()
   photo_url?: string;
 
-  @ApiProperty({ description: 'User password', example: '$trongP@ssword' })
-  @IsOptional()
-  @IsString()
-  password?: string;
-
   @ApiProperty({ description: 'User authentication information', type: UserAuthInfoDto })
-  @IsOptional()
   @Type(() => UserAuthInfoDto)
   user_auth_info?: UserAuthInfoDto;
 
   @ApiProperty({ description: 'User emergency contact information', type: UserEmergencyInfoDto })
-  @IsOptional()
   @Type(() => UserEmergencyInfoDto)
   user_emergency_info?: UserEmergencyInfoDto;
+  
+  @ApiProperty({ 
+    description: 'User attendance log information', 
+    type: [AttendanceLogDto], 
+    example: [
+      { check_in_time: '', check_out_time: '', user_id: '' }
+    ]
+  })
+  @IsOptional()
+  attendance_logs?: AttendanceLogDto[];
 }

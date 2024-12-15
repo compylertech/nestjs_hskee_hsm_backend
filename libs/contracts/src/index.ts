@@ -15,6 +15,12 @@ export * from '@app/contracts/forms/answers/answers.patterns'
 export * from '@app/contracts/forms/answers/create-answer.dto'
 export * from '@app/contracts/forms/answers/update-answer.dto'
 
+export * from '@app/contracts/auth/attendance-log/attendance-log.dto'
+export * from '@app/contracts/auth/attendance-log/attendance-log.enum'
+export * from '@app/contracts/auth/attendance-log/create-attendance-log.dto'
+export * from '@app/contracts/auth/attendance-log/update-attendance-log.dto'
+export * from '@app/contracts/auth/attendance-log/attendance-log.patterns'
+
 export * from '@app/contracts/users/user.dto'
 export * from '@app/contracts/users/users.patterns'
 export * from '@app/contracts/users/create-user.dto'
