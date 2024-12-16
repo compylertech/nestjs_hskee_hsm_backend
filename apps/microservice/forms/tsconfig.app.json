@@ -2,7 +2,7 @@
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "declaration": false,
-    "outDir": "../../../dist/apps/modules/forms"
+    "outDir": "../../../dist/apps/microservice/forms"
   },
   "include": ["src/**/*", "../auth/src/**/entities/*.ts"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
