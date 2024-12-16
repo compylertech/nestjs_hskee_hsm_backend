@@ -17,7 +17,7 @@ const ports = {
 const services = [
   { name: 'billing', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start billing --watch', port: ports.BILLING_CLIENT_PORT },
   { name: 'address', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start address --watch', port: ports.ADDRESS_CLIENT_PORT },
-  { name: 'auth', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start auth --watch', port: ports.AUTH_CLIENT_PORT },
+  { name: 'auth', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start auth --watch', port: ports.RBAC_CLIENT_PORT },
   { name: 'forms', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start forms --watch', port: ports.FORMS_CLIENT_PORT },
 ];
 
