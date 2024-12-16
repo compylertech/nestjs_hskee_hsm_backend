@@ -55,7 +55,7 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# apps/microservice/forms/src/forms-app.module.ts
-# apps/microservice/billing/src/billing-app.module.ts
-# apps/microservice/auth/src/core.module.ts
-# apps/microservice/address/src/address-app.module.ts
+apps/microservice/forms/src/forms-app.module.ts
+apps/microservice/billing/src/billing-app.module.ts
+apps/microservice/auth/src/core.module.ts
+apps/microservice/address/src/address-app.module.ts
