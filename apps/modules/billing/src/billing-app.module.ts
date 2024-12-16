@@ -25,6 +25,9 @@ import { InvoiceModule } from './invoice/invoice.module';
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
+        ssl: {
+          rejectUnauthorized: false
+        },
       }),
       inject: [ConfigService],
     }),
