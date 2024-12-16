@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 import { RouterModule } from '@nestjs/core';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 // controllers
 import { AlevaApiGatewayController } from './aleva-api-gateway.controller';
@@ -14,10 +17,38 @@ import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
 import { UserModule } from './auth/modules/users/users.module';
 import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-log.module';
-// import { BillingModule } from './billing/billing.module';
+
 @Module({
   imports: [AuthModule, AddressModule, UserModule, FormsModule, AttendanceLogModule,
-    // BillingModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        transport: {
+          host: configService.get<string>('MAIL_HOST'),
+          port: configService.get<number>('MAIL_PORT'),
+          secure: configService.get<boolean>('MAIL_SECURE'),
+          auth: {
+            user: configService.get<string>('MAIL_USER'),
+            pass: configService.get<string>('MAIL_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: `"No Reply" <${configService.get<string>('MAIL_FROM')}>`,
+        },
+        template: {
+          dir: __dirname + '../../../../apps/templates',
+          adapter: new HandlebarsAdapter(), 
+          options: {
+            strict: false
+          },
+        },
+      }),
+    }),
     RouterModule.register([
       {
         path: 'forms',
@@ -26,14 +57,11 @@ import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-lo
       {
         path: 'booking',
         module: BookingModule,
-      },
-      // {
-      //   path: 'billing',
-      //   module: BillingModule,
-      // },
+      }
     ]),
   ],
   controllers: [AlevaApiGatewayController],
   providers: [AlevaApiGatewayService],
 })
+
 export class AlevaApiGatewayModule {}

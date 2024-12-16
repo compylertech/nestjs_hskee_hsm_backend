@@ -4,6 +4,6 @@
     "declaration": false,
     "outDir": "../../dist/apps/aleva-api-gateway"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../templates"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

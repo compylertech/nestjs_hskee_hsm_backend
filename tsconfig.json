@@ -25,10 +25,10 @@
         "libs/contracts/src/*"
       ],
       "@app/modules": [
-        "apps/modules"
+        "apps/microservice"
       ],
       "@app/modules/*": [
-        "apps/modules/*"
+        "apps/microservice/*"
       ]
     }
   }
