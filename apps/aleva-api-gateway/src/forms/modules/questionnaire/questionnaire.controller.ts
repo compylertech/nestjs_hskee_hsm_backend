@@ -27,7 +27,7 @@ export class QuestionnaireController {
   @ApiOperation({ summary: 'Fetch All Questionnaire' })
   @ApiResponse({ status: 200, description: 'Successfully fetched questionnaire.', type: QuestionnaireDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
-  async findAll(@Query() pageOptionsDto: PageOptionsDto, @Param('tag') tag?: string) {
+  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
     let query = await this.questionnaireService.findAll(pageOptionsDto);
     return query;
   }

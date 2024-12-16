@@ -4,6 +4,6 @@
     "declaration": false,
     "outDir": "../../../dist/apps/modules/forms"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../auth/src/**/entities/*.ts"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

@@ -21,7 +21,6 @@ export class CreateUserDto {
 
   @ApiProperty({ description: 'Date of birth', example: '2024-11-26' })
   @IsDate()
-  // @Transform(({ value }) => new Date(value)) 
   @Type(() => Date)
   date_of_birth: Date;
 
@@ -58,7 +57,6 @@ export class CreateUserDto {
   user_emergency_info?: UserEmergencyInfoDto;
 
   @ApiProperty({ description: 'User attendance log information', type: [CreateAttendanceLogDto] })
-  
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateAttendanceLogDto)

@@ -23,6 +23,12 @@
       ],
       "@app/contracts/*": [
         "libs/contracts/src/*"
+      ],
+      "@app/modules": [
+        "apps/modules"
+      ],
+      "@app/modules/*": [
+        "apps/modules/*"
       ]
     }
   }

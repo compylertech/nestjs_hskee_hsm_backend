@@ -5,6 +5,7 @@ import { IsArray, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from '
 // dto
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
 import { UpdateAttendanceLogDto } from '../../attendance_log/dto/update-attendance-log.dto';
+import { EntityQuestionnaireDto } from './entity-questionnaire.dto';
 
 export class UpdateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })
@@ -68,4 +69,45 @@ export class UpdateUserDto {
   @Type(() => UpdateAttendanceLogDto)
   @IsOptional()
   attendance_logs?: UpdateAttendanceLogDto[];
+
+  @ApiProperty({
+    description: 'List of answers associated with the user',
+    type: [EntityQuestionnaireDto],
+    example: [
+      {
+        mark_as_read: true,
+        entity_type: 'answers',
+        entity_id: '4416269b-739f-4843-ad9d-27b3299a4638',
+        questionnaires: [
+          {
+            title: 'Testing from the frontend',
+            description: 'description101',
+            questions: [
+              {
+                question_id: '4416269b-739f-4843-ad9d-27b3299a4638',
+                questionnaire_id: '29af4056-569b-410e-a1fe-7e330e9beb2f',
+                content: 'how old are you?',
+                question_type: 'short_text',
+                answers: [
+                  {
+                    answer_id: '61ddbca3-e0f6-4fcd-af48-e9b98ab42f83',
+                    questionnaire_id: '29af4056-569b-410e-a1fe-7e330e9beb2f',
+                    question_id: '4416269b-739f-4843-ad9d-27b3299a4638',
+                    answer_type: 'short_text',
+                    content: 'twenty',
+                    mark_as_read: false,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => EntityQuestionnaireDto)
+  @IsOptional()
+  answers?: EntityQuestionnaireDto[];
 }
