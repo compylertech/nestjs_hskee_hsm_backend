@@ -38,6 +38,7 @@ export class [Module]Controller {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async findOne(@Param('id') id: string) {
     let query = await this.[module]Service.findOne(id);
+    return query;
   }
 
   @Patch(':id')
