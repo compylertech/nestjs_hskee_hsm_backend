@@ -21,47 +21,47 @@
     },
     "auth": {
       "type": "application",
-      "root": "apps/modules/auth",
+      "root": "apps/microservice/auth",
       "entryFile": "main",
-      "sourceRoot": "apps/modules/auth/src",
+      "sourceRoot": "apps/microservice/auth/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/modules/auth/tsconfig.app.json"
+        "tsConfigPath": "apps/microservice/auth/tsconfig.app.json"
       }
     },
     "address": {
       "type": "application",
-      "root": "apps/modules/address",
+      "root": "apps/microservice/address",
       "entryFile": "main",
-      "sourceRoot": "apps/modules/address/src",
+      "sourceRoot": "apps/microservice/address/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/modules/address/tsconfig.app.json"
+        "tsConfigPath": "apps/microservice/address/tsconfig.app.json"
       }
     },
     "forms": {
       "type": "application",
-      "root": "apps/modules/forms",
+      "root": "apps/microservice/forms",
       "entryFile": "main",
-      "sourceRoot": "apps/modules/forms/src",
+      "sourceRoot": "apps/microservice/forms/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/modules/forms/tsconfig.app.json"
+        "tsConfigPath": "apps/microservice/forms/tsconfig.app.json"
       }
     },
     "booking": {
       "type": "application",
-      "root": "apps/modules/booking",
+      "root": "apps/microservice/booking",
       "entryFile": "main",
-      "sourceRoot": "apps/modules/booking/src",
+      "sourceRoot": "apps/microservice/booking/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/modules/booking/tsconfig.app.json"
+        "tsConfigPath": "apps/microservice/booking/tsconfig.app.json"
       }
     },
     "billing": {
       "type": "application",
-      "root": "apps/modules/billing",
+      "root": "apps/microservice/billing",
       "entryFile": "main",
-      "sourceRoot": "apps/modules/billing/src",
+      "sourceRoot": "apps/microservice/billing/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/modules/billing/tsconfig.app.json"
+        "tsConfigPath": "apps/microservice/billing/tsconfig.app.json"
       }
     },
     "contracts": {
