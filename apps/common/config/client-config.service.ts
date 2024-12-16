@@ -38,4 +38,8 @@ export class ClientConfigService {
     get bookingClientOptions() {
         return this.optionsProvider.createClientOptions(this.portsProvider.getBookingClientPort());
     }
+
+    get billingClientOptions() {
+        return this.optionsProvider.createClientOptions(this.portsProvider.getBillingClientPort());
+    }
 }

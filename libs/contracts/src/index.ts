@@ -25,3 +25,8 @@ export * from '@app/contracts/calendar-event/calendar-event.dto'
 export * from '@app/contracts/calendar-event/create-calendar-event.dto'
 export * from '@app/contracts/calendar-event/update-calendar-event.dto'
 export * from '@app/contracts/calendar-event/calendar-event.pattern'
+
+export * from '@app/contracts/invoice/invoice.dto'
+export * from '@app/contracts/invoice/create-invoice.dto'
+export * from '@app/contracts/invoice/update-invoice.dto'
+export * from '@app/contracts/invoice/invoice.patterns'

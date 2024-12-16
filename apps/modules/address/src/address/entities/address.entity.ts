@@ -1,10 +1,10 @@
 import {
-    Column,
-    CreateDateColumn,
-    Entity,
     Index,
-    PrimaryGeneratedColumn,
+    Column,
+    Entity,
+    CreateDateColumn,
     UpdateDateColumn,
+    PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity('address')
