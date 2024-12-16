@@ -27,9 +27,9 @@ import { AttendanceLogModule } from './attendance_log/attendance-log.module';
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        // ssl: {
-        //   rejectUnauthorized: true
-        // },
+        ssl: {
+          rejectUnauthorized: true
+        },
       }),
       inject: [ConfigService],
     }),
