@@ -25,9 +25,9 @@ import { AddressModule } from './address/address.module';
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        // ssl: {
-        //   rejectUnauthorized: true
-        // },
+        ssl: {
+          rejectUnauthorized: true
+        },
       }),
       inject: [ConfigService],
     }),
