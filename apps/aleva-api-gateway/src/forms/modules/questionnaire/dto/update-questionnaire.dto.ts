@@ -13,13 +13,19 @@ export class UpdateQuestionnaireDto {
 
   @ApiProperty({ description: 'Title of the questionnaire', example: 'Cleaning' })
   @IsString()
+  @IsOptional()
   @IsNotEmpty()
-  title: string;
+  title?: string;
 
   @ApiProperty({ description: 'Description of the questionnaire', example: 'Dope' })
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty({ description: 'Tag added to the questionnaire', example: 'onboarding' })
+  @IsString()
+  @IsOptional()
+  tag?: string;
 
   @ApiProperty({
     description: 'List of questions to update in the questionnaire',

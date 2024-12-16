@@ -1,6 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateAttendanceLogDto } from './create-attendance-log.dto';
-
-export class UpdateAttendanceLogDto extends PartialType(CreateAttendanceLogDto) {
-  answer_id?: string;
+export class UpdateAttendanceLogDto {
+  attendance_log_id?: string;
+  check_in_time?: Date;
+  check_out_time?: Date;
+  user_id?: string;
 }

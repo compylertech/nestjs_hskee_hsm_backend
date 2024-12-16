@@ -31,6 +31,7 @@ export class QuestionsService {
     const queryBuilder = this.questionsRepository.createQueryBuilder('questions');
     
     queryBuilder
+      .leftJoinAndSelect('questions.answers', 'answers')
       .orderBy('questions.created_at', pageOptionsDto.order)
       .skip(options.skip)
       .take(options.limit);

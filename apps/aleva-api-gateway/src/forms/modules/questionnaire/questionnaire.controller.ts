@@ -27,7 +27,7 @@ export class QuestionnaireController {
   @ApiOperation({ summary: 'Fetch All Questionnaire' })
   @ApiResponse({ status: 200, description: 'Successfully fetched questionnaire.', type: QuestionnaireDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
-  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+  async findAll(@Query() pageOptionsDto: PageOptionsDto, @Param('tag') tag?: string) {
     let query = await this.questionnaireService.findAll(pageOptionsDto);
     return query;
   }
@@ -38,6 +38,7 @@ export class QuestionnaireController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async findOne(@Param('id') id: string) {
     let query = await this.questionnaireService.findOne(id);
+    return query;
   }
 
   @Patch(':id')

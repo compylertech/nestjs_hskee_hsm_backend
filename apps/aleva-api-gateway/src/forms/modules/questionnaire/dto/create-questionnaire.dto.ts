@@ -16,6 +16,11 @@ export class CreateQuestionnaireDto {
   @IsOptional()
   description?: string;
 
+  @ApiProperty({ description: 'Tag added to the questionnaire', example: 'onboarding' })
+  @IsString()
+  @IsOptional()
+  tag?: string;
+
   @ApiProperty({
     description: 'List of questions associated with the questionnaire',
     type: [CreateQuestionDto],

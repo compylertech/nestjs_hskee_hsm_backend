@@ -45,5 +45,11 @@ import {
   
     @Column({ type: 'boolean', default: false, nullable: true })
     mark_as_read: boolean;
+    
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    created_at: Date;
+  
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updated_at: Date;
   }
   

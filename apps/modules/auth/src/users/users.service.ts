@@ -30,6 +30,8 @@ export class UsersService {
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
     queryBuilder
+      .leftJoinAndSelect('user.attendance_logs', 'attendance_logs')
+      .addSelect('attendance_logs.user_id')
       .orderBy('user.created_at', pageOptionsDto.order)
       .skip(options.skip)
       .take(options.limit);

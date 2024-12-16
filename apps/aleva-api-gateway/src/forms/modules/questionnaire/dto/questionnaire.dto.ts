@@ -13,6 +13,9 @@ export class QuestionnaireDto {
   @ApiProperty({ description: 'Description of the questionnaire', example: 'Dope' })
   description: string;
 
+  @ApiProperty({ description: 'Tag added to the questionnaire', example: 'onboarding' })
+  tag: string;
+
   @ApiProperty({
     description: 'List of questions in the questionnaire',
     type: [QuestionDto],

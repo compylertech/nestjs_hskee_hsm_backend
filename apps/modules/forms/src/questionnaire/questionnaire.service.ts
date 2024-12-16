@@ -31,6 +31,8 @@ export class QuestionnaireService {
     const queryBuilder = this.questionnaireRepository.createQueryBuilder('questionnaire');
 
     queryBuilder
+      .leftJoinAndSelect('questionnaire.questions', 'questions')
+      .leftJoinAndSelect('questions.answers', 'answers')
       .orderBy('questionnaire.created_at', pageOptionsDto.order)
       .skip(options.skip)
       .take(options.limit);
@@ -43,14 +45,25 @@ export class QuestionnaireService {
     return new PageDto(transformedEntities, pageMetaDto);
   }
 
-  async findOne(id: string): Promise<QuestionnaireDto> {
-    const questionnaire = await this.findEntityById(id);
+  async findOne(id: string): Promise<QuestionnaireDto[]> {
+    const queryBuilder = this.questionnaireRepository.createQueryBuilder('questionnaire');
 
-    return plainToInstance(QuestionnaireDto, questionnaire, { excludeExtraneousValues: false });
+    queryBuilder
+      .leftJoinAndSelect('questionnaire.questions', 'questions')
+      .leftJoinAndSelect('questions.answers', 'answers')
+      .where({questionnaire_id: id});
+
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    return plainToInstance(QuestionnaireDto, entities, { excludeExtraneousValues: false });
   }
 
   async update(id: string, updateQuestionnaireDto: UpdateQuestionnaireDto): Promise<QuestionnaireDto> {
-    const questionnaire = await this.findEntityById(id);
+    // const questionnaire = await this.findEntityById(id);
+    const questionnaire = await this.questionnaireRepository.findOne({
+      where: { questionnaire_id: id },
+      relations: ['questions', 'questions.answers'],
+    });
 
     // merge the updates into the questionnaire entity
     const updateQuestionnaire = this.questionnaireRepository.merge(questionnaire, updateQuestionnaireDto);

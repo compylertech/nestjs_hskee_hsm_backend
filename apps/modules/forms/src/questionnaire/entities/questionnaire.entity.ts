@@ -18,6 +18,9 @@ export class Questionnaire {
   @Column({ type: 'boolean', default: false })
   publish_for_registration: boolean;
 
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  tag: string;
+
   @Column({ type: 'boolean', default: false })
   published: boolean;
 

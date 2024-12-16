@@ -1,4 +1,4 @@
-import { CreateAttendanceLogDto } from "../auth/attendance-log/create-attendance-log.dto";
+import { AttendanceLogDto } from "@app/contracts";
 
 
 export class UserDto {
@@ -35,5 +35,5 @@ export class UserDto {
   created_at?: string;
   updated_at?: string;
 
-  attendance_logs?: CreateAttendanceLogDto[];
+  attendance_logs?: AttendanceLogDto[];
 }

@@ -9,13 +9,14 @@ import { AlevaApiGatewayService } from './aleva-api-gateway.service';
 
 // modules
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './auth/modules/users/users.module';
 import { FormsModule } from './forms/forms.module';
 import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
+import { UserModule } from './auth/modules/users/users.module';
+import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-log.module';
 // import { BillingModule } from './billing/billing.module';
 @Module({
-  imports: [AuthModule, AddressModule, UserModule, FormsModule, BookingModule,
+  imports: [AuthModule, AddressModule, UserModule, FormsModule, AttendanceLogModule,
     // BillingModule,
     RouterModule.register([
       {

@@ -1,3 +1,5 @@
+import { CreateAttendanceLogDto, UpdateAttendanceLogDto } from "@app/contracts";
+
 export class CreateUserDto {
   first_name: string;
   last_name: string;
@@ -28,4 +30,6 @@ export class CreateUserDto {
   emergency_contact_email?: string;
   emergency_contact_relation?: string;
   emergency_contact_number?: string;
+
+  attendance_logs?: CreateAttendanceLogDto[];
 }

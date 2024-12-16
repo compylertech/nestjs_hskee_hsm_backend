@@ -26,7 +26,8 @@ export class UpdateQuestionDto {
   })
   @IsEnum(QuestionType)
   @IsNotEmpty()
-  question_type: QuestionType;
+  @IsOptional()
+  question_type?: QuestionType;
 
   @ApiProperty({ description: 'ID of the associated questionnaire', example: 'd1b9d7c2-8e34-42b3-9bfe-123456789abc' })
   @IsString()

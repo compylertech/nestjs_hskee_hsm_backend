@@ -110,7 +110,7 @@ import { AttendanceLog } from '../../attendance_log/entities/attendance-log.enti
     // @OneToMany(() => Account, (account) => account.user, { cascade: true })
     // accounts: Account[];
   
-    @OneToMany(() => AttendanceLog, (attendanceLog) => attendanceLog.user, { cascade: true })
+    @OneToMany(() => AttendanceLog, (attendanceLog) => attendanceLog.user, { cascade: true, eager: true })
     attendance_logs: AttendanceLog[];
   
     // @OneToMany(() => Questionnaire, (questionnaire) => questionnaire.user, { cascade: true })

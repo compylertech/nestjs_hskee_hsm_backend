@@ -8,6 +8,7 @@ import { ClientConfigModule } from 'apps/common/config';
 // modules
 import { AuthModule } from './core/auth.module';
 import { UsersModule } from './users/users.module';
+import { AttendanceLogModule } from './attendance_log/attendance-log.module';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { UsersModule } from './users/users.module';
       }),
       inject: [ConfigService],
     }),
-    UsersModule, AuthModule, ClientConfigModule
+    UsersModule, AttendanceLogModule, AuthModule, ClientConfigModule
   ],
   controllers: [],
   providers: [],

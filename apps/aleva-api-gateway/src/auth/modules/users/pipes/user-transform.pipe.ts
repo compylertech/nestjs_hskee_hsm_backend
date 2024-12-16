@@ -102,7 +102,12 @@ export function transformGatewayUserDto(dto: GatewayCreateUserDto | GatewayUpdat
 
         // add password if it exists
         ...(dto.password ? { password: dto.password } : {}),
+
+        // take care of dates
         ...(dto.date_of_birth ? { date_of_birth: format(new Date(dto?.date_of_birth), 'yyyy-MM-dd') } : {}),
+
+        // attendance logs
+        attendance_logs: dto.attendance_logs,
     };
 }
 

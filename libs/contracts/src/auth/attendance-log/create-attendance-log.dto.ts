@@ -1,6 +1,5 @@
-import { AttendanceLogType } from "@app/contracts";
-
 export class CreateAttendanceLogDto {
-  answer_type: AttendanceLogType;
-  content: string;
+  check_in_time: Date;
+  check_out_time?: Date;
+  user_id?: string;
 }

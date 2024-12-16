@@ -3,6 +3,7 @@ import { QuestionDto } from "@app/contracts";
 export class QuestionnaireDto {
   questionnaire_id: string;
   title: string;
+  tag: string;
   description: string;
   questions: QuestionDto[];
   publish_for_registration: boolean;

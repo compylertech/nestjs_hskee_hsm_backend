@@ -1,5 +1,6 @@
 export class AttendanceLogDto {
-  check_in_time: string;
-  check_out_time: string;
+  attendance_log_id: string
+  check_in_time: Date;
+  check_out_time?: Date;
   user_id: string;
 }

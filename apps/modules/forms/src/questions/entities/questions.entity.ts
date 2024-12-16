@@ -24,7 +24,7 @@ export class Question {
   @Column({ type: 'uuid', nullable: false })
   questionnaire_id: string;
 
-  @OneToMany(() => Answer, (answer) => answer.question, { cascade: true })
+  @OneToMany(() => Answer, (answer) => answer.question, { cascade: true, eager: true })
   answers: Answer[];
 
   @ManyToOne(() => Questionnaire, (questionnaire) => questionnaire.questions, {
