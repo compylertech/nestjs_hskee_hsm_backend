@@ -1,9 +1,10 @@
 import { RpcException } from '@nestjs/microservices';
 import { Catch, ArgumentsHost, RpcExceptionFilter } from '@nestjs/common';
+import { Observable, of } from 'rxjs';
 
 @Catch(RpcException)
 export class GlobalRpcExceptionFilter implements RpcExceptionFilter<RpcException> {
-    catch(exception: RpcException, host: ArgumentsHost) {
+    catch(exception: RpcException, host: ArgumentsHost): Observable<any> {
         const context = host.switchToRpc();
         const data = exception.getError();
 
@@ -12,14 +13,16 @@ export class GlobalRpcExceptionFilter implements RpcExceptionFilter<RpcException
             typeof data === 'string'
                 ? data
                 : typeof data === 'object' && 'message' in data
-                ? data.message
-                : 'Internal Server Error';
+                    ? data.message
+                    : 'Internal Server Error';
 
-        return {
-            status,
+        const response = {
+            status: status,
             success: false,
-            error: message,
+            error: message || exception.message,
             data: {},
-        }
+        };
+
+        return of(response);
     }
 }
