@@ -56,8 +56,8 @@ export class UsersService {
     ).toPromise();
   }
 
-  remove(id: string) {
-    return this.rbacClient.send<ClientUserDto>(
+  remove(id: string): Promise<void> {
+    return this.rbacClient.send<void>(
       USERS_PATTERNS.REMOVE,
       id
     ).toPromise();;

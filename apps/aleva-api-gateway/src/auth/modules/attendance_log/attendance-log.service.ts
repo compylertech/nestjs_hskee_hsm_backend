@@ -53,7 +53,7 @@ export class AttendanceLogService {
   }
 
   async remove(attendanceLogId: string): Promise<void> {
-    return this.attendanceLogClient.send<ClientAttendanceLogDto>(
+    return this.attendanceLogClient.send<void>(
       ATTENDANCE_LOG_PATTERN.REMOVE,
       attendanceLogId
     ).toPromise();

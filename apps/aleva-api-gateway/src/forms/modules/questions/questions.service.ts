@@ -53,7 +53,7 @@ export class QuestionsService {
   }
 
   async remove(questionsId: string): Promise<void> {
-    return this.questionsClient.send<ClientQuestionDto>(
+    return this.questionsClient.send<void>(
       QUESTION_PATTERN.DELETE,
       questionsId
     ).toPromise();

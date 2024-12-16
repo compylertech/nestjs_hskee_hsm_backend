@@ -53,7 +53,7 @@ export class AnswerService {
   }
 
   async remove(answerId: string): Promise<void> {
-    return this.answerClient.send<ClientAnswerDto>(
+    return this.answerClient.send<void>(
       ANSWER_PATTERN.REMOVE,
       answerId
     ).toPromise();
