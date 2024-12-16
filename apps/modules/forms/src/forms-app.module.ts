@@ -27,7 +27,7 @@ import { QuestionnaireModule } from './questionnaire/questionnaire.module';
         autoLoadEntities: true,
         synchronize: true,
         ssl: {
-          rejectUnauthorized: false
+          rejectUnauthorized: true
         },
       }),
       inject: [ConfigService],

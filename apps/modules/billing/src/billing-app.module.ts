@@ -26,7 +26,7 @@ import { InvoiceModule } from './invoice/invoice.module';
         autoLoadEntities: true,
         synchronize: true,
         ssl: {
-          rejectUnauthorized: false
+          rejectUnauthorized: true
         },
       }),
       inject: [ConfigService],

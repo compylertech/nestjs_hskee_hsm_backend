@@ -28,7 +28,7 @@ import { AttendanceLogModule } from './attendance_log/attendance-log.module';
         autoLoadEntities: true,
         synchronize: true,
         ssl: {
-          rejectUnauthorized: false
+          rejectUnauthorized: true
         },
       }),
       inject: [ConfigService],
