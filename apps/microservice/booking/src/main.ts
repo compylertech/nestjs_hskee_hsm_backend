@@ -3,6 +3,8 @@ import { MicroserviceOptions } from '@nestjs/microservices';
 
 // modules
 import { BookingAppModule } from './booking-app.module';
+
+// services
 import { ClientConfigService } from 'apps/common/config/client-config.service';
 
 async function bootstrap() {
