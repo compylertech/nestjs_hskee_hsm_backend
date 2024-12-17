@@ -33,7 +33,7 @@ import { EntityQuestionnaire } from '../../forms/src/questionnaire/entities/enti
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        entities: [EntityQuestionnaire, Questionnaire, Question, Answer]
+        entities: [EntityQuestionnaire, Questionnaire, Question, Answer],
         ssl: {
           rejectUnauthorized: true
         },

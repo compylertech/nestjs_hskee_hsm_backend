@@ -31,7 +31,7 @@ import { AttendanceLog } from '../../auth/src/attendance_log/entities/attendance
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        entities: [User, AttendanceLog]
+        entities: [User, AttendanceLog],
         ssl: {
           rejectUnauthorized: true
         },
