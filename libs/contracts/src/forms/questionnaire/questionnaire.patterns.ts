@@ -6,4 +6,5 @@ export const QUESTIONNAIRE_PATTERN = {
   DELETE: 'questionnaire.delete',
   CREATE_ENTITY: 'entityQuestionnaire.create',
   UPDATE_ENTITY: 'entityQuestionnaire.update',
+  GET_ENTITY_RESPONSES: 'entityQuestionnaire.responses',
 };

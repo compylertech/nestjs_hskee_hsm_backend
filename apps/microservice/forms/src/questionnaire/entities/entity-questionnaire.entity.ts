@@ -6,7 +6,6 @@ import {
   JoinColumn,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-// import { Answer, Question, Questionnaire  } from '@app/modules'
 import { Questionnaire } from './questionnaire.entity';
 import { Answer } from '../../answers/entities/answer.entity';
 import { Question } from '../../questions/entities/questions.entity';

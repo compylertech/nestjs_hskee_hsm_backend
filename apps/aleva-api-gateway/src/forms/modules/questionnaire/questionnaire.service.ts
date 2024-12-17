@@ -46,6 +46,13 @@ export class QuestionnaireService {
     ).toPromise();
   }
 
+  async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto): Promise<any[]> {
+    return this.questionnaireClient.send<any[]>(
+      QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES,
+      pageOptionsDto
+    ).toPromise();
+  }
+
   async findOne(questionnaireId: string): Promise<ClientQuestionnaireDto> {
     return this.questionnaireClient
       .send<ClientQuestionnaireDto>(QUESTIONNAIRE_PATTERN.FIND_ONE, questionnaireId)

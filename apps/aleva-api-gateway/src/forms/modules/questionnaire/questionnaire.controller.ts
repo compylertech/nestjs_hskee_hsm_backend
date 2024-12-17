@@ -32,6 +32,14 @@ export class QuestionnaireController {
     return query;
   }
 
+  @Get("responses")
+  @ApiOperation({ summary: 'Get Grouped Questionnaire Responses' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched grouped questionnaire responses.' })
+  @ApiResponse({ status: 422, description: 'Validation Error' })
+  async fetchResponses(@Query() pageOptionsDto: PageOptionsDto) {
+    return await this.questionnaireService.fetchGroupedQuestionnaireData(pageOptionsDto);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Fetch Single Questionnaire' })
   @ApiResponse({ status: 200, description: 'Successfully fetched questionnaire.', type: QuestionnaireDto })
@@ -56,13 +64,6 @@ export class QuestionnaireController {
   async remove(@Param('id') questionnaireId: string) {
     await this.questionnaireService.remove(questionnaireId);
   }
-
-  @Get('/responses/')
-  @ApiOperation({ summary: 'Get Questionnaire Responses' })
-  @ApiResponse({ status: 200, description: 'Successfully fetched questionnaire responses.', type: QuestionnaireDto })
-  @ApiResponse({ status: 422, description: 'Validation Error' })
-  async fetchResponses(@Query() pageOptionsDto: PageOptionsDto) {
-    return {}
-  }
+  
 
 }

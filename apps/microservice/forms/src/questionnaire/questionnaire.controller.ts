@@ -36,6 +36,18 @@ export class QuestionnaireController {
     }
   }
 
+  @MessagePattern(QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES)
+  async fetchGroupedQuestionnaireData(@Payload() pageOptionsDto: PageOptionsDto) {
+    try {
+      return await this.questionnaireService.fetchGroupedQuestionnaireData(pageOptionsDto);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || 'Error fetching questionnaire responses!',
+      });
+    }
+  }
+
   @MessagePattern(QUESTIONNAIRE_PATTERN.FIND_ONE)
   async findOne(@Payload() id: string) {
     try {
