@@ -34,9 +34,9 @@ import { EntityQuestionnaire } from '../../forms/src/questionnaire/entities/enti
         autoLoadEntities: true,
         synchronize: true,
         entities: [EntityQuestionnaire, Questionnaire, Question, Answer]
-        // ssl: {
-        //   rejectUnauthorized: true
-        // },
+        ssl: {
+          rejectUnauthorized: true
+        },
       }),
       inject: [ConfigService],
     }),

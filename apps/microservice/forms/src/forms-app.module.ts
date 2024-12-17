@@ -32,9 +32,9 @@ import { AttendanceLog } from '../../auth/src/attendance_log/entities/attendance
         autoLoadEntities: true,
         synchronize: true,
         entities: [User, AttendanceLog]
-        // ssl: {
-        //   rejectUnauthorized: true
-        // },
+        ssl: {
+          rejectUnauthorized: true
+        },
       }),
       inject: [ConfigService],
     }),
