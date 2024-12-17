@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { CorsOptions } from '@nestjs/common/interfaces/external/cors-options.interface';
 
 // module
 import { AlevaApiGatewayModule } from './aleva-api-gateway.module';
@@ -32,6 +33,15 @@ async function bootstrap() {
   app.useGlobalInterceptors(new GlobalResponseInterceptor());
   // app.useGlobalGuards(new PassportJwtAuthGuard(reflector));
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
+  // enable CORS
+  const corsOptions: CorsOptions = {
+    origin: ['*'],
+    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  };
+  app.enableCors(corsOptions);
 
   await app.listen(process.env.port ?? 3000);
 }
