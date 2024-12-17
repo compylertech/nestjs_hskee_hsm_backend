@@ -131,7 +131,90 @@ export class QuestionnaireService {
     return plainToInstance(EntityQuestionnaireDto, updatedEntity, { excludeExtraneousValues: false });
   }
 
-  async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto): Promise<PageDto<any>> {
+  async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto):  Promise<PageDto<any>> {
+    const queryBuilder = this.entityQuestionnaireRepository
+      .createQueryBuilder('entity_questionnaire')
+      .leftJoinAndSelect('entity_questionnaire.user', 'user')
+      .leftJoinAndSelect('entity_questionnaire.questionnaire', 'questionnaire')
+      .leftJoinAndSelect('entity_questionnaire.question', 'question')
+      .leftJoinAndSelect('entity_questionnaire.answer', 'answer')
+      .orderBy('questionnaire.created_at', 'DESC');
+  
+    const entityQuestionnaireRecords = await queryBuilder.getMany();
+  
+    // Transform data to the required format
+    const groupedData = {};
+  
+    for (const record of entityQuestionnaireRecords) {
+      const userId = record.user.user_id;
+      const questionnaireId = record.questionnaire.questionnaire_id;
+      const questionId = record.question.question_id;
+  
+      // Initialize user entry if not present
+      if (!groupedData[userId]) {
+        groupedData[userId] = {
+          user_id: userId,
+          questionnaires: {},
+        };
+      }
+  
+      // Initialize questionnaire under the user
+      if (!groupedData[userId].questionnaires[questionnaireId]) {
+        groupedData[userId].questionnaires[questionnaireId] = {
+          questionnaire_id: record.questionnaire.questionnaire_id,
+          title: record.questionnaire.title,
+          description: record.questionnaire.description,
+          publish_for_registration: record.questionnaire.publish_for_registration,
+          published: record.questionnaire.published,
+          created_at: record.questionnaire.created_at,
+          updated_at: record.questionnaire.updated_at,
+          number_of_responses: record.questionnaire.number_of_responses,
+          read: record.mark_as_read || false, // Comes from entity_questionnaire
+          tag: record.questionnaire.tag || null, // Assuming 'tag' is a column in questionnaire
+          questions: {},
+        };
+      }
+  
+      const questionnaire = groupedData[userId].questionnaires[questionnaireId];
+  
+      // Initialize question under the questionnaire
+      if (!questionnaire.questions[questionId]) {
+        questionnaire.questions[questionId] = {
+          question_id: questionId,
+          content: record.question.content,
+          question_type: record.question.question_type,
+          answers: [],
+        };
+      }
+  
+      // Add the answer to the respective question
+      questionnaire.questions[questionId].answers.push({
+        answer_id: record.answer.answer_id,
+        content: record.answer.content,
+        answer_type: record.answer.answer_type,
+        mark_as_read: record.mark_as_read,
+      });
+    }
+  
+    // Convert the grouped data into an array format
+    const result = Object.values(groupedData).map((userEntry: any) => ({
+      user_id: userEntry.user_id,
+      questionnaires: Object.values(userEntry.questionnaires).map(
+        (questionnaire: any) => ({
+          ...questionnaire,
+          questions: Object.values(questionnaire.questions),
+        }),
+      ),
+    }));
+  
+    const itemCount = await queryBuilder.getCount();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
+    return new PageDto(result, pageMetaDto);
+  }
+
+  
+  async fetchGroupedQuestionnaireDat2(pageOptionsDto: PageOptionsDto): Promise<PageDto<any>> {
 
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.entityQuestionnaireRepository.createQueryBuilder('entity_questionnaire');
