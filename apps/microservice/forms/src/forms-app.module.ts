@@ -9,6 +9,11 @@ import { ClientConfigModule } from 'apps/common/config';
 import { AnswersModule } from './answers/answers.module';
 import { QuestionsModule } from './questions/questions.module';
 import { QuestionnaireModule } from './questionnaire/questionnaire.module';
+
+// entities
+import { User } from '../../auth/src/users/entities/user.entity';
+import { AttendanceLog } from '../../auth/src/attendance_log/entities/attendance-log.entity';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -26,9 +31,10 @@ import { QuestionnaireModule } from './questionnaire/questionnaire.module';
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        ssl: {
-          rejectUnauthorized: true
-        },
+        entities: [User, AttendanceLog]
+        // ssl: {
+        //   rejectUnauthorized: true
+        // },
       }),
       inject: [ConfigService],
     }),

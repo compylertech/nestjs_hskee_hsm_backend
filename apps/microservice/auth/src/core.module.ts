@@ -10,6 +10,12 @@ import { AuthModule } from './core/auth.module';
 import { UsersModule } from './users/users.module';
 import { AttendanceLogModule } from './attendance_log/attendance-log.module';
 
+// entity
+import { Answer } from '../../forms/src/answers/entities/answer.entity';
+import { Question } from '../../forms/src/questions/entities/questions.entity';
+import { Questionnaire } from '../../forms/src/questionnaire/entities/questionnaire.entity';
+import { EntityQuestionnaire } from '../../forms/src/questionnaire/entities/entity-questionnaire.entity';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -27,9 +33,10 @@ import { AttendanceLogModule } from './attendance_log/attendance-log.module';
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        ssl: {
-          rejectUnauthorized: true
-        },
+        entities: [EntityQuestionnaire, Questionnaire, Question, Answer]
+        // ssl: {
+        //   rejectUnauthorized: true
+        // },
       }),
       inject: [ConfigService],
     }),
