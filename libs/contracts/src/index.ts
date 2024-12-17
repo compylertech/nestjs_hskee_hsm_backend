@@ -9,6 +9,10 @@ export * from '@app/contracts/forms/questionnaire/questionnaire.patterns'
 export * from '@app/contracts/forms/questionnaire/create-questionnaire.dto'
 export * from '@app/contracts/forms/questionnaire/update-questionnaire.dto'
 
+export * from '@app/contracts/forms/entity-questionnaire/entity-questionnaire.dto'
+export * from '@app/contracts/forms/entity-questionnaire/create-entity-questionnaire.dto'
+export * from '@app/contracts/forms/entity-questionnaire/update-entity-questionnaire.dto'
+
 export * from '@app/contracts/forms/answers/answer.dto'
 export * from '@app/contracts/forms/answers/answers.enum'
 export * from '@app/contracts/forms/answers/answers.patterns'

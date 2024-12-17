@@ -11,7 +11,7 @@ import { CreateAttendanceLogDto } from './dto/create-attendance-log.dto';
 import { UpdateAttendanceLogDto } from './dto/update-attendance-log.dto';
 
 @ApiBearerAuth()
-@Controller('attendanceLogs')
+@Controller('attendance-logs')
 export class AttendanceLogController {
   constructor(private readonly attendanceLogService: AttendanceLogService) { }
 

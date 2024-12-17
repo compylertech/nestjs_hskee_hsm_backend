@@ -10,7 +10,7 @@ import {
 import { Questionnaire } from './questionnaire.entity';
 import { Answer } from '../../answers/entities/answer.entity';
 import { Question } from '../../questions/entities/questions.entity';
-// import { User } from '../../../../auth/src/users/entities/user.entity';
+import { User } from '../../../../auth/src/users/entities/user.entity';
 
 export enum EntityTypeEnum {
   USER = 'user',
@@ -31,7 +31,16 @@ export class EntityQuestionnaire {
   entity_id: string;
 
   @Column({ type: 'enum', enum: EntityTypeEnum, nullable: false })
-  entity_type: EntityTypeEnum;
+  entity_type: string;
+
+  @Column({ name: 'questionnaire_id', nullable: false })
+  questionnaire_id: string;
+
+  @Column({ name: 'question_id', nullable: false })
+  question_id: string;
+
+  @Column({ name: 'answer_id', nullable: false })
+  answer_id: string;
 
   @ManyToOne(() => Questionnaire, (questionnaire) => questionnaire.entity_questionnaire, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'questionnaire_id' })
@@ -51,8 +60,9 @@ export class EntityQuestionnaire {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  // @ManyToOne(() => User, (user) => user.answers, { onDelete: 'CASCADE' })
-  // user: User;
+  @ManyToOne(() => User, (user) => user.answers, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'entity_id' })
+  user: User;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;

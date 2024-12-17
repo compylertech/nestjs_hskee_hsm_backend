@@ -17,6 +17,15 @@ import { CreateQuestionnaireDto } from './dto/create-questionnaire.dto';
 import { UpdateQuestionnaireDto } from './dto/update-questionnaire.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
+// entity
+import {
+  EntityQuestionnaireDto as EntityQuestionnaireDto,
+  CreateEntityQuestionnaireDto as ClientCreateEntityQuestionnaireDto,
+  UpdateEntityQuestionnaireDto as ClientUpdateEntityQuestionnaireDto,
+} from '@app/contracts';
+
+import { UpdateEntityQuestionnaireDto } from './dto/update-entity-questionnaire.dto';
+import { CreateEntityQuestionnaireDto } from './dto/create-entity-questionnaire.dto';
 
 @Injectable()
 export class QuestionnaireService {
@@ -58,5 +67,33 @@ export class QuestionnaireService {
       questionnaireId
     ).toPromise();
   }
+
+  async createEntityQuestionnaire(
+    createEntityQuestionnaireDto: CreateEntityQuestionnaireDto
+  ): Promise<EntityQuestionnaireDto> {
+    const createEntityQuestionnaireContract: ClientCreateEntityQuestionnaireDto = {
+      ...createEntityQuestionnaireDto,
+    };
+
+    return this.questionnaireClient.send<EntityQuestionnaireDto, ClientCreateEntityQuestionnaireDto>(
+      QUESTIONNAIRE_PATTERN.CREATE_ENTITY,
+      createEntityQuestionnaireContract
+    ).toPromise();
+  }
+
+  async updateEntityQuestionnaire(
+    entityQuestionnaireId: string,
+    updateEntityQuestionnaireDto: UpdateEntityQuestionnaireDto
+  ): Promise<EntityQuestionnaireDto> {
+    const updateEntityQuestionnaireContract: ClientUpdateEntityQuestionnaireDto = {
+      ...updateEntityQuestionnaireDto,
+    };
+
+    return this.questionnaireClient.send<EntityQuestionnaireDto, ClientUpdateEntityQuestionnaireDto>(
+      QUESTIONNAIRE_PATTERN.UPDATE_ENTITY,
+      { entity_questionnaire_id: entityQuestionnaireId, ...updateEntityQuestionnaireContract }
+    ).toPromise();
+  }
+
 }
 

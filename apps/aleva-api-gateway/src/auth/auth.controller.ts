@@ -5,7 +5,7 @@ import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { Public } from 'apps/common/decorators/public.decorator';
 
 // dto
-import { AuthSignInDto, MailActionDto, ResetPasswordDto, VerifyEmailDto } from './dto/auth.dto';
+import { AuthSignInDto, ChangePasswordDto, MailActionDto, ResetPasswordDto, VerifyEmailDto } from './dto/auth.dto';
 
 // services
 import { AuthService } from './auth.service';
@@ -28,6 +28,15 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Failed to reset password.' })
   resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     return this.authService.resetPassword(resetPasswordDto);
+  }
+
+
+  @Post('/change-password')
+  @ApiOperation({ summary: 'Change Password' })
+  @ApiResponse({ status: 200, description: 'Password changed successfully.' })
+  @ApiResponse({ status: 400, description: 'Failed to change password.' })
+  changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    return this.authService.changePassword(changePasswordDto);
   }
 
   @Get('/verify-email')

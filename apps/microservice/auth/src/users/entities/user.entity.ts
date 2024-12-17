@@ -92,8 +92,8 @@ export class User {
   @OneToMany(() => AttendanceLog, (attendanceLog) => attendanceLog.user, { cascade: true, eager: true })
   attendance_logs: AttendanceLog[];
 
-  // @OneToMany(() => EntityQuestionnaire, (entityQuestionnaire) => entityQuestionnaire.user, { cascade: true, eager: true })
-  // answers: EntityQuestionnaire[];
+  @OneToMany(() => EntityQuestionnaire, (entityQuestionnaire) => entityQuestionnaire.user, { cascade: true, eager: true })
+  answers: EntityQuestionnaire[];
 
   @CreateDateColumn()
   created_at: Date;

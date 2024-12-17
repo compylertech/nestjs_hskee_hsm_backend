@@ -11,6 +11,7 @@ import {
     ResetPasswordDto,
     VerifyEmailDto,
     MailActionDto,
+    ChangePasswordDto,
 } from '@app/contracts';
 
 @Controller('auth')
@@ -37,6 +38,18 @@ export class AuthController {
             throw new RpcException({
                 statusCode: 400,
                 message: error.message || 'Password reset failed',
+            });
+        }
+    }
+
+    @MessagePattern(AUTH_PATTERN.CHANGE_PASSWORD)
+    async changePassword(@Payload() input: ChangePasswordDto) {
+        try {
+            return await this.authService.changePassword(input);
+        } catch (error) {
+            throw new RpcException({
+                statusCode: 400,
+                message: error.message || 'Password change failed',
             });
         }
     }

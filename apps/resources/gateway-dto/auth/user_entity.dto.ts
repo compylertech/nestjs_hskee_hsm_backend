@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AddressDto } from './address.dto';
+import { AddressDto } from '../address/address.dto';
 import { RoleDto } from './role.dto';
-import { MediaDto } from './media.dto';
+import { MediaDto } from '../resources/media.dto';
 import { AttendanceLogDto } from './attendance-log.dto';
-import { AccountDto } from './account.dto';
-import { QuestionnaireDto } from './questionnaire.dto';
+import { AccountDto } from '../billing/account.dto';
+import { QuestionnaireDto } from '../forms/questionnaire.dto';
 
 export class UserDto {
   @ApiProperty({ description: 'User ID', example: '5c3e3e10-0467-4466-86db-412987e75b0e' })

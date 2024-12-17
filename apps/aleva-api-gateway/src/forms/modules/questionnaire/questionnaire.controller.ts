@@ -57,4 +57,12 @@ export class QuestionnaireController {
     await this.questionnaireService.remove(questionnaireId);
   }
 
+  @Get('/responses/')
+  @ApiOperation({ summary: 'Get Questionnaire Responses' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched questionnaire responses.', type: QuestionnaireDto })
+  @ApiResponse({ status: 422, description: 'Validation Error' })
+  async fetchResponses(@Query() pageOptionsDto: PageOptionsDto) {
+    return {}
+  }
+
 }

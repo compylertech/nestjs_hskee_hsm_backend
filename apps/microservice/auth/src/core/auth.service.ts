@@ -12,7 +12,8 @@ import {
     AuthResultDto,
     ResetPasswordDto,
     VerifyEmailDto,
-    MailActionDto
+    MailActionDto,
+    ChangePasswordDto
 } from '@app/contracts';
 
 @Injectable()
@@ -56,8 +57,22 @@ export class AuthService {
         return { accessToken, email: user.email, userId: user.userId }
     }
 
-    async resetPassword(input: ResetPasswordDto): Promise<{ message: string }> {
+    async resetPassword(input: ResetPasswordDto): Promise<{ message: string } | any> {
+        try {
+
+            await this.usersService.setResetToken(input.email);
+
+        } catch (error) {
+            throw new BadRequestException(`Error resetting password: ${error.message}`);
+        }
+
+
+        return { message: 'Password reset successfully' };
+    }
+
+    async changePassword(input: ChangePasswordDto): Promise<{ message: string }> {
         const user = await this.usersService.findUserByEmail(input.email);
+
         if (!user) {
             throw new UnauthorizedException('User not found');
         }
@@ -66,12 +81,14 @@ export class AuthService {
             input.email,
             input.token,
         );
+
         if (!isValidToken) {
             throw new UnauthorizedException('Invalid reset token');
         }
 
         await this.usersService.updatePassword(user.user_id, input.newPassword);
-        return { message: 'Password reset successfully' };
+        
+        return { message: 'Password changed successfully' };
     }
 
     // Handles email verification

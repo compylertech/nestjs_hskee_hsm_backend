@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 // constants
-import { RBAC_CLIENT } from '../../../common/utils/constants';
+import { FORMS_CLIENT, RBAC_CLIENT } from '../../../common/utils/constants';
 
 // contracts
 import {
@@ -23,7 +23,10 @@ import { transformGatewayUserDto } from './pipes/user-transform.pipe';
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(RBAC_CLIENT) private rbacClient: ClientProxy) { }
+  constructor(
+    @Inject(RBAC_CLIENT) private rbacClient: ClientProxy,
+    @Inject(FORMS_CLIENT) private formsClient: ClientProxy
+  ) { }
 
   create(createUserDto: CreateUserDto) {
     const transformedDto = transformGatewayUserDto(createUserDto);

@@ -1,11 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 // dto
+import { EntityQuestionnaireDto } from './entity-questionnaire.dto';
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
 import { UpdateAttendanceLogDto } from '../../attendance_log/dto/update-attendance-log.dto';
-import { EntityQuestionnaireDto } from './entity-questionnaire.dto';
 
 export class UpdateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })
@@ -75,34 +75,14 @@ export class UpdateUserDto {
     type: [EntityQuestionnaireDto],
     example: [
       {
-        mark_as_read: true,
-        entity_type: 'answers',
-        entity_id: '4416269b-739f-4843-ad9d-27b3299a4638',
-        questionnaires: [
-          {
-            title: 'Testing from the frontend',
-            description: 'description101',
-            questions: [
-              {
-                question_id: '4416269b-739f-4843-ad9d-27b3299a4638',
-                questionnaire_id: '29af4056-569b-410e-a1fe-7e330e9beb2f',
-                content: 'how old are you?',
-                question_type: 'short_text',
-                answers: [
-                  {
-                    answer_id: '61ddbca3-e0f6-4fcd-af48-e9b98ab42f83',
-                    questionnaire_id: '29af4056-569b-410e-a1fe-7e330e9beb2f',
-                    question_id: '4416269b-739f-4843-ad9d-27b3299a4638',
-                    answer_type: 'short_text',
-                    content: 'twenty',
-                    mark_as_read: false,
-                  },
-                ],
-              },
-            ],
-          },
-        ],
-      },
+        answer_id: "be583bfd-4609-4a64-a156-e7ab9b45337a",
+        answer_type: "text",
+        content: "Case some letter north.",
+        entity_type: "user",
+        mark_as_read: false,
+        question_id: "f7a0fe99-12b6-4dee-a14f-dd318d984b73",
+        questionnaire_id: "6a8e0f5e-2653-4ee9-9b56-711133afaf4c"
+      }
     ],
   })
   @IsArray()

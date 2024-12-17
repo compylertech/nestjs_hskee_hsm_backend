@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsDate, IsBoolean, IsOptional } from 'class-validator';
 
 // address
-import { AddressDto } from './address.dto';
+import { AddressDto } from '../address/address.dto';
 
 export class UserAuthInfoDto {
   @ApiProperty({ description: 'Login provider', example: 'native' })

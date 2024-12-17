@@ -12,11 +12,15 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 // pipes
 import { transformUserToDto } from './pipes/user-transform.pipe';
+import { QuestionnaireService } from 'apps/aleva-api-gateway/src/forms/modules/questionnaire/questionnaire.service';
 
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) { }
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly questionnaireService: QuestionnaireService,
+  ) { }
 
   @Post()
   @ApiOperation({ summary: 'Create User' })
@@ -52,8 +56,22 @@ export class UsersController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     let query = await this.usersService.update(id, updateUserDto);
-    return transformUserToDto(query);
+    let usersQueryResponse = transformUserToDto(query);
+
+    if (updateUserDto.answers && Array.isArray(updateUserDto.answers)) {
+      updateUserDto.answers = updateUserDto.answers.map((answer) => {
+        return {
+          ...answer,
+          entity_id: answer.entity_id || id,
+        };
+      });
+    }
+
+    let t = await this.questionnaireService.createEntityQuestionnaire(updateUserDto.answers[0]);
+
+    return t;
   }
+
 
   @Delete(':id')
   @HttpCode(204)

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { AddressDto } from "./address.dto";
+import { AddressDto } from "../address/address.dto";
 
 export class AccountDto {
     @ApiProperty({ description: 'Account ID', example: '7e3eea56-82d6-49c2-a623-85b4f68469ff' })

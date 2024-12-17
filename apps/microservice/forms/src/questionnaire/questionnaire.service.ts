@@ -8,16 +8,20 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Questionnaire } from './entities/questionnaire.entity';
 
 // contracts
-import { QuestionnaireDto, CreateQuestionnaireDto, UpdateQuestionnaireDto } from '@app/contracts';
+import { QuestionnaireDto, CreateQuestionnaireDto, UpdateQuestionnaireDto, UpdateEntityQuestionnaireDto, EntityQuestionnaireDto, CreateEntityQuestionnaireDto } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
 import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+import { EntityQuestionnaire } from './entities/entity-questionnaire.entity';
 
 @Injectable()
 export class QuestionnaireService {
-  constructor(@InjectRepository(Questionnaire) private questionnaireRepository: Repository<Questionnaire>) { }
+  constructor(
+    @InjectRepository(Questionnaire) private questionnaireRepository: Repository<Questionnaire>,
+    @InjectRepository(EntityQuestionnaire) private entityQuestionnaireRepository: Repository<EntityQuestionnaire>
+  ) { }
 
 
   async create(createQuestionnaireDto: CreateQuestionnaireDto): Promise<Questionnaire> {
@@ -89,5 +93,41 @@ export class QuestionnaireService {
     }
 
     return questionnaire;
+  }
+
+  /**
+   * Create a new EntityQuestionnaire relationship
+   */
+  async createEntityQuestionnaire(createEntityQuestionnaireDto: CreateEntityQuestionnaireDto): Promise<EntityQuestionnaireDto> {
+    const newEntityQuestionnaire = this.entityQuestionnaireRepository.create(createEntityQuestionnaireDto);
+
+    const savedEntity = await this.entityQuestionnaireRepository.save(newEntityQuestionnaire);
+
+    return plainToInstance(EntityQuestionnaireDto, savedEntity, { excludeExtraneousValues: false });
+  }
+
+  /**
+   * Update an existing EntityQuestionnaire relationship
+   */
+  async updateEntityQuestionnaire(
+    entityQuestionnaireId: string,
+    updateEntityQuestionnaireDto: UpdateEntityQuestionnaireDto,
+  ): Promise<EntityQuestionnaireDto> {
+    if (!isUUID(entityQuestionnaireId)) {
+      throw new BadRequestException(`Invalid UUID: ${entityQuestionnaireId}`);
+    }
+
+    const entityQuestionnaire = await this.entityQuestionnaireRepository.findOne({
+      where: { entity_questionnaire_id: entityQuestionnaireId },
+    });
+
+    if (!entityQuestionnaire) {
+      throw new NotFoundException(`EntityQuestionnaire with ID ${entityQuestionnaireId} not found`);
+    }
+
+    const updatedEntity = this.entityQuestionnaireRepository.merge(entityQuestionnaire, updateEntityQuestionnaireDto);
+    await this.entityQuestionnaireRepository.save(updatedEntity);
+
+    return plainToInstance(EntityQuestionnaireDto, updatedEntity, { excludeExtraneousValues: false });
   }
 }

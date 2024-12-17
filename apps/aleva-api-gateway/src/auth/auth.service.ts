@@ -10,6 +10,7 @@ import {
   ResetPasswordDto,
   VerifyEmailDto,
   MailActionDto,
+  ChangePasswordDto,
 } from './dto/auth.dto';
 
 // contracts
@@ -18,6 +19,7 @@ import {
   AuthDto as ClientAuthDto,
   AuthSignInDto as ClientAuthSignInDto,
   ResetPasswordDto as ClientResetPasswordDto,
+  ChangePasswordDto as ClientChangePasswordDto,
   VerifyEmailDto as ClientVerifyEmailDto,
   MailActionDto as ClientMailActionDto,
 } from '@app/contracts';
@@ -43,6 +45,17 @@ export class AuthService {
       return this.authClient.send<{}, ClientResetPasswordDto>(
         AUTH_PATTERN.RESET_PASSWORD,
         resetPasswordDto,
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  changePassword(changePasswordDto: ChangePasswordDto) {
+    try {
+      return this.authClient.send<{}, ClientChangePasswordDto>(
+        AUTH_PATTERN.CHANGE_PASSWORD,
+        changePasswordDto,
       );
     } catch (error) {
       throw error;

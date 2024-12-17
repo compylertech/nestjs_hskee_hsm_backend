@@ -5,7 +5,7 @@ import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { QuestionnaireService } from './questionnaire.service';
 
 // contracts
-import { CreateQuestionnaireDto, UpdateQuestionnaireDto, QUESTIONNAIRE_PATTERN } from '@app/contracts';
+import { CreateQuestionnaireDto, UpdateQuestionnaireDto, QUESTIONNAIRE_PATTERN, CreateEntityQuestionnaireDto, UpdateEntityQuestionnaireDto } from '@app/contracts';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Controller('questionnaire')
@@ -63,5 +63,32 @@ export class QuestionnaireController {
   @MessagePattern(QUESTIONNAIRE_PATTERN.DELETE)
   remove(@Payload() id: string) {
     return this.questionnaireService.remove(id);
+  }
+
+  @MessagePattern(QUESTIONNAIRE_PATTERN.CREATE_ENTITY)
+  async createEntityQuestionnaire(@Payload() createEntityQuestionnaireDto: CreateEntityQuestionnaireDto) {
+    try {
+      return await this.questionnaireService.createEntityQuestionnaire(createEntityQuestionnaireDto);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || 'Error creating entity-questionnaire relationship!',
+      });
+    }
+  }
+
+  @MessagePattern(QUESTIONNAIRE_PATTERN.UPDATE_ENTITY)
+  async updateEntityQuestionnaire(@Payload() updateEntityQuestionnaireDto: UpdateEntityQuestionnaireDto) {
+    try {
+      return await this.questionnaireService.updateEntityQuestionnaire(
+        updateEntityQuestionnaireDto.entity_questionnaire_id,
+        updateEntityQuestionnaireDto,
+      );
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error updating entity-questionnaire with id: ${updateEntityQuestionnaireDto.entity_questionnaire_id}`,
+      });
+    }
   }
 }

@@ -19,6 +19,13 @@ export class ResetPasswordDto {
     @IsString()
     @IsNotEmpty()
     email!: string;
+}
+
+export class ChangePasswordDto {
+    @ApiProperty({ description: 'The email of the user' })
+    @IsString()
+    @IsNotEmpty()
+    email!: string;
 
     @ApiProperty({ description: 'The reset token sent to the user' })
     @IsString()
@@ -30,6 +37,7 @@ export class ResetPasswordDto {
     @IsNotEmpty()
     newPassword!: string;
 }
+
 
 export class VerifyEmailDto {
     @ApiProperty({ description: 'The email of the user' })

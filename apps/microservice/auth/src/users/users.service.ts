@@ -1,3 +1,5 @@
+import * as bcrypt from 'bcrypt';
+import { v4 as uuidv4 } from 'uuid';
 import { Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -111,7 +113,20 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    user.password = newPassword;
+    user.password =  bcrypt.hashSync(newPassword, 10);
+    user.reset_token = "";
+    await this.userRepository.save(user);
+  }
+
+  // Set reset token
+  async setResetToken(email: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { email: email } });
+
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+
+    user.reset_token = uuidv4();
     await this.userRepository.save(user);
   }
 
