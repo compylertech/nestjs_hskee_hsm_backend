@@ -25,15 +25,14 @@ export class CreateQuestionDto {
 
   @ApiProperty({ description: 'ID of the associated questionnaire', example: 'd1b9d7c2-8e34-42b3-9bfe-123456789abc' })
   @IsString()
-  @IsNotEmpty()
-  questionnaire_id: string;
+  @IsOptional()
+  questionnaire_id?: string;
 
   @ApiProperty({
     description: 'List of answers for the question',
     type: [CreateAnswerDto],
     example: [{ answer_type: 'short_text', content: 'Red' }],
   })
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateAnswerDto)
