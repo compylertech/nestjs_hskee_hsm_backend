@@ -6,12 +6,16 @@ export interface AuthDto {
 export interface AuthSignInDto {
   userId: string;
   email: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface AuthResultDto {
   accessToken: string;
   userId: string;
-  email: string;
+  email: string
+  firstName: string;
+  lastName: string;
 }
 
 export interface ResetPasswordDto {

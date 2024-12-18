@@ -39,7 +39,9 @@ export class AuthService {
         if (user && bcrypt.compareSync(input.password, user.password)) {
             return {
                 userId: user.user_id,
-                email: user.email
+                email: user.email,
+                firstName: user.first_name,
+                lastName: user.last_name
             }
         }
 
@@ -54,7 +56,7 @@ export class AuthService {
 
         const accessToken = await this.jwtService.signAsync(tokenPayload);
 
-        return { accessToken, email: user.email, userId: user.userId }
+        return { accessToken, email: user.email, userId: user.userId, firstName: user.firstName, lastName: user.lastName}
     }
 
     async resetPassword(input: ResetPasswordDto): Promise<{ message: string } | any> {
