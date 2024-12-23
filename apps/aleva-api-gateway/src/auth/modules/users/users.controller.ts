@@ -49,7 +49,7 @@ export class UsersController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update User' })
-  @ApiResponse({ status: 200, description: 'Successfully fetched users.'})
+  @ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
 
@@ -65,6 +65,7 @@ export class UsersController {
       }
 
       let usersQueryResponse = await this.usersService.update(id, updateUserDto);
+      console.log(usersQueryResponse)
 
       return transformUserToDto(usersQueryResponse);
 

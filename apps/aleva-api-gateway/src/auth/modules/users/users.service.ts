@@ -83,7 +83,7 @@ export class UsersService {
     ).toPromise();
 
     // fetch answers from the forms microservice
-    const answers = await this.createEntityQuestionnaire(updateUserDto.answers)
+    const answers = updateUserDto.answers ? await this.createEntityQuestionnaire(updateUserDto.answers) : [];
 
     return {
       ...user,
