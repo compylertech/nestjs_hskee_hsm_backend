@@ -8,7 +8,6 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 
 // entity
 import { User } from './entities/user.entity';
-// import { EntityQuestionnaire } from '../../../forms/src/questionnaire/entities/entity-questionnaire.entity';
 
 // contracts
 import { UserDto, CreateUserDto, UpdateUserDto } from '@app/contracts';
@@ -21,8 +20,7 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    // @InjectRepository(EntityQuestionnaire) private entityRepository: Repository<EntityQuestionnaire>
+    @InjectRepository(User) private userRepository: Repository<User>
   ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

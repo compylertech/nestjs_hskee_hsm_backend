@@ -4,6 +4,7 @@ import { Controller } from '@nestjs/common/interfaces';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
+import { FORMS } from 'apps/common/config/constants';
 import { FORMS_CLIENT } from '../common/utils/constants';
 
 // services
@@ -51,7 +52,7 @@ function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controll
     {
       provide: FORMS_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.formClientOptions;
+        const clientOptions = configService.getClientOptions(FORMS);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]

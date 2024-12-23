@@ -1,10 +1,13 @@
-import { Module, Type } from '@nestjs/common';
-import { RouterModule, RouteTree } from '@nestjs/core';
-import { Controller } from '@nestjs/common/interfaces';
+import { Module } from '@nestjs/common';
+import { RouterModule } from '@nestjs/core';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
+import { BILLING } from 'apps/common/config/constants';
 import { BILLING_CLIENT } from '../common/utils/constants';
+
+// config
+import { ClientConfigModule, ClientConfigService } from '../../../common/config';
 
 // services
 import { BillingService } from './billing.service';
@@ -15,20 +18,8 @@ import { BillingController } from './billing.controller';
 // module
 import { InvoiceModule } from './modules/invoice/invoice.module';
 
-// config
-import { ClientConfigModule, ClientConfigService } from '../../../common/config';
-
-
-function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controller>[]): RouteTree[] {
-  return controllers.map((controller) => {
-    const controllerPath = Reflect.getMetadata('path', controller);
-
-    return {
-      path: `${basePath}`,
-      module: controller as Type<Controller>,
-    };
-  });
-}
+// helpers
+import { appendSubPathsToBaseModule } from 'apps/common/utils/helpers';
 
 @Module({
   imports: [
@@ -48,7 +39,7 @@ function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controll
     {
       provide: BILLING_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.billingClientOptions;
+        const clientOptions = configService.getClientOptions(BILLING);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]

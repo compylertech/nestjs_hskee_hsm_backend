@@ -1,6 +1,6 @@
 
 // dto
-import { UpdateAttendanceLogDto } from '@app/contracts';
+import { UpdateAttendanceLogDto, UpdateEntityQuestionnaireDto } from '@app/contracts';
 
 export class UpdateUserDto {
     user_id?: string;
@@ -36,4 +36,5 @@ export class UpdateUserDto {
     emergency_contact_number?: string;
 
     attendance_logs?: UpdateAttendanceLogDto[];
+    answers?: UpdateEntityQuestionnaireDto[];
 }

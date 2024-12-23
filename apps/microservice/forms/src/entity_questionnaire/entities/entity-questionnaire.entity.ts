@@ -5,12 +5,13 @@ import {
   ManyToOne,
   JoinColumn,
   PrimaryGeneratedColumn,
+  Index,
 } from 'typeorm';
-import { Questionnaire } from './questionnaire.entity';
 import { Answer } from '../../answers/entities/answer.entity';
 import { Question } from '../../questions/entities/questions.entity';
-import { User } from '../../../../auth/src/users/entities/user.entity';
+import { Questionnaire } from '../../questionnaire/entities/questionnaire.entity';
 
+// enums
 export enum EntityTypeEnum {
   USER = 'user',
   ANSWERS = 'answers',
@@ -19,9 +20,8 @@ export enum EntityTypeEnum {
 }
 
 @Entity('entity_questionnaire')
-@Check(
-  "entity_type IN ('user', 'questions', 'questionnaires', 'answers')"
-)
+@Check("entity_type IN ('user', 'questions', 'questionnaires', 'answers')")
+// @Index('entity_questionnaire_composite_key', ['question_id', 'entity_id', 'questionnaire_id', 'answer_id', 'entity_type'], { unique: true })
 export class EntityQuestionnaire {
   @PrimaryGeneratedColumn('uuid')
   entity_questionnaire_id: string;
@@ -58,10 +58,6 @@ export class EntityQuestionnaire {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
-
-  @ManyToOne(() => User, (user) => user.answers, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'entity_id' })
-  user: User;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
   updated_at: Date;

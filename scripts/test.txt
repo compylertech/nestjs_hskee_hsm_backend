@@ -1,3 +1,14 @@
-node scripts/runner.js --module forms --base apps --submodule questions --microservice all
+// creating a microservice
+node scripts/runner.js --module forms --base apps --submodule entityQuestionnaire --microservice all
 
-node scripts/runner.js --module forms --base apps --submodule answer --gateway all
+// Creating gateway
+node scripts/runner.js --module resources --base apps --submodule media --gateway all
+
+// updating typeorm after db update
+npm run typeorm migration:generate -- -n AddCompositeKeyToEntityQuestionnaire
+npm run typeorm migration:run
+
+
+// Creating contracts
+node scripts/runner.js --module forms --base apps --submodule answer --contracts all
+node scripts/runner.js --module resources --base apps --submodule media --contracts all

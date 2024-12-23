@@ -36,12 +36,42 @@ function processFile(inputPath, outputPath, moduleName, subModuleName) {
   console.log(`Generated: ${outputPath}`);
 }
 
+// Function to process contract files
+function processContractFiles(baseDir, moduleName, subModuleName) {
+  const sourceDir = path.join(__dirname, 'sample/example/contracts'); // Define a template folder for contracts
+  const targetDir = subModuleName
+    ? `libs/contracts/src/${moduleName}/${subModuleName}`
+    : `libs/contracts/src/${moduleName}`;
+
+  const filesToCreate = [
+    '[module].dto.ts',
+    '[module].enum.ts',
+    '[module].pattern.ts',
+    'create-[module].dto.ts',
+    'update-[module].dto.ts',
+  ];
+
+  filesToCreate.forEach((file) => {
+    const fileName = file.replace('[module]', subModuleName || moduleName);
+    const outputPath = path.join(targetDir, fileName);
+
+    // Optionally add templates for these files or leave them empty
+    const fileContent = `// Template for ${fileName}`; // Add meaningful templates if required
+    const updatedContent = replacePlaceholders(fileContent, moduleName, subModuleName);
+
+    // Write the file
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(outputPath, updatedContent, 'utf8');
+    console.log(`Generated: ${outputPath}`);
+  });
+}
+
 // Function to process microservice files
 function processMicroserviceFiles(microserviceType, baseDir, moduleName, subModuleName) {
   const sourceDir = path.join(__dirname, 'sample/example/microservices');
   const targetDir = subModuleName
-    ? `${baseDir}/modules/${moduleName}/src/${subModuleName}`
-    : `${baseDir}/modules/${moduleName}/src/${moduleName}`;
+    ? `${baseDir}/microservice/${moduleName}/src/${subModuleName}`
+    : `${baseDir}/microservice/${moduleName}/src/${moduleName}`;
 
   const filesToProcess = {
     controller: '[module].controller.ts',
@@ -64,7 +94,6 @@ function processMicroserviceFiles(microserviceType, baseDir, moduleName, subModu
 
 // Function to process gateway files
 function processGatewayFiles(gatewayType, baseDir, moduleName, subModuleName) {
-  // Find the gateway directory with the "-gateway" suffix
   const gatewayDir = fs.readdirSync(baseDir).find((dir) => dir.endsWith('-gateway'));
   if (!gatewayDir) {
     console.error('No gateway directory found in the base directory!');
@@ -98,7 +127,7 @@ function processGatewayFiles(gatewayType, baseDir, moduleName, subModuleName) {
 // Main function to handle arguments
 function main() {
   const args = require('minimist')(process.argv.slice(2));
-  const { module: moduleName, base: baseDir, microservice, gateway, submodule: subModuleName } = args;
+  const { module: moduleName, base: baseDir, microservice, gateway, submodule: subModuleName, contracts } = args;
 
   if (!moduleName || !baseDir) {
     console.error('Error: --module and --base arguments are required.');
@@ -113,6 +142,11 @@ function main() {
   if (gateway) {
     console.log('Processing Gateway files...');
     processGatewayFiles(gateway, baseDir, moduleName, subModuleName);
+  }
+
+  if (contracts) {
+    console.log('Processing Contract files...');
+    processContractFiles(baseDir, moduleName, subModuleName);
   }
 
   console.log('Script execution completed.');

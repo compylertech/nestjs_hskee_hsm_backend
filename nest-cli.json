@@ -64,6 +64,15 @@
         "tsConfigPath": "apps/microservice/billing/tsconfig.app.json"
       }
     },
+    "resources": {
+      "type": "application",
+      "root": "apps/microservice/resources",
+      "entryFile": "main",
+      "sourceRoot": "apps/microservice/resources/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/microservice/resources/tsconfig.app.json"
+      }
+    },
     "contracts": {
       "type": "library",
       "root": "libs/contracts",

@@ -3,6 +3,7 @@ import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 
 // services
 import { QuestionsService } from './questions.service';
+import { EntityQuestionnaireService } from '../entity_questionnaire/entity-questionnaire.service';
 
 // contracts
 import { CreateQuestionDto, UpdateQuestionDto, QUESTION_PATTERN } from '@app/contracts';
@@ -12,12 +13,20 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Controller('questions')
 export class QuestionsController {
-  constructor(private readonly questionsService: QuestionsService) { }
+  constructor(
+    private readonly questionsService: QuestionsService,
+    private readonly entityQuestionnaireService: EntityQuestionnaireService
+) { }
 
   @MessagePattern(QUESTION_PATTERN.CREATE)
   async create(@Payload() createQuestionDto: CreateQuestionDto) {
     try {
-      return await this.questionsService.create(createQuestionDto);
+      const newQuestions = await this.questionsService.create(createQuestionDto);
+      
+      // create entity-questionnaire records for each answer of each question
+      await this.entityQuestionnaireService.createEntityQuestionnaireRecords([newQuestions]);
+
+      return newQuestions;
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

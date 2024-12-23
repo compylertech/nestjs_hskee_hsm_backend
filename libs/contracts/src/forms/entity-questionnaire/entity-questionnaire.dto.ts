@@ -7,6 +7,6 @@ export class EntityQuestionnaireDto {
     answer_id: string; 
     answer_type?: string; 
     content?: string; 
-    mark_as_read: boolean; 
+    mark_as_read?: boolean; 
   }
   

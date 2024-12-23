@@ -2,7 +2,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 // entity
 import { Question } from '../../questions/entities/questions.entity';
-import { EntityQuestionnaire } from './entity-questionnaire.entity';
+import { EntityQuestionnaire } from '../../entity_questionnaire/entities/entity-questionnaire.entity';
 
 @Entity('questionnaire')
 export class Questionnaire {

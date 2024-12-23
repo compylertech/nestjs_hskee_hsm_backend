@@ -3,6 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
+import { RBAC } from 'apps/common/config/constants';
 import { AUTH_CLIENT } from '../common/utils/constants';
 
 // config
@@ -26,7 +27,7 @@ import { AuthController } from './auth.controller';
     {
       provide: AUTH_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.rbacClientOptions;
+        const clientOptions = configService.getClientOptions(RBAC);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]

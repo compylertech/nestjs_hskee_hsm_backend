@@ -6,8 +6,9 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+
+// entity
 import { AttendanceLog } from '../../attendance_log/entities/attendance-log.entity';
-import { EntityQuestionnaire } from '../../../../forms/src/questionnaire/entities/entity-questionnaire.entity';
 
 @Entity('users')
 export class User {
@@ -91,9 +92,6 @@ export class User {
 
   @OneToMany(() => AttendanceLog, (attendanceLog) => attendanceLog.user, { cascade: true, eager: true })
   attendance_logs: AttendanceLog[];
-
-  @OneToMany(() => EntityQuestionnaire, (entityQuestionnaire) => entityQuestionnaire.user, { cascade: true, eager: true })
-  answers: EntityQuestionnaire[];
 
   @CreateDateColumn()
   created_at: Date;

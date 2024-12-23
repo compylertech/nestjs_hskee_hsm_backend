@@ -29,12 +29,18 @@ export class QuestionsService {
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<QuestionDto>> {
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.questionsRepository.createQueryBuilder('questions');
-    
+
+
     queryBuilder
       .leftJoinAndSelect('questions.answers', 'answers')
+      .leftJoin('entity_questionnaire', 'eq', 'eq.question_id = questions.question_id')
+      .where('eq.entity_type = :entityType', { entityType: 'questions' })
+      .andWhere('eq.question_id IS NOT NULL')
+      .andWhere('eq.answer_id = answers.answer_id')
       .orderBy('questions.created_at', pageOptionsDto.order)
       .skip(options.skip)
       .take(options.limit);
+
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
@@ -45,9 +51,19 @@ export class QuestionsService {
   }
 
   async findOne(id: string): Promise<QuestionDto> {
-    const questions = await this.findEntityById(id);
+    const queryBuilder = this.questionsRepository.createQueryBuilder('questions');
 
-    return plainToInstance(QuestionDto, questions, { excludeExtraneousValues: false });
+    queryBuilder
+      .leftJoinAndSelect('questions.answers', 'answers')
+      .leftJoin('entity_questionnaire', 'eq', 'eq.question_id = questions.question_id')
+      .where({ question_id: id })
+      .andWhere('eq.entity_type = :entityType', { entityType: 'questions' })
+      .andWhere('eq.question_id IS NOT NULL')
+      .andWhere('eq.answer_id = answers.answer_id');
+    
+    const { entities } = await queryBuilder.getRawAndEntities();
+
+    return plainToInstance(QuestionDto, entities[0], { excludeExtraneousValues: false });
   }
 
   async update(id: string, updateQuestionDto: UpdateQuestionDto): Promise<QuestionDto> {

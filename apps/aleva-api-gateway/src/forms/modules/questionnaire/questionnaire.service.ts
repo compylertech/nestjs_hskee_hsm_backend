@@ -6,26 +6,16 @@ import { FORMS_CLIENT } from '../../../common/utils/constants';
 
 // contracts
 import {
-  QUESTIONNAIRE_PATTERN,
+  QUESTIONNAIRE_PATTERN, ENTITY_QUESTIONNAIRE_PATTERN,
   QuestionnaireDto as ClientQuestionnaireDto,
   CreateQuestionnaireDto as ClientCreateQuestionnaireDto,
   UpdateQuestionnaireDto as ClientUpdateQuestionnaireDto
 } from '@app/contracts';
 
 // dto
+import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import { CreateQuestionnaireDto } from './dto/create-questionnaire.dto';
 import { UpdateQuestionnaireDto } from './dto/update-questionnaire.dto';
-import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
-
-// entity
-import {
-  EntityQuestionnaireDto as EntityQuestionnaireDto,
-  CreateEntityQuestionnaireDto as ClientCreateEntityQuestionnaireDto,
-  UpdateEntityQuestionnaireDto as ClientUpdateEntityQuestionnaireDto,
-} from '@app/contracts';
-
-import { UpdateEntityQuestionnaireDto } from './dto/update-entity-questionnaire.dto';
-import { CreateEntityQuestionnaireDto } from './dto/create-entity-questionnaire.dto';
 
 @Injectable()
 export class QuestionnaireService {
@@ -46,10 +36,10 @@ export class QuestionnaireService {
     ).toPromise();
   }
 
-  async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto): Promise<any[]> {
-    return this.questionnaireClient.send<any[]>(
+  async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto, entityId?: string[]): Promise<any[]> {
+    return await this.questionnaireClient.send<any[]>(
       QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES,
-      pageOptionsDto
+      { pageOptionsDto, entityId }
     ).toPromise();
   }
 
@@ -75,32 +65,11 @@ export class QuestionnaireService {
     ).toPromise();
   }
 
-  async createEntityQuestionnaire(
-    createEntityQuestionnaireDto: CreateEntityQuestionnaireDto
-  ): Promise<EntityQuestionnaireDto> {
-    const createEntityQuestionnaireContract: ClientCreateEntityQuestionnaireDto = {
-      ...createEntityQuestionnaireDto,
-    };
-
-    return this.questionnaireClient.send<EntityQuestionnaireDto, ClientCreateEntityQuestionnaireDto>(
-      QUESTIONNAIRE_PATTERN.CREATE_ENTITY,
-      createEntityQuestionnaireContract
-    ).toPromise();
-  }
-
-  async updateEntityQuestionnaire(
-    entityQuestionnaireId: string,
-    updateEntityQuestionnaireDto: UpdateEntityQuestionnaireDto
-  ): Promise<EntityQuestionnaireDto> {
-    const updateEntityQuestionnaireContract: ClientUpdateEntityQuestionnaireDto = {
-      ...updateEntityQuestionnaireDto,
-    };
-
-    return this.questionnaireClient.send<EntityQuestionnaireDto, ClientUpdateEntityQuestionnaireDto>(
-      QUESTIONNAIRE_PATTERN.UPDATE_ENTITY,
-      { entity_questionnaire_id: entityQuestionnaireId, ...updateEntityQuestionnaireContract }
+  async removeEntityQuestionnaireResponse(questionnaireId: string): Promise<void> {
+    return this.questionnaireClient.send<void>(
+      ENTITY_QUESTIONNAIRE_PATTERN.DELETE,
+      questionnaireId
     ).toPromise();
   }
 
 }
-

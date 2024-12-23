@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions } from '@nestjs/microservices';
 
+// constants
+import { RBAC } from 'apps/common/config/constants';
+
 // modules
 import { CoreModule } from './core.module';
 
@@ -15,7 +18,7 @@ import { GlobalRpcExceptionFilter } from '../../../common/filters/global-rpc-exc
 async function bootstrap() {
   const appContext = await NestFactory.createApplicationContext(CoreModule);
   const clientConfigService = appContext.get(ClientConfigService);
-  const clientOptions = clientConfigService.rbacClientOptions;
+  const clientOptions = clientConfigService.getClientOptions(RBAC);
 
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
     CoreModule,

@@ -1,5 +1,5 @@
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 
 // services
 import { UsersService } from './users.service';
@@ -12,14 +12,11 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 // pipes
 import { transformUserToDto } from './pipes/user-transform.pipe';
-import { QuestionnaireService } from 'apps/aleva-api-gateway/src/forms/modules/questionnaire/questionnaire.service';
-
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly questionnaireService: QuestionnaireService,
+    private readonly usersService: UsersService
   ) { }
 
   @Post()
@@ -55,21 +52,25 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    let query = await this.usersService.update(id, updateUserDto);
-    let usersQueryResponse = transformUserToDto(query);
 
-    if (updateUserDto.answers && Array.isArray(updateUserDto.answers)) {
-      updateUserDto.answers = updateUserDto.answers.map((answer) => {
-        return {
-          ...answer,
-          entity_id: answer.entity_id || id,
-        };
-      });
+    try {
+
+      if (updateUserDto.answers && Array.isArray(updateUserDto.answers)) {
+        updateUserDto.answers = updateUserDto.answers.map((answer) => {
+          return {
+            ...answer,
+            entity_id: answer.entity_id || id,
+          };
+        });
+      }
+
+      let usersQueryResponse = await this.usersService.update(id, updateUserDto);
+
+      return transformUserToDto(usersQueryResponse);
+
+    } catch (error) {
+      throw new BadRequestException('Validation failed: ' + error.message);
     }
-
-    let t = await this.questionnaireService.createEntityQuestionnaire(updateUserDto.answers[0]);
-
-    return t;
   }
 
 

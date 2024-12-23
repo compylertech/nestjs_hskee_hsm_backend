@@ -1,33 +1,20 @@
 import { ConfigService } from '@nestjs/config';
 
 export class ClientPortsProvider {
-    constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService) {}
 
-    getUsersClientPort(): number {
-        return this.config.get<number>('USERS_CLIENT_PORT');
-    }
+  /**
+   * Dynamically fetch client port for a given service
+   * @param serviceName Name of the microservice (e.g., "auth", "users")
+   */
+  getClientPort(serviceName: string): number {
+    const portKey = `${serviceName.toUpperCase()}_CLIENT_PORT`;
+    const port = this.config.get<number>(portKey);
 
-    getAuthClientPort(): number {
-        return this.config.get<number>('AUTH_CLIENT_PORT');
+    if (!port) {
+      throw new Error(`Port not configured for service: ${serviceName}`);
     }
-
-    getFormsClientPort(): number {
-        return this.config.get<number>('FORMS_CLIENT_PORT');
-    }
-
-    getRbacClientPort(): number {
-        return this.config.get<number>('RBAC_CLIENT_PORT');
-    }
-
-    getAddressClientPort(): number {
-        return this.config.get<number>('ADDRESS_CLIENT_PORT');
-    }
-
-    getBookingClientPort(): number {
-        return this.config.get<number>('BOOKING_CLIENT_PORT');
-    }
-
-    getBillingClientPort(): number {
-        return this.config.get<number>('BILLING_CLIENT_PORT');
-    }
+    
+    return port;
+  }
 }

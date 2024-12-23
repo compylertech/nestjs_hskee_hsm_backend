@@ -6,7 +6,7 @@ import { QuestionType } from '@app/contracts';
 // entity
 import { Answer } from '../../answers/entities/answer.entity';
 import { Questionnaire } from '../../questionnaire/entities/questionnaire.entity';
-import { EntityQuestionnaire } from '../../questionnaire/entities/entity-questionnaire.entity';
+import { EntityQuestionnaire } from '../../entity_questionnaire/entities/entity-questionnaire.entity';
 
 
 @Entity('question')

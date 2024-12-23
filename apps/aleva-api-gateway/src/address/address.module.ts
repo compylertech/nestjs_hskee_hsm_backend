@@ -2,16 +2,17 @@ import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
+import { ADDRESS } from 'apps/common/config/constants';
 import { ADDRESS_CLIENT } from '../common/utils/constants';
+
+// config
+import { ClientConfigModule, ClientConfigService } from '../../../common/config';
 
 // services
 import { AddressService } from './address.service';
 
 // controller
 import { AddressController } from './address.controller';
-
-// config
-import { ClientConfigModule, ClientConfigService } from '../../../common/config';
 
 @Module({
   imports: [ClientConfigModule],
@@ -21,7 +22,7 @@ import { ClientConfigModule, ClientConfigService } from '../../../common/config'
     {
       provide: ADDRESS_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.addressClientOptions;
+        const clientOptions = configService.getClientOptions(ADDRESS);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]

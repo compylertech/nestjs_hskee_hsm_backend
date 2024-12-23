@@ -1,10 +1,13 @@
-import { Module, Type } from '@nestjs/common';
-import { RouterModule, RouteTree } from '@nestjs/core';
-import { Controller } from '@nestjs/common/interfaces';
+import { Module } from '@nestjs/common';
+import { RouterModule } from '@nestjs/core';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
+import { BOOKING } from 'apps/common/config/constants';
 import { BOOKING_CLIENT } from '../common/utils/constants';
+
+// config
+import { ClientConfigModule, ClientConfigService } from '../../../common/config';
 
 // services
 import { BookingService } from './booking.service';
@@ -12,34 +15,16 @@ import { BookingService } from './booking.service';
 // controller
 import { BookingController } from './booking.controller';
 
-// config
-import { ClientConfigModule, ClientConfigService } from '../../../common/config';
-
-// module
-// import { AnswersModule } from './modules/answers/answers.module';  // TODO: REMOVE AND ADD YOUR CALENDAR_EVENT MODULE HERE
-
-function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controller>[]): RouteTree[] {
-  return controllers.map((controller) => {
-    const controllerPath = Reflect.getMetadata('path', controller);
-
-    return {
-      path: `${basePath}`,
-      module: controller as Type<Controller>,
-    };
-  });
-}
-
+// helpers
+import { appendSubPathsToBaseModule } from 'apps/common/utils/helpers';
 @Module({
   imports: [
     ClientConfigModule, 
-    // AnswersModule,  // TODO: REMOVE AND ADD YOUR CALENDAR_EVENT MODULE HERE
     RouterModule.register([
       {
         path: 'forms',
         children: [
-          ...appendSubPathsToBaseModule('/', [
-            // AnswersModule,  // TODO: REMOVE AND ADD YOUR CALENDAR_EVENT MODULE HERE
-          ]),
+          ...appendSubPathsToBaseModule('/', [ ]),
         ],
       },
     ]),
@@ -49,7 +34,7 @@ function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controll
     {
       provide: BOOKING_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.bookingClientOptions;
+        const clientOptions = configService.getClientOptions(BOOKING);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]
