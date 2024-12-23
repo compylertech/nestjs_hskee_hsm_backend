@@ -65,9 +65,8 @@ export class UsersController {
       }
 
       let usersQueryResponse = await this.usersService.update(id, updateUserDto);
-      console.log(usersQueryResponse)
-
-      return transformUserToDto(usersQueryResponse);
+      // return transformUserToDto(usersQueryResponse);
+      return usersQueryResponse;
 
     } catch (error) {
       throw new BadRequestException('Validation failed: ' + error.message);
