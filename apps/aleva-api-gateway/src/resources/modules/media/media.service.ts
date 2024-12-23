@@ -25,20 +25,20 @@ export class MediaService {
   async create(createMediaDto: CreateMediaDto): Promise<ClientMediaDto> {
     const createMediaContract: CreateMediaDto = { ...createMediaDto };
 
-    return this.mediaClient.send<ClientMediaDto, ClientCreateMediaDto>(
+    return await this.mediaClient.send<ClientMediaDto, ClientCreateMediaDto>(
       MEDIA_PATTERN.CREATE, createMediaContract
     ).toPromise();
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<ClientMediaDto[]> {
-    return this.mediaClient.send<ClientMediaDto[]>(
+    return await this.mediaClient.send<ClientMediaDto[]>(
       MEDIA_PATTERN.FIND_ALL,
       pageOptionsDto
     ).toPromise();
   }
 
   async findOne(mediaId: string): Promise<ClientMediaDto> {
-    return this.mediaClient
+    return await this.mediaClient
       .send<ClientMediaDto>(MEDIA_PATTERN.FIND_ONE, mediaId)
       .toPromise();
   }
@@ -46,14 +46,14 @@ export class MediaService {
   async update(mediaId: string, updateMediaDto: UpdateMediaDto): Promise<ClientMediaDto> {
     const updateMediaContract: UpdateMediaDto = { ...updateMediaDto };
 
-    return this.mediaClient.send<ClientMediaDto, ClientUpdateMediaDto>(
+    return await this.mediaClient.send<ClientMediaDto, ClientUpdateMediaDto>(
       MEDIA_PATTERN.UPDATE,
       { media_id: mediaId, ...updateMediaContract }
     ).toPromise();
   }
 
   async remove(mediaId: string): Promise<void> {
-    return this.mediaClient.send<ClientMediaDto>(
+    await this.mediaClient.send<ClientMediaDto>(
       MEDIA_PATTERN.DELETE,
       mediaId
     ).toPromise();
