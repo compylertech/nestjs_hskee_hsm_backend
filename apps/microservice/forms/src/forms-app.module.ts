@@ -19,8 +19,11 @@ import { EntityQuestionnaireModule } from './entity_questionnaire/entity-questio
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
+      useFactory: async (configService: ConfigService) => {
+        const isSslEnabled = configService.get<string>('DB_SSL') === 'true';
+
+        return {
+          type: 'postgres',
         host: configService.get<string>('DB_HOST'),
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
@@ -28,18 +31,16 @@ import { EntityQuestionnaireModule } from './entity_questionnaire/entity-questio
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        // entities: [User, AttendanceLog],
-        // ssl: {
-        //   rejectUnauthorized: true
-        // },
-      }),
+          ...(isSslEnabled && {
+            ssl: {
+              rejectUnauthorized: true,
+            },
+          }),
+        }
+      },
       inject: [ConfigService],
     }),
-    AnswersModule, 
-    QuestionsModule, 
-    QuestionnaireModule, 
-    EntityQuestionnaireModule,
-    ClientConfigModule
+    EntityQuestionnaireModule, QuestionsModule, AnswersModule, QuestionnaireModule, ClientConfigModule
   ],
   controllers: [],
   providers: [],

@@ -6,7 +6,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientConfigModule } from 'apps/common/config';
 
 // module
-import { InvoiceModule } from './invoice/invoice.module';
+import { MailModule } from './mail/mail.module';
+
 
 @Module({
   imports: [
@@ -21,13 +22,13 @@ import { InvoiceModule } from './invoice/invoice.module';
 
         return {
           type: 'postgres',
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          username: configService.get<string>('DB_USERNAME'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_DATABASE'),
-          autoLoadEntities: true,
-          synchronize: true,
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: true,
           ...(isSslEnabled && {
             ssl: {
               rejectUnauthorized: true,
@@ -37,9 +38,9 @@ import { InvoiceModule } from './invoice/invoice.module';
       },
       inject: [ConfigService],
     }),
-    InvoiceModule, ClientConfigModule
+    ClientConfigModule, MailModule
   ],
   controllers: [],
   providers: [],
 })
-export class BillingAppModule { }
+export class MessagingAppModule { }

@@ -16,8 +16,11 @@ import { AddressModule } from './address/address.module';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        type: 'postgres',
+      useFactory: async (configService: ConfigService) => {
+        const isSslEnabled = configService.get<string>('DB_SSL') === 'true';
+
+        return {
+          type: 'postgres',
         host: configService.get<string>('DB_HOST'),
         port: configService.get<number>('DB_PORT'),
         username: configService.get<string>('DB_USERNAME'),
@@ -25,10 +28,13 @@ import { AddressModule } from './address/address.module';
         database: configService.get<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        // ssl: {
-        //   rejectUnauthorized: true
-        // },
-      }),
+          ...(isSslEnabled && {
+            ssl: {
+              rejectUnauthorized: true,
+            },
+          }),
+        }
+      },
       inject: [ConfigService],
     }),
     AddressModule, ClientConfigModule

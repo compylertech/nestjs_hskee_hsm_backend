@@ -6,3 +6,4 @@ export const ADDRESS = "ADDRESS";
 export const BOOKING = "BOOKING";
 export const BILLING = "BILLING";
 export const RESOURCE = "RESOURCES";
+export const MAIL = "MAIL";
