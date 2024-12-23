@@ -64,6 +64,15 @@
         "tsConfigPath": "apps/microservice/billing/tsconfig.app.json"
       }
     },
+    "messaging": {
+      "type": "application",
+      "root": "apps/microservice/messaging",
+      "entryFile": "main",
+      "sourceRoot": "apps/microservice/messaging/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/microservice/messaging/tsconfig.app.json"
+      }
+    },
     "resources": {
       "type": "application",
       "root": "apps/microservice/resources",

@@ -11,6 +11,7 @@ const ports = {
   ADDRESS_CLIENT_PORT: 3004,
   BOOKING_CLIENT_PORT: 3005,
   BILLING_CLIENT_PORT: 3006,
+  MAIL_CLIENT_PORT: 3007,
   RESOURCES_CLIENT_PORT: 3008,
 };
 
@@ -20,6 +21,7 @@ const services = [
   { name: 'address', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start address --watch', port: ports.ADDRESS_CLIENT_PORT },
   { name: 'auth', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start auth --watch', port: ports.RBAC_CLIENT_PORT },
   { name: 'forms', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start forms --watch', port: ports.FORMS_CLIENT_PORT },
+  { name: 'messaging', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start messaging --watch', port: ports.MAIL_CLIENT_PORT},
   { name: 'resources', command: 'node ./node_modules/@nestjs/cli/bin/nest.js start resources --watch', port: ports.RESOURCES_CLIENT_PORT }
 ];
 

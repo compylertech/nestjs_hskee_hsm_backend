@@ -52,6 +52,8 @@ export * from '@app/contracts/resources/media/create-media.dto'
 export * from '@app/contracts/resources/media/update-media.dto'
 export * from '@app/contracts/resources/media/media.patterns'
 
+export * from '@app/contracts/mail/onboarding-mail.dto'
+export * from '@app/contracts/mail/mail.pattern'
 
 export * from '@app/contracts/resources/entity-media/entity-media.dto'
 export * from '@app/contracts/resources/entity-media/create-entity-media.dto'

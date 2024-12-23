@@ -1,0 +1,9 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "declaration": false,
+    "outDir": "../../../dist/apps/microservice/messaging"
+  },
+  "include": ["src/**/*", "../auth/src/**/entities/*.ts", "../../templates"],
+  "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
+}

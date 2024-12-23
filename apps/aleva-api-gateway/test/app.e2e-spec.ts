@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AlevaApiGatewayModule } from './../src/aleva-api-gateway.module';
+import { AlevaApiGatewayModule } from '../../../../../misc/aleva-api-gateway.module';
 
 describe('AlevaApiGatewayController (e2e)', () => {
   let app: INestApplication;

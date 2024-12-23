@@ -1,16 +1,8 @@
 import { Module } from '@nestjs/common';
 import { RouterModule } from '@nestjs/core';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { ClientProxyFactory } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-
-// config
-import { ClientConfigModule, ClientConfigService } from 'apps/common/config';
-
-// constants
-import { MAIL } from 'apps/common/config/constants';
-import { MAIL_CLIENT } from './common/utils/constants';
 
 // controllers
 import { AlevaApiGatewayController } from './aleva-api-gateway.controller';
@@ -23,12 +15,15 @@ import { AuthModule } from './auth/auth.module';
 import { FormsModule } from './forms/forms.module';
 import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
-import { ResourceModule } from './resources/resources.module';
 import { UserModule } from './auth/modules/users/users.module';
 import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-log.module';
+import { MAIL_CLIENT } from './common/utils/constants';
+import { ClientProxyFactory } from '@nestjs/microservices';
+import { ClientConfigModule, ClientConfigService } from 'apps/common/config';
+import { MAIL } from 'apps/common/config/constants';
 
 @Module({
-  imports: [AuthModule, AddressModule, UserModule, FormsModule, AttendanceLogModule, ResourceModule,
+  imports: [AuthModule, AddressModule, UserModule, FormsModule, AttendanceLogModule, ClientConfigModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -66,10 +61,6 @@ import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-lo
       {
         path: 'booking',
         module: BookingModule,
-      },
-      {
-        path: 'resources',
-        module: ResourceModule
       }
     ]),
   ],
