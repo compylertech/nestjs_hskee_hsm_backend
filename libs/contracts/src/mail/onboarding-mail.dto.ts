@@ -1,5 +1,5 @@
 
-export class OnboardingMailDto {
+export class MailDto {
   name: string;
   email: string;
   bcc?: string;

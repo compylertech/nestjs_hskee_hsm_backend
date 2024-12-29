@@ -8,7 +8,7 @@ import { SendEmailDto } from "./auth/dto/send-email.dto";
 import { MAIL_CLIENT } from "./common/utils/constants";
 
 // contracts
-import { MAIL_PATTERN, OnboardingMailDto as ClientOnboardingDto } from '@app/contracts'
+import { MAIL_PATTERN, MailDto as ClientOnboardingDto } from '@app/contracts'
 
 
 @Injectable()
@@ -20,17 +20,4 @@ export class AlevaApiGatewayService {
             MAIL_PATTERN.MAIL_ONBOARDING_SEND, sendOnboardingMailDto
         ).toPromise();
     }
-
-    // async sendEmail(variables: Record<string, string>, recipient: string, subject: string): Promise<void> {
-    //     try {
-    //         await this.mailerService.sendMail({
-    //             to: recipient,
-    //             subject: subject,
-    //             template: './confirmEmail.html',
-    //             context: variables
-    //         })
-    //     } catch (error) {
-    //         throw new Error(`Failed to send email ${error.message}`);
-    //     }
-    // }
 }
