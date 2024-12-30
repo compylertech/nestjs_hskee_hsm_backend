@@ -1,0 +1,7 @@
+welcome.html: first_name, last_name, user_email, unsubscribe_link
+rejected.html: first_name, last_name, user_email, unsubscribe_link
+payment.html: first_name, last_name, user_email, unsubscribe_link
+passwordRest.html: first_name, last_name, user_email, reset_link, unsubscribe_link
+onboardingCompleted.html: first_name, last_name, user_email, phone_number, qr_code, unsubscribe_link
+confirmEmail.html: first_name, last_name, user_email, verify_link, unsubscribe_link
+approved.html: first_name, last_name, user_email, unsubscribe_link

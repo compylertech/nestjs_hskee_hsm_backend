@@ -21,10 +21,10 @@
                     <h1 class="title" style="font-size: 28px; font-weight: 700; color: #CC5EB3;">Update on Your Status</h1>
                 </div>
                 <div class="mail-body-wrapper" style="display: flex; flex-direction: column; gap: 38px; width: 100%;">
-                    <p class="mail-salutation" style="font-size: 18px; font-weight: 400; line-height: 28px; margin: 0;">Hi Arthur Taylor,</p>
+                    <p class="mail-salutation" style="font-size: 18px; font-weight: 400; line-height: 28px; margin: 0;">Hi {{ first_name }} {{ last_name }},</p>
                     <div class="mail-body-container" style="display: flex; flex-direction: column; gap: 40px;">
                         <p class="mail-body" style="font-size: 16px; line-height: 24px; display: flex; flex-direction: column; gap: 30px; margin-top: 10px;">
-                            <span>Congratulations! Your application has been approved, and we’re delighted to welcome you to Aleva Daycare. We can’t wait to have you as part of our community.</span>
+                            <span>Congratulations! Your application has been approved, and we're delighted to welcome you to Aleva Daycare. We can't wait to have you as part of our community.</span>
                             <span>If you have any questions, please feel free to reach out to our team.</span>
                         </p>
                         <p class="mail-signature" style="display: flex; flex-direction: column; gap: 4px; margin: 0;">
@@ -36,12 +36,12 @@
                         </div>
                     </div>
                     <div style="display: grid; gap: 12px;">
-                        <p>This email was sent to <a href="">ataylor@gmail.com</a>. If you’d prefer not to receive updates from Aleva Daycare, you can <a href="">[unsubscribe here]</a>.</p>
+                        <p>This email was sent to <a href="">{{ user_email }}</a>. If you'd prefer not to receive updates from Aleva Daycare, you can <a href="{{ unsubscribe_link }}">[unsubscribe here]</a>.</p>
                         <p class="mail-signature" style="display: flex; flex-direction: column; gap: 4px; margin: 0;">
                             <span>Aleva Daycare</span>
                             <span>Accra</span>
-                            <span>&copy; 2024 Aleva Daycare</span>
-                        </p>
+                            <span>&copy; 2025 Aleva Daycare</span>
+                        </p> 
                     </div>
                 </div>
             </main>
