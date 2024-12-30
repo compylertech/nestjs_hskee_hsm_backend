@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <title>Reset Password</title>
+    <style>
+        /* ----- global css ----- */
+        body, 
+        .mail-wrapper, 
+        .mail-header-wrapper, 
+        .mail-body-container, 
+        .mail-signature, 
+        footer, 
+        .footer-top, 
+        .footer-bottom, 
+        .socials, 
+        .social-icons {
+            display: flex;
+        }
+
+        .mail-wrapper, 
+        .mail-header-wrapper, 
+        .mail-body-container, 
+        .mail-signature, 
+        footer, 
+        .footer-bottom {
+            flex-direction: column;
+        }
+
+        .mail-header-wrapper, 
+        .footer-top, 
+        .socials, 
+        .social-icons {
+            align-items: center;
+        }
+        /* ----- end of global css ----- */
+
+        body {
+            font-family: Inter;
+            justify-content: center;
+            background: #FFEBF4;
+            margin: 0;
+        }
+        .body-container {
+            width: 60%;
+            height: 100vh;
+            margin: auto;
+            color: #CC5EB3;
+            background-color: white;
+        }
+        
+        .mail-wrapper {
+            padding: 48px;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 24px;
+            flex-shrink: 0;
+            color: #0E121B;
+        }
+        .mail-header-wrapper {
+            padding: 24px 48px 16px 48px;
+            justify-content: center;
+        }
+        .mail-header {
+            font-size: 24px;
+            font-weight: 500;
+            font-family: "Inter", sans-serif;
+        }
+        .title {
+            font-family: "Inter", sans-serif;
+            font-size: 28px;
+            font-style: normal;
+            color: #CC5EB3;
+            font-weight: 700;
+        }
+        .mail-salutation {
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 28px;
+            margin: 0px;
+        }
+        .mail-body-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 38px;
+        }
+        .mail-body-container {
+            gap: 40px;
+        }
+        .mail-body {
+            font-size: 16px;
+            line-height: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-top: 10px;
+        }
+        .mail-body-container button {
+            border: none;
+            color: white;
+            font-weight: 600;
+            background-color: #CC5EB3;
+            border-radius: 6px;
+            padding: 15px 30px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0px 20px;
+        }
+
+        .mail-signature {
+            gap: 4px;
+            margin: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="body-container">
+        <main class="mail-wrapper">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="logo.svg" alt="logo" />
+                    <h2 class="mail-header">Aleva Daycare</h2>
+                </div>
+                <h1 class="title">Proceed to Payment</h1>
+            </div>
+            <div style="width: 100%" class="mail-body-wrapper">
+                <p class="mail-salutation">Hi Arthur Taylor,</p>
+                <div class="mail-body-container">
+                    <p class="mail-body">
+                        <span>Thank you for choosing Aleva Daycare! Your registration has been approved. To finalize your spot in the program, please complete the payment process.</span>
+                    </p>
+                    <p class="mail-signature">
+                        <span>Thanks,</span>
+                        <span>The Aleva Daycare Team</span>
+                    </p>
+                    <div>
+                        <button type="button">Proceed To Payment</button>
+                        <p>Your payment confirms your place in our supportive, enriching environment, and we’re looking forward to welcoming you to our community. If you have questions about the process, please reach out—we’re here to help!</p>
+                    </div>
+                </div>
+                <div style="display: grid; gap: 12px;">
+                    <p>This email was sent to <a href="">ataylor@gmail.com</a>. If you’d prefer not to receive updates from Aleva Daycare, you can <a href="">[unsubscribe here]</a>.</p>
+                    <p class="mail-signature">
+                        <span>Aleva Daycare</span>
+                        <span>Accra</span>
+                        <span>&copy; 2024 Aleva Daycare</span>
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+</body>
+</html>

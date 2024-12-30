@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta Aleva Daycare="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+
+        <title>Onboarding Completed</title>
+    </head>
+    <body style="font-family: 'Inter', sans-serif; display: flex; justify-content: center; background: #FFEBF4; margin: 0;">
+        <table style="width: 60%; min-height: 100vh; margin: auto; background-color: white; color: #CC5EB3; border-spacing: 0; border-collapse: collapse;">
+            <tr style="display: flex; flex-direction: column; padding: 48px; align-items: flex-start; justify-content: center; gap: 24px; color: #0E121B; flex-shrink: 0;">
+                <td>
+                    <table style="width: 100%; border-spacing: 0;">
+                        <tr>
+                            <td style="display: flex; align-items: center; gap: 10px;">
+                                <!-- <img src="logo.svg" alt="logo" /> -->
+                                <h2 style="font-size: 24px; font-weight: 500;">Aleva Daycare</h2>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h1 style="font-size: 28px; font-weight: 700; color: #CC5EB3;">Onboarding Completed - Here's Your QR Code</h1>
+                            </td>
+                        </tr>
+                    </table>
+                    
+                    <table style="width: 100%; margin-top: 24px; border-spacing: 0;">
+                        <tr>
+                            <td>
+                                <p style="font-size: 18px; font-weight: 400; line-height: 28px; margin: 0;">Hi <span> {{ user_info.first_name }} {{ user_info.last_name }}</span>,</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p style="font-size: 16px; line-height: 24px; margin-top: 10px;">
+                                    <span>Congratulations on completing your onboarding! Your information has been successfully submitted for review.</span><br>
+                                    <span>Here is your unique ID (QR code) and will be your reference for all future interactions.</span>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- cards section -->
+                    <table style="width: 100%; margin-top: 40px; table-layout: fixed; border-spacing: 40px 0;">
+                        <tr>
+                            <!-- first card -->
+                            <td style="width: 85.6mm; height: 120mm; padding: 20px; background-color: #030301; color: white; vertical-align: top;">
+                                <table style="width: 100%; height: 100%; border-spacing: 0;">
+                                    <tr>
+                                        <td style="display: flex; align-items: center; gap: 10px;">
+                                            <!-- <img src="logomark.svg" alt="logo" width="22" /> -->
+                                            <h2 style="font-size: 14px; font-weight: 500; margin: 0;">Aleva Daycare</h2>
+                                        </td>
+                                    </tr>
+                                    
+                                    <tr>
+                                        <td>
+                                            <table style="width: 100%; border-spacing: 0;">
+                                                <tr>
+                                                    <td>
+                                                        <div style="background-color: #CC5EB3; color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; border-radius: 50%;">
+                                                            AT
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 14px 0 0 0;">{{ user_info.first_name }}</h1>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 0 0 14px 0;">{{ user_info.last_name }}</h1>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-size: 14px;">
+                                                        <p style="margin: 0 0 10px;">{{ user_info.email }}</p>
+                                                        <p style="margin: 0 0 10px;"> {{ user_info.phone_number }}</p>
+                                                        <!-- <p style="margin: 0;">P.O. Box 2344</p> -->
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span style="font-size: 14px;">→ QR Code behind</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <!-- second card -->
+                            <td style="width: 85.6mm; height: 120mm; padding: 20px; background-color: #030301; color: white; text-align: center; vertical-align: middle; display: table-cell;">
+                                <div style="width: 50mm; height: 50mm; background-color: white; padding: 12px; border-radius: 10px; display: inline-block;">
+                                    <img src="{{ user_info.qr_code }}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />
+                                </div>
+                                <p style="font-size: small; margin-top: 10px;">Scan QR code for entry</p>
+                            </td>
+                        </tr>
+                    </table>
+    
+                    <table style="width: 100%; table-layout: fixed; margin-top: 40px; border-spacing: 40px 0;">
+                        <tr>
+                            <!-- third card -->
+                            <td style="width: 85.6mm; height: 120mm; padding: 20px; background-color: #F2F1EF; color: #030301; width: 50%; vertical-align: top;">
+                                <table style="width: 100%; height: 100%; border-spacing: 0;">
+                                    <tr>
+                                        <td style="display: flex; align-items: center; gap: 10px;">
+                                            <!-- <img src="logo.svg" alt="logo" width="22" /> -->
+                                            <h2 style="font-size: 14px; font-weight: 500; margin: 0;">Aleva Daycare</h2>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table style="width: 100%; border-spacing: 0;">
+                                                <tr>
+                                                    <td>
+                                                        <div style="background-color: #CC5EB3; color: white; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 500; border-radius: 50%;">
+                                                            AT
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 14px 0 0 0;">{{ user_info.first_name }}</h1>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 0 0 14px 0;">{{ user_info.last_name }}</h1>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="font-size: 14px;">
+                                                        <p style="margin: 0 0 10px;"> {{ user_info.email }} </p>
+                                                        <p style="margin: 0 0 10px;"> {{ user_info.phone_number }} </p>
+                                                        <!-- <p style="margin: 0;">P.O. Box 2344</p> -->
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span style="font-size: 14px;">→ QR Code behind</span>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <!-- fourth card -->
+                            <td style="width: 85.6mm; height: 120mm; padding: 20px; background-color: #F2F1EF; color: #030301; text-align: center; vertical-align: middle; display: table-cell;">
+                                <div style="width: 50mm; height: 50mm; background-color: white; padding: 12px; border-radius: 10px; display: inline-block;">
+                                    <img src="{{ user_info.qr_code }}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />
+                                </div>
+                                <p style="font-size: small; margin-top: 10px;">Scan QR code for entry</p>
+                            </td>
+                        </tr>
+                    </table>
+    
+                    <table style="width: 100%; border-spacing: 0;">
+                        <tr>
+                            <td>
+                                <p style="margin-top: 40px;">Thanks,<br />The Aleva Daycare Team</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p style="margin: 20px 0;">
+                                    This email was sent to <a href="mailto:{{ user_info.email }}">{{ user_info.email }}</a>. If you'd prefer not to receive updates from Aleva Daycare, you can <a href="#">unsubscribe here</a>.
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <p style="margin-top: 12px;">
+                                    Aleva Daycare<br />
+                                    Accra<br />
+                                    &copy; 2024 Aleva Daycare
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+    </body>
+</html>
