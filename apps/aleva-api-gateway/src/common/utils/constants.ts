@@ -7,3 +7,4 @@ export const BOOKING_CLIENT = Symbol('BOOKING_CLIENT');
 export const BILLING_CLIENT = Symbol('BILLING_CLIENT');
 export const MAIL_CLIENT = Symbol('MAIL_CLIENT');
 export const RESOURCE_CLIENT = Symbol('RESOURCES_CLIENT');
+export const PROPERTIES_CLIENT = Symbol('PROPERTIES_CLIENT');

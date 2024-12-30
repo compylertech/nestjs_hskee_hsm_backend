@@ -51,9 +51,9 @@ export class EntityQuestionnaireController {
   }
 
   @MessagePattern(ENTITY_QUESTIONNAIRE_PATTERN.UPDATE)
-  update(@Payload() updateEntityQuestionnaireDto: UpdateEntityQuestionnaireDto) {
+  async update(@Payload() updateEntityQuestionnaireDto: UpdateEntityQuestionnaireDto) {
     try {
-      return this.entityquestionnaireService.update(updateEntityQuestionnaireDto.entity_questionnaire_id, updateEntityQuestionnaireDto);
+      return await this.entityquestionnaireService.update(updateEntityQuestionnaireDto.entity_questionnaire_id, updateEntityQuestionnaireDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -63,7 +63,7 @@ export class EntityQuestionnaireController {
   }
 
   @MessagePattern(ENTITY_QUESTIONNAIRE_PATTERN.DELETE)
-  remove(@Payload() id: string) {
-    return this.entityquestionnaireService.remove(id);
+  async remove(@Payload() id: string) {
+    return await this.entityquestionnaireService.remove(id);
   }
 }

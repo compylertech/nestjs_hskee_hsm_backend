@@ -6,6 +6,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientConfigModule } from 'apps/common/config';
 
 // module
+import { MediaModule } from './media/media.module';
+import { EntityMedia } from './entity-media/entities/entity-media.entity';
+import { EntityMediaModule } from './entity-media/entity-media.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -35,6 +39,7 @@ import { ClientConfigModule } from 'apps/common/config';
       },
       inject: [ConfigService],
     }),
+    MediaModule, EntityMediaModule,
     ClientConfigModule
   ],
   controllers: [],

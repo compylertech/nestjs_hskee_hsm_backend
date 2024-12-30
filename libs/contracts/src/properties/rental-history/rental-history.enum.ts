@@ -1,0 +1,1 @@
+// Template for rental-history.enum.ts

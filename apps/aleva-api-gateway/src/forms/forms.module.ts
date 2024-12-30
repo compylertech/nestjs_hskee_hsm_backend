@@ -7,6 +7,9 @@ import { ClientProxyFactory } from '@nestjs/microservices';
 import { FORMS } from 'apps/common/config/constants';
 import { FORMS_CLIENT } from '../common/utils/constants';
 
+// helpers
+import { appendSubPathsToBaseModule } from 'apps/common/utils/helpers';
+
 // services
 import { FormsService } from './forms.service';
 
@@ -20,17 +23,6 @@ import { ClientConfigModule, ClientConfigService } from '../../../common/config'
 import { AnswersModule } from './modules/answers/answers.module';
 import { QuestionsModule } from './modules/questions/questions.module';
 import { QuestionnaireModule } from './modules/questionnaire/questionnaire.module';
-
-function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controller>[]): RouteTree[] {
-  return controllers.map((controller) => {
-    const controllerPath = Reflect.getMetadata('path', controller);
-
-    return {
-      path: `${basePath}`,
-      module: controller as Type<Controller>,
-    };
-  });
-}
 
 @Module({
   imports: [

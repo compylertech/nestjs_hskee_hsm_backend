@@ -4,8 +4,6 @@ import { Controller } from '@nestjs/common/interfaces';
 
 export function appendSubPathsToBaseModule(basePath: string, controllers: Type<Controller>[]): RouteTree[] {
     return controllers.map((controller) => {
-        const controllerPath = Reflect.getMetadata('path', controller);
-
         return {
             path: `${basePath}`,
             module: controller as Type<Controller>,

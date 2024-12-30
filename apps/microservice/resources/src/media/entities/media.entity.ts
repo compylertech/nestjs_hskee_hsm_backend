@@ -31,4 +31,10 @@ export class Media {
 
     @OneToMany(() => EntityMedia, (entityMedia) => entityMedia.media, { cascade: true })
     entity_media: EntityMedia[];
+
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    created_at: Date;
+  
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updated_at: Date;
 }

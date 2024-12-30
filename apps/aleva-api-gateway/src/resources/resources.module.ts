@@ -28,7 +28,7 @@ import { ResourceController } from './resources.controller';
     MediaModule,
     RouterModule.register([
       {
-        path: 'forms',
+        path: '',
         children: [
           ...appendSubPathsToBaseModule('/', [MediaModule]),
         ],

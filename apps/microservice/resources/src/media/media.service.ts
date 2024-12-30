@@ -14,22 +14,30 @@ import { MediaDto, CreateMediaDto, UpdateMediaDto } from '@app/contracts';
 import { PageDto } from 'apps/common/dto/page.dto';
 import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+import MediaUploaderService from 'apps/common/services/cloudinary/media_uploader';
 
 @Injectable()
 export class MediaService {
+  private readonly mediaStore = 'media';
+
   constructor(@InjectRepository(Media) private mediaRepository: Repository<Media>) { }
 
-
   async create(createMediaDto: CreateMediaDto): Promise<Media> {
-    const newMedia = this.mediaRepository.create(createMediaDto);
+    try {
+      const mediaInfo = await this.processMedia(createMediaDto);
+      const newMedia = this.mediaRepository.create(mediaInfo);
 
-    return this.mediaRepository.save(newMedia);
+      return this.mediaRepository.save(newMedia);
+    } catch (error) {
+      throw new BadRequestException(`Error creating media: ${error.message}`);
+    }
   }
+
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<MediaDto>> {
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.mediaRepository.createQueryBuilder('media');
-    
+
     queryBuilder
       .orderBy('media.created_at', pageOptionsDto.order)
       .skip(options.skip)
@@ -50,13 +58,16 @@ export class MediaService {
   }
 
   async update(id: string, updateMediaDto: UpdateMediaDto): Promise<MediaDto> {
-    const media = await this.findEntityById(id);
+    try {
+      const media = await this.findEntityById(id);
+      const mediaInfo = await this.processMedia(updateMediaDto, media);
+      const updatedMedia = this.mediaRepository.merge(media, mediaInfo);
+      await this.mediaRepository.save(updatedMedia);
 
-    // merge the updates into the media entity
-    const updateMedia = this.mediaRepository.merge(media, updateMediaDto);
-    await this.mediaRepository.save(updateMedia);
-
-    return plainToInstance(MediaDto, updateMedia, { excludeExtraneousValues: false });
+      return plainToInstance(MediaDto, updatedMedia, { excludeExtraneousValues: true });
+    } catch (error) {
+      throw new BadRequestException(`Error updating media: ${error.message}`);
+    }
   }
 
   async remove(id: string): Promise<void> {
@@ -76,5 +87,28 @@ export class MediaService {
     }
 
     return media;
+  }
+
+  private async processMedia(dto: CreateMediaDto | UpdateMediaDto, existingMedia?: Media): Promise<CreateMediaDto | UpdateMediaDto> {
+    let mediaInfo = { ...dto };
+
+    if (mediaInfo.content_url) {
+      const uploader = new MediaUploaderService(
+        mediaInfo.content_url,
+        mediaInfo.media_name || existingMedia?.media_name || 'default',
+        this.mediaStore
+      );
+
+      const uploadResponse = await uploader.upload();
+      if (!uploadResponse.success) {
+        throw new Error(uploadResponse.error);
+      }
+
+      mediaInfo.content_url = uploadResponse.data.contentUrl;
+      // const detectedType = uploader.getImageType();
+      // mediaInfo.media_type = detectedType || mediaInfo.media_type;
+    }
+
+    return mediaInfo;
   }
 }

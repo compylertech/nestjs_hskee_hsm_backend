@@ -4,6 +4,7 @@ import {
     PrimaryGeneratedColumn,
     ManyToOne,
     Check,
+    JoinColumn,
 } from 'typeorm';
 
 // enums
@@ -34,5 +35,12 @@ export class EntityMedia {
     media_type: MediaType;
 
     @ManyToOne(() => Media, (media) => media.entity_media, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'media_id' })
     media: Media;
+
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    created_at: Date;
+  
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updated_at: Date;
 }

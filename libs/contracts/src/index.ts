@@ -47,15 +47,34 @@ export * from '@app/contracts/billing/invoice/create-invoice.dto'
 export * from '@app/contracts/billing/invoice/update-invoice.dto'
 export * from '@app/contracts/billing/invoice/invoice.patterns'
 
+export * from '@app/contracts/mail/onboarding-mail.dto'
+export * from '@app/contracts/mail/mail.pattern'
+
+// Media
 export * from '@app/contracts/resources/media/media.dto'
 export * from '@app/contracts/resources/media/create-media.dto'
 export * from '@app/contracts/resources/media/update-media.dto'
 export * from '@app/contracts/resources/media/media.patterns'
 
-export * from '@app/contracts/mail/onboarding-mail.dto'
-export * from '@app/contracts/mail/mail.pattern'
-
 export * from '@app/contracts/resources/entity-media/entity-media.dto'
 export * from '@app/contracts/resources/entity-media/create-entity-media.dto'
 export * from '@app/contracts/resources/entity-media/update-entity-media.dto'
 export * from '@app/contracts/resources/entity-media/entity-media.patterns'
+
+// Properties
+export * from '@app/contracts/properties/property/property.dto'
+export * from '@app/contracts/properties/property/property-info.dto'
+export * from '@app/contracts/properties/property/property.enum'
+export * from '@app/contracts/properties/property/create-property.dto'
+export * from '@app/contracts/properties/property/update-property.dto'
+export * from '@app/contracts/properties/property/property.pattern'
+
+export * from '@app/contracts/properties/unit/unit.dto'
+export * from '@app/contracts/properties/unit/create-unit.dto'
+export * from '@app/contracts/properties/unit/update-unit.dto'
+export * from '@app/contracts/properties/unit/unit.pattern'
+
+export * from '@app/contracts/properties/rental-history/rental-history.dto'
+export * from '@app/contracts/properties/rental-history/create-rental-history.dto'
+export * from '@app/contracts/properties/rental-history/update-rental-history.dto'
+export * from '@app/contracts/properties/rental-history/rental-history.pattern'

@@ -60,7 +60,7 @@ export class [Module]Controller {
     }
   }
 
-  @MessagePattern([MODULE]_PATTERN.REMOVE)
+  @MessagePattern([MODULE]_PATTERN.DELETE)
   remove(@Payload() id: string) {
     return this.[module]Service.remove(id);
   }

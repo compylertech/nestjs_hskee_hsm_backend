@@ -21,7 +21,7 @@ export enum EntityTypeEnum {
 
 @Entity('entity_questionnaire')
 @Check("entity_type IN ('user', 'questions', 'questionnaires', 'answers')")
-// @Index('entity_questionnaire_composite_key', ['question_id', 'entity_id', 'questionnaire_id', 'answer_id', 'entity_type'], { unique: true })
+@Index('entity_questionnaire_composite_key', ['question_id', 'entity_id', 'questionnaire_id', 'answer_id', 'entity_type'], { unique: true })
 export class EntityQuestionnaire {
   @PrimaryGeneratedColumn('uuid')
   entity_questionnaire_id: string;

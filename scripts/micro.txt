@@ -1,0 +1,58 @@
+microservices
+-------------
+=> address
+  - address.entity.ts
+  - country.entity.ts
+  - region.entity.ts
+  - city.entity.ts
+
+=> billing
+  - account.entity.ts
+  - invoice.entity.ts
+  - invoice_item.entity.ts
+  - billable.entity.ts
+  - payment_type.entity.ts
+  - transaction_type.entity.ts
+  - transaction.entity.ts
+  - utility.entity.ts **
+
+=> bookings
+  - reservation.entity.ts ??
+  - calendar_event.entity.ts
+  - tours.entity.ts
+
+=> forms
+  - questions.entity.ts
+  - answers.entity.ts
+  - questionnaire.entity.ts
+  - entity_questionnaire.entity.ts
+  
+=> messaging
+  - message.entity.ts
+  - message_recipient.entity.ts
+  - reminder_frequency.entity.ts
+
+=> ticketing
+  - ticket.entity.ts [ formerly maintenance_request ]
+
+=> resources
+  - media.entity.ts
+
+
+=> contract [ billing.payment_type, auth.user | relationships: properties | billing.entity_billable ]
+  - contract.entity.ts
+  - contract_assignment.entity.ts
+  - contract_type.entity.ts
+  -------------------------
+  - contract_invoice.entity.ts [ replace this by implementing a reference_id on invoice ]
+  - contract_document.entity.ts [ replace this by implementing entity_media media_type = doc ]
+
+=> properties [ auth.user ]
+  - property_assignment.entity.ts
+  - property_type.entity.ts
+  - property_unit_association.entity.ts
+  - property.entity.ts
+  - unit.entity.ts
+  - property_unit_type.entity.ts
+  - rental_history.entity.ts
+  - amenities.entity.ts

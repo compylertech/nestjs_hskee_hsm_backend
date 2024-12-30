@@ -82,6 +82,15 @@
         "tsConfigPath": "apps/microservice/resources/tsconfig.app.json"
       }
     },
+    "properties": {
+      "type": "application",
+      "root": "apps/microservice/properties",
+      "entryFile": "main",
+      "sourceRoot": "apps/microservice/properties/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/microservice/properties/tsconfig.app.json"
+      }
+    },
     "contracts": {
       "type": "library",
       "root": "libs/contracts",

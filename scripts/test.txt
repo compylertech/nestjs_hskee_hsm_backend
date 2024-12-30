@@ -12,3 +12,8 @@ npm run typeorm migration:run
 // Creating contracts
 node scripts/runner.js --module forms --base apps --submodule answer --contracts all
 node scripts/runner.js --module resources --base apps --submodule media --contracts all
+
+node scripts/runner.js --module properties --base apps --submodule property --microservice all
+node scripts/runner.js --module properties --base apps --submodule unit --microservice all
+
+node scripts/runner.js --module properties --base apps --submodule rental-history --microservice all

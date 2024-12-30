@@ -60,13 +60,12 @@ export class UsersController {
           return {
             ...answer,
             entity_id: answer.entity_id || id,
-          };
+          } 
         });
       }
 
       let usersQueryResponse = await this.usersService.update(id, updateUserDto);
-      // return transformUserToDto(usersQueryResponse);
-      return usersQueryResponse;
+      return transformUserToDto(usersQueryResponse);
 
     } catch (error) {
       throw new BadRequestException('Validation failed: ' + error.message);
