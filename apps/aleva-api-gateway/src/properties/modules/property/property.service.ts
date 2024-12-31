@@ -43,14 +43,14 @@ export class PropertyService {
       .toPromise();
   }
 
-  async update(propertyId: string, updatePropertyDto: UpdatePropertyDto): Promise<ClientPropertyDto> {
-    const updatePropertyContract: UpdatePropertyDto = { ...updatePropertyDto };
+  // async update(propertyId: string, updatePropertyDto: UpdatePropertyDto): Promise<ClientPropertyDto> {
+  //   const updatePropertyContract: UpdatePropertyDto = { ...updatePropertyDto };
 
-    return this.propertyClient.send<ClientPropertyDto, ClientUpdatePropertyDto>(
-      PROPERTY_PATTERN.UPDATE,
-      { property_id: propertyId, ...updatePropertyContract }
-    ).toPromise();
-  }
+  //   return this.propertyClient.send<ClientPropertyDto, ClientUpdatePropertyDto>(
+  //     PROPERTY_PATTERN.UPDATE,
+  //     { property_unit_assoc_id: propertyId, ...updatePropertyContract }
+  //   ).toPromise();
+  // }
 
   async remove(propertyId: string): Promise<void> {
     return this.propertyClient.send<ClientPropertyDto>(

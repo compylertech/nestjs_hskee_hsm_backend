@@ -8,7 +8,7 @@ export class CreateUnitDto {
   property_unit_commission: number;
   property_floor_id: number;
   property_status: PropertyStatus;
-  property_unit_notes: string;
+  property_unit_notes?: string;
   has_amenities: boolean;
   property_id: string;
 }

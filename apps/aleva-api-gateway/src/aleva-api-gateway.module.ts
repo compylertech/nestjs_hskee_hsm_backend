@@ -24,13 +24,14 @@ import { FormsModule } from './forms/forms.module';
 import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
 import { UserModule } from './auth/modules/users/users.module';
+import { PropertiesModule } from './properties/properties.module';
 import { MediaModule } from './resources/modules/media/media.module';
 import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-log.module';
 
 @Module({
   imports: [
     AuthModule, AddressModule, UserModule, FormsModule, 
-    AttendanceLogModule, ClientConfigModule, MediaModule,
+    AttendanceLogModule, ClientConfigModule, MediaModule, PropertiesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',

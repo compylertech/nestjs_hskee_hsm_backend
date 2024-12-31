@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { PROPERTY_CLIENT } from '../common/utils/constants';
+import { PROPERTIES } from 'apps/common/config/constants';
+import { PROPERTIES_CLIENT } from '../../../common/utils/constants';
 
 // services
 import { PropertyService } from './property.service';
@@ -11,7 +12,7 @@ import { PropertyService } from './property.service';
 import { PropertyController } from './property.controller';
 
 // config
-import { ClientConfigModule, ClientConfigService } from '../../../common/config';
+import { ClientConfigModule, ClientConfigService } from '../../../../../common/config';
 
 @Module({
   imports: [ClientConfigModule],
@@ -19,9 +20,9 @@ import { ClientConfigModule, ClientConfigService } from '../../../common/config'
   providers: [
     PropertyService,
     {
-      provide: PROPERTY_CLIENT,
+      provide: PROPERTIES_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.propertyClientOptions;
+        const clientOptions = configService.getClientOptions(PROPERTIES);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]

@@ -21,19 +21,17 @@ import { ClientConfigModule, ClientConfigService } from '../../../common/config'
 // module
 import { UnitModule } from './modules/unit/unit.module';
 import { PropertyModule } from './modules/property/property.module';
-import { RentalHistoryModule } from '@app/modules/properties/src/rental-history/rental-history.module';
 
 @Module({
   imports: [
     UnitModule,
     PropertyModule,
     ClientConfigModule,
-    RentalHistoryModule,
     RouterModule.register([
       {
-        path: 'forms',
+        path: '',
         children: [
-          ...appendSubPathsToBaseModule('/', [PropertyModule, UnitModule, RentalHistoryModule]),
+          ...appendSubPathsToBaseModule('/', [PropertyModule, UnitModule]),
         ],
       },
     ]),
@@ -49,4 +47,4 @@ import { RentalHistoryModule } from '@app/modules/properties/src/rental-history/
       inject: [ClientConfigService]
     }],
 })
-export class FormsModule { }
+export class PropertiesModule { }
