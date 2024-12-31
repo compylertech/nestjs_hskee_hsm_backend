@@ -3,8 +3,8 @@ import { RouterModule } from '@nestjs/core';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { FORMS } from 'apps/common/config/constants';
-import { FORMS_CLIENT } from '../common/utils/constants';
+import { PROPERTIES } from 'apps/common/config/constants';
+import { PROPERTIES_CLIENT } from '../common/utils/constants';
 
 // helpers
 import { appendSubPathsToBaseModule } from 'apps/common/utils/helpers';
@@ -39,9 +39,9 @@ import { PropertyModule } from './modules/property/property.module';
   controllers: [PropertiesController],
   providers: [PropertiesService,
     {
-      provide: FORMS_CLIENT,
+      provide: PROPERTIES_CLIENT,
       useFactory(configService: ClientConfigService) {
-        const clientOptions = configService.getClientOptions(FORMS);
+        const clientOptions = configService.getClientOptions(PROPERTIES);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]
