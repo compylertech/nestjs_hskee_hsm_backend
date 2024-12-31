@@ -53,7 +53,7 @@ export class UnitService {
   }
 
   async remove(unitId: string): Promise<void> {
-    return this.unitClient.send<ClientUnitDto>(
+    await this.unitClient.send<ClientUnitDto>(
       UNIT_PATTERN.DELETE,
       unitId
     ).toPromise();

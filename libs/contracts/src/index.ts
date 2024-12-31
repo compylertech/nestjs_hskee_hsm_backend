@@ -47,8 +47,14 @@ export * from '@app/contracts/billing/invoice/create-invoice.dto'
 export * from '@app/contracts/billing/invoice/update-invoice.dto'
 export * from '@app/contracts/billing/invoice/invoice.patterns'
 
-export * from '@app/contracts/mail/onboarding-mail.dto'
-export * from '@app/contracts/mail/mail.pattern'
+export * from '@app/contracts/messaging/mail/onboarding-mail.dto'
+export * from '@app/contracts/messaging/mail/approved-mail.dto'
+export * from '@app/contracts/messaging/mail/confirm-mail.dto'
+export * from '@app/contracts/messaging/mail/payment-mail.dto'
+export * from '@app/contracts/messaging/mail/rejected-mail.dto'
+export * from '@app/contracts/messaging/mail/reset-pass-mail.dto'
+export * from '@app/contracts/messaging/mail/welcome-mail.dto'
+export * from '@app/contracts/messaging/mail/mail.pattern'
 
 // Media
 export * from '@app/contracts/resources/media/media.dto'

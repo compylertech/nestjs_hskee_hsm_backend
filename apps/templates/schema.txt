@@ -1,7 +1,19 @@
 welcome.html: first_name, last_name, user_email, unsubscribe_link
+ - after confirming email 
+
 rejected.html: first_name, last_name, user_email, unsubscribe_link
+- when applicant is rejected
+
 payment.html: first_name, last_name, user_email, unsubscribe_link
+
 passwordRest.html: first_name, last_name, user_email, reset_link, unsubscribe_link
+- reset password
+
 onboardingCompleted.html: first_name, last_name, user_email, phone_number, qr_code, unsubscribe_link
+- after filling onboarding
+
 confirmEmail.html: first_name, last_name, user_email, verify_link, unsubscribe_link
+- After successful verification send email
+
 approved.html: first_name, last_name, user_email, unsubscribe_link
+- When application is approved

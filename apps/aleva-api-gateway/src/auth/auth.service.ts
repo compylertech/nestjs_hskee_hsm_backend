@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 // constants
-import { AUTH_CLIENT } from '../common/utils/constants';
+import { AUTH_CLIENT, MAIL_CLIENT } from '../common/utils/constants';
 
 // api-gateway dtos
 import {
@@ -27,7 +27,10 @@ import {
 
 @Injectable()
 export class AuthService {
-  constructor(@Inject(AUTH_CLIENT) private authClient: ClientProxy) { }
+  constructor(
+    @Inject(AUTH_CLIENT) private authClient: ClientProxy,
+    @Inject(MAIL_CLIENT) private mailClient: ClientProxy
+  ) { }
 
   userLogin(authSignInDto: AuthSignInDto) {
     try {
