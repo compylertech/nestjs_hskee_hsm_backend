@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -8,19 +8,23 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Media } from './entities/media.entity';
 
 // contracts
-import { MediaDto, CreateMediaDto, UpdateMediaDto } from '@app/contracts';
+import { MediaDto, CreateMediaDto, UpdateMediaDto, EntityMediaTypeEnum } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
 import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import MediaUploaderService from 'apps/common/services/cloudinary/media_uploader';
+import { EntityMedia } from '../entity-media/entities/entity-media.entity';
 
 @Injectable()
 export class MediaService {
   private readonly mediaStore = 'media';
 
-  constructor(@InjectRepository(Media) private mediaRepository: Repository<Media>) { }
+  constructor(
+    @InjectRepository(Media) private mediaRepository: Repository<Media>,
+    @InjectRepository(EntityMedia) private entityMediaRepository: Repository<EntityMedia>
+  ) { }
 
   async create(createMediaDto: CreateMediaDto): Promise<Media> {
     try {
@@ -32,7 +36,6 @@ export class MediaService {
       throw new BadRequestException(`Error creating media: ${error.message}`);
     }
   }
-
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<MediaDto>> {
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
@@ -57,14 +60,34 @@ export class MediaService {
     return plainToInstance(MediaDto, media, { excludeExtraneousValues: false });
   }
 
+  async findByEntity(entity_ids: string[], entity_type: EntityMediaTypeEnum): Promise<any> {
+    const media = await this.entityMediaRepository.find({
+      where: {
+        entity_id: In(entity_ids),
+        entity_type: entity_type,
+      },
+      relations: ['media'],
+    });
+
+    const mediaByEntity = media.reduce((acc, curr) => {
+      if (!acc[curr.entity_id]) {
+        acc[curr.entity_id] = [];
+      }
+      acc[curr.entity_id].push(curr.media);
+      return acc;
+    }, {});
+    
+    return mediaByEntity;
+  }
+
   async update(id: string, updateMediaDto: UpdateMediaDto): Promise<MediaDto> {
     try {
       const media = await this.findEntityById(id);
       const mediaInfo = await this.processMedia(updateMediaDto, media);
       const updatedMedia = this.mediaRepository.merge(media, mediaInfo);
-      await this.mediaRepository.save(updatedMedia);
+      const savedMedia = await this.mediaRepository.save(updatedMedia);
 
-      return plainToInstance(MediaDto, updatedMedia, { excludeExtraneousValues: true });
+      return plainToInstance(MediaDto, savedMedia, { excludeExtraneousValues: false });
     } catch (error) {
       throw new BadRequestException(`Error updating media: ${error.message}`);
     }

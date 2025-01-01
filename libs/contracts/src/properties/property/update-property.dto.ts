@@ -1,17 +1,13 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreatePropertyDto } from './create-property.dto';
-import { PropertyTypeContract } from './property-info.dto';
+// enum
 import { PropertyStatus } from './property.enum';
 
-// export class UpdatePropertyDto extends PartialType(CreatePropertyDto) {
-//     property_unit_assoc_id?: string;
-// }
-
+// dto
+import { CreateMediaDto, CreateUnitDto, UpdateMediaDto, UpdateUnitDto } from '@app/contracts';
 
 export class UpdatePropertyDto {
     property_unit_assoc_id: string;
     name: string;
-    property_type: PropertyTypeContract;
+    property_type: string; // changed this from `PropertyTypeContract` to string
     amount: number;
     security_deposit: number;
     commission: number;
@@ -24,4 +20,6 @@ export class UpdatePropertyDto {
     pets_allowed: boolean;
     description?: string;
     property_status: PropertyStatus;
+    units?: CreateUnitDto[] | UpdateUnitDto[];
+    media?: CreateMediaDto[] | UpdateMediaDto[];
 }

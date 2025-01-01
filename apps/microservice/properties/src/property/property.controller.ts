@@ -49,9 +49,9 @@ export class PropertyController {
   }
 
   @MessagePattern(PROPERTY_PATTERN.UPDATE)
-  update(@Payload() updatePropertyDto: UpdatePropertyDto) {
+  async update(@Payload() updatePropertyDto: UpdatePropertyDto) {
     try {
-      return this.propertyService.update(updatePropertyDto.property_unit_assoc_id, updatePropertyDto);
+      return await this.propertyService.update(updatePropertyDto.property_unit_assoc_id, updatePropertyDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -61,7 +61,7 @@ export class PropertyController {
   }
 
   @MessagePattern(PROPERTY_PATTERN.DELETE)
-  remove(@Payload() id: string) {
-    return this.propertyService.remove(id);
+  async remove(@Payload() id: string) {
+    return await this.propertyService.remove(id);
   }
 }

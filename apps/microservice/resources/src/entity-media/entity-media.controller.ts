@@ -5,7 +5,7 @@ import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { EntityMediaService } from './entity-media.service';
 
 // contracts
-import { CreateEntityMediaDto, UpdateEntityMediaDto, ENTITY_MEDIA_PATTERN } from '@app/contracts';
+import { CreateEntityMediaDto, UpdateEntityMediaDto, ENTITY_MEDIA_PATTERN, EntityMediaTypeEnum } from '@app/contracts';
 
 // dto
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
@@ -50,6 +50,24 @@ export class EntityMediaController {
     }
   }
 
+  @MessagePattern(ENTITY_MEDIA_PATTERN.FIND_BY_ENTITY)
+  async findByEntity(@Payload() payload: { entity_id: string; entity_type: string }) {
+    const { entity_id, entity_type } = payload;
+
+    try {
+      if (!Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
+        throw new Error(`Invalid entity_type: ${entity_type}`);
+      }
+
+      return await this.entityMediaService.findByEntity(entity_id, entity_type as EntityMediaTypeEnum);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error fetching entityMedia with id: ${entity_id}`,
+      });
+    }
+  }
+
   @MessagePattern(ENTITY_MEDIA_PATTERN.UPDATE)
   update(@Payload() updateEntityMediaDto: UpdateEntityMediaDto) {
     try {
@@ -65,5 +83,16 @@ export class EntityMediaController {
   @MessagePattern(ENTITY_MEDIA_PATTERN.DELETE)
   remove(@Payload() id: string) {
     return this.entityMediaService.remove(id);
+  }
+
+  @MessagePattern(ENTITY_MEDIA_PATTERN.DELETE_BY_ENTITY)
+  async deleteByEntity(@Payload() payload: { entity_id: string; entity_type: string }): Promise<void> {
+    const { entity_id, entity_type } = payload;
+
+    if (!Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
+      throw new Error(`Invalid entity_type: ${entity_type}`);
+    }
+
+    await this.entityMediaService.deleteByEntity(entity_id, entity_type as EntityMediaTypeEnum);
   }
 }

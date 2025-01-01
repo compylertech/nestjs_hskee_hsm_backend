@@ -1,4 +1,8 @@
+// enum
 import { PropertyStatus } from './property.enum';
+
+// dto
+import { CreateMediaDto, CreateUnitDto, UpdateMediaDto, UpdateUnitDto } from '@app/contracts';
 
 export class CreatePropertyDto {
   name: string;
@@ -15,4 +19,6 @@ export class CreatePropertyDto {
   pets_allowed: boolean;
   description?: string;
   property_status: PropertyStatus;
+  units?: CreateUnitDto[] | UpdateUnitDto[];
+  media?: CreateMediaDto[] | UpdateMediaDto[];
 }

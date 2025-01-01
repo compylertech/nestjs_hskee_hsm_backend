@@ -44,7 +44,7 @@ export class QuestionnaireService {
   }
 
   async findOne(questionnaireId: string): Promise<ClientQuestionnaireDto> {
-    return this.questionnaireClient
+    return await this.questionnaireClient
       .send<ClientQuestionnaireDto>(QUESTIONNAIRE_PATTERN.FIND_ONE, questionnaireId)
       .toPromise();
   }
@@ -52,21 +52,21 @@ export class QuestionnaireService {
   async update(questionnaireId: string, updateQuestionnaireDto: UpdateQuestionnaireDto): Promise<ClientQuestionnaireDto> {
     const updateQuestionnaireContract: UpdateQuestionnaireDto = { ...updateQuestionnaireDto };
 
-    return this.questionnaireClient.send<ClientQuestionnaireDto, ClientUpdateQuestionnaireDto>(
+    return await this.questionnaireClient.send<ClientQuestionnaireDto, ClientUpdateQuestionnaireDto>(
       QUESTIONNAIRE_PATTERN.UPDATE,
       { questionnaire_id: questionnaireId, ...updateQuestionnaireContract }
     ).toPromise();
   }
 
   async remove(questionnaireId: string): Promise<void> {
-    return this.questionnaireClient.send<void>(
+    return await this.questionnaireClient.send<void>(
       QUESTIONNAIRE_PATTERN.DELETE,
       questionnaireId
     ).toPromise();
   }
 
   async removeEntityQuestionnaireResponse(questionnaireId: string): Promise<void> {
-    return this.questionnaireClient.send<void>(
+    return await this.questionnaireClient.send<void>(
       ENTITY_QUESTIONNAIRE_PATTERN.DELETE,
       questionnaireId
     ).toPromise();

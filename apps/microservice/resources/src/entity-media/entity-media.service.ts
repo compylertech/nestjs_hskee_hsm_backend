@@ -8,7 +8,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { EntityMedia } from './entities/entity-media.entity';
 
 // contracts
-import { EntityMediaDto, CreateEntityMediaDto, UpdateEntityMediaDto } from '@app/contracts';
+import { EntityMediaDto, CreateEntityMediaDto, UpdateEntityMediaDto, EntityMediaTypeEnum } from '@app/contracts';
 
 // pageMeta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -48,6 +48,12 @@ export class EntityMediaService {
     return plainToInstance(EntityMediaDto, entityMedia, { excludeExtraneousValues: false });
   }
 
+  async findByEntity(entity_id: string, entity_type: EntityMediaTypeEnum): Promise<EntityMedia[]> {
+    return await this.entityMediaRepository.find({
+      where: { entity_id, entity_type },
+    });
+  }
+
   async update(id: string, updateEntityMediaDto: UpdateEntityMediaDto): Promise<EntityMediaDto> {
     const entityMedia = await this.findEntityById(id);
 
@@ -61,6 +67,10 @@ export class EntityMediaService {
   async remove(id: string): Promise<void> {
     const entityMedia = await this.findEntityById(id);
     await this.entityMediaRepository.remove(entityMedia);
+  }
+
+  async deleteByEntity(entity_id: string, entity_type: EntityMediaTypeEnum): Promise<void> {
+    await this.entityMediaRepository.delete({ entity_id, entity_type });
   }
 
   private async findEntityById(id: string): Promise<EntityMedia> {

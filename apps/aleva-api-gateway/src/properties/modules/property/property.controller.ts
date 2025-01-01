@@ -11,7 +11,7 @@ import { UpdatePropertyDto } from './dto/update-property.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @ApiBearerAuth()
-@Controller('propertyes')
+@Controller('property')
 export class PropertyController {
   constructor(private readonly propertyService: PropertyService) { }
 
@@ -41,14 +41,14 @@ export class PropertyController {
     return query;
   }
 
-  // @Patch(':id')
-  // @ApiOperation({ summary: 'Update Property' })
-  // @ApiResponse({ status: 200, description: 'Successfully fetched property.', type: PropertyDto })
-  // @ApiResponse({ status: 422, description: 'Validation Error' })
-  // async update(@Param('id') id: string, @Body() updatePropertyDto: UpdatePropertyDto) {
-  //   let query = await this.propertyService.update(id, updatePropertyDto);
-  //   return query;
-  // }
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update Property' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched property.', type: PropertyDto })
+  @ApiResponse({ status: 422, description: 'Validation Error' })
+  async update(@Param('id') id: string, @Body() updatePropertyDto: UpdatePropertyDto) {
+    let query = await this.propertyService.update(id, updatePropertyDto);
+    return query;
+  }
 
   @Delete(':id')
   @HttpCode(204)

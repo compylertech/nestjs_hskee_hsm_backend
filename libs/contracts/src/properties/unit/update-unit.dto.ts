@@ -1,7 +1,7 @@
 import { PropertyStatus } from '../property/property.enum';
 
 export class UpdateUnitDto {
-    unit_id?: string;
+    property_unit_assoc_id?: string;
     property_unit_code?: string;
     property_unit_floor_space?: number;
     property_unit_amount?: number;

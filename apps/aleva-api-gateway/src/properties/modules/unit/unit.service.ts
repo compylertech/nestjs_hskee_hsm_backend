@@ -48,7 +48,7 @@ export class UnitService {
 
     return this.unitClient.send<ClientUnitDto, ClientUpdateUnitDto>(
       UNIT_PATTERN.UPDATE,
-      { unit_id: unitId, ...updateUnitContract }
+      { property_unit_assoc_id: unitId, ...updateUnitContract }
     ).toPromise();
   }
 

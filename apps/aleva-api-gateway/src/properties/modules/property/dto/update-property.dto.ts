@@ -1,12 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
-import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 // dto
 import { CreatePropertyDto } from './create-property.dto';
-import { PropertyStatus } from '@app/contracts';
+import { PropertyStatus, CreateMediaDto, CreateUnitDto, UpdateMediaDto, UpdateUnitDto } from '@app/contracts';
+import { Type } from 'class-transformer';
 
-export class UpdatePropertyDto extends PartialType(CreatePropertyDto) {
+export class UpdatePropertyDto {
     @ApiProperty()
     @IsOptional()
     @IsString()
@@ -82,4 +83,16 @@ export class UpdatePropertyDto extends PartialType(CreatePropertyDto) {
     @IsEnum(PropertyStatus)
     @IsOptional()
     property_status: PropertyStatus;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UpdateUnitDto)
+    @IsOptional()
+    units?: UpdateUnitDto[];
+  
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UpdateMediaDto)
+    @IsOptional()
+    media?: UpdateMediaDto[];
 }

@@ -9,9 +9,10 @@ import { MediaService } from './media.service';
 
 // controllers
 import { MediaController } from './media.controller';
+import { EntityMedia } from '../entity-media/entities/entity-media.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Media])],
+  imports: [TypeOrmModule.forFeature([Media, EntityMedia])],
   controllers: [MediaController],
   providers: [MediaService],
 })

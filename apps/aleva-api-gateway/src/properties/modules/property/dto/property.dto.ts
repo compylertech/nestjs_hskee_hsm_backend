@@ -1,8 +1,12 @@
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean, IsArray, ValidateNested } from 'class-validator';
 
 // enum
 import { PropertyStatus } from '@app/contracts/properties/property/property.enum';
+
+// dto
+import { MediaDto, UnitDto } from '@app/contracts';
 
 export class PropertyDto {
     @ApiProperty()
@@ -64,4 +68,16 @@ export class PropertyDto {
     @ApiProperty({ enum: PropertyStatus })
     @IsEnum(PropertyStatus)
     property_status: PropertyStatus;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UnitDto)
+    @IsOptional()
+    units?: UnitDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => MediaDto)
+    @IsOptional()
+    media?: MediaDto[];
 }

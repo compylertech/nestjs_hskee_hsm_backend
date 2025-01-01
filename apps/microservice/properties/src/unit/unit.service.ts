@@ -19,11 +19,15 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 export class UnitService {
   constructor(@InjectRepository(Unit) private unitRepository: Repository<Unit>) { }
 
+  async create(createUnitDto: CreateUnitDto): Promise<UnitDto> {
+    // create unit record
+    const newUnit = this.unitRepository.create({
+      ...createUnitDto
+    });
 
-  async create(createUnitDto: CreateUnitDto): Promise<Unit> {
-    const newUnit = this.unitRepository.create(createUnitDto);
+    const savedEntity = await this.unitRepository.save(newUnit);
 
-    return this.unitRepository.save(newUnit);
+    return plainToInstance(UnitDto, savedEntity, { excludeExtraneousValues: false });
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UnitDto>> {

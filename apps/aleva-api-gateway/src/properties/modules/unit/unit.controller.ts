@@ -11,7 +11,7 @@ import { UpdateUnitDto } from './dto/update-unit.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @ApiBearerAuth()
-@Controller('unites')
+@Controller('unit')
 export class UnitController {
   constructor(private readonly unitService: UnitService) { }
 

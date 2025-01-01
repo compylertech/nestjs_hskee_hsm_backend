@@ -21,17 +21,19 @@ import { ClientConfigModule, ClientConfigService } from '../../../common/config'
 // module
 import { UnitModule } from './modules/unit/unit.module';
 import { PropertyModule } from './modules/property/property.module';
+import { AmenitiesModule } from './modules/amenities/amenities.module';
 
 @Module({
   imports: [
     UnitModule,
     PropertyModule,
+    AmenitiesModule,
     ClientConfigModule,
     RouterModule.register([
       {
         path: '',
         children: [
-          ...appendSubPathsToBaseModule('/', [PropertyModule, UnitModule]),
+          ...appendSubPathsToBaseModule('/', [PropertyModule, UnitModule, AmenitiesModule]),
         ],
       },
     ]),

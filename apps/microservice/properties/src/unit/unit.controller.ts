@@ -51,11 +51,11 @@ export class UnitController {
   @MessagePattern(UNIT_PATTERN.UPDATE)
   async update(@Payload() updateUnitDto: UpdateUnitDto) {
     try {
-      return await this.unitService.update(updateUnitDto.unit_id, updateUnitDto);
+      return await this.unitService.update(updateUnitDto.property_unit_assoc_id, updateUnitDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
-        message: error.message || `Error updating unit with id: ${updateUnitDto.unit_id}`,
+        message: error.message || `Error updating unit with id: ${updateUnitDto.property_unit_assoc_id}`,
       });
     }
   }

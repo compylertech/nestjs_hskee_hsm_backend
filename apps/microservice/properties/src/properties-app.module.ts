@@ -8,7 +8,9 @@ import { ClientConfigModule } from 'apps/common/config';
 // module
 import { UnitModule } from './unit/unit.module';
 import { PropertyModule } from './property/property.module';
+import { AmenitiesModule } from './amenities/amenities.module';
 import { RentalHistoryModule } from './rental-history/rental-history.module';
+import { EntityAmenitiesModule } from './entity-amenities/entity-amenities.module';
 
 
 @Module({
@@ -40,7 +42,7 @@ import { RentalHistoryModule } from './rental-history/rental-history.module';
       },
       inject: [ConfigService],
     }),
-    PropertyModule, UnitModule, RentalHistoryModule, ClientConfigModule
+    PropertyModule, UnitModule, EntityAmenitiesModule, AmenitiesModule, RentalHistoryModule, ClientConfigModule
   ],
   controllers: [],
   providers: [],

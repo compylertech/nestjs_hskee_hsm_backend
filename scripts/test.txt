@@ -17,3 +17,12 @@ node scripts/runner.js --module properties --base apps --submodule property --mi
 node scripts/runner.js --module properties --base apps --submodule unit --microservice all
 
 node scripts/runner.js --module properties --base apps --submodule rental-history --microservice all
+
+node scripts/runner.js --module properties --base apps --submodule amenities --contracts all
+
+node scripts/runner.js --module properties --base apps --submodule amenities --gateway all
+
+node scripts/runner.js --module resources --base apps --submodule account --gateway all
+
+
+node scripts/runner.js --module properties --base apps --submodule amenities --microservice all

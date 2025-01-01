@@ -25,13 +25,18 @@ import { AddressModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
 import { UserModule } from './auth/modules/users/users.module';
 import { PropertiesModule } from './properties/properties.module';
-import { MediaModule } from './resources/modules/media/media.module';
 import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-log.module';
+import { ResourceModule } from './resources/resources.module';
+import { BillingModule } from './billing/billing.module';
 
 @Module({
   imports: [
+    ClientConfigModule,
     AuthModule, AddressModule, UserModule, FormsModule, 
-    AttendanceLogModule, ClientConfigModule, MediaModule, PropertiesModule,
+    AttendanceLogModule,
+     ResourceModule,
+     BillingModule,
+      PropertiesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -69,10 +74,6 @@ import { AttendanceLogModule } from './auth/modules/attendance_log/attendance-lo
       {
         path: 'booking',
         module: BookingModule,
-      },
-      {
-        path: '',
-        module: MediaModule,
       }
     ]),
   ],
