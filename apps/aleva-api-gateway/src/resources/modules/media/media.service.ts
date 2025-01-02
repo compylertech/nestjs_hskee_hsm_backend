@@ -6,13 +6,14 @@ import { RESOURCE_CLIENT } from '../../../common/utils/constants';
 
 // contracts
 import {
+  EntityMediaTypeEnum,
+  
   MEDIA_PATTERN,
   MediaDto as ClientMediaDto,
   CreateMediaDto as ClientCreateMediaDto,
   UpdateMediaDto as ClientUpdateMediaDto,
 
   ENTITY_MEDIA_PATTERN,
-  EntityMediaTypeEnum,
   EntityMediaDto as ClientEntityMediaDto,
   CreateEntityMediaDto as ClientCreateEntityMediaDto,
 } from '@app/contracts';
@@ -37,6 +38,8 @@ export class MediaService extends BaseService<
   ClientEntityMediaDto,
   ClientCreateEntityMediaDto
 > {
+  private readonly entityIdKey = 'media_id';
+
   constructor(@Inject(RESOURCE_CLIENT) mediaClient: ClientProxy) {
     super(
       'media_id',

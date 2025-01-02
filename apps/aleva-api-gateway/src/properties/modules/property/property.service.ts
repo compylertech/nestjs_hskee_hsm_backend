@@ -7,11 +7,12 @@ import { PROPERTIES_CLIENT } from '../../../common/utils/constants';
 // contracts
 import {
   EntityMediaTypeEnum,
+  EntityAmenityTypeEnum,
+  
   PROPERTY_PATTERN,
   PropertyDto as ClientPropertyDto,
   CreatePropertyDto as ClientCreatePropertyDto,
-  UpdatePropertyDto as ClientUpdatePropertyDto,
-  EntityAmenityTypeEnum,
+  UpdatePropertyDto as ClientUpdatePropertyDto
 } from '@app/contracts';
 
 // dto
@@ -35,6 +36,8 @@ export class PropertyService extends BaseService<
   null,
   null
 > {
+  private readonly entityIdKey = 'property_unit_assoc_id'; 
+  
   constructor(
     private readonly mediaService: MediaService,
     private readonly amenityService: AmenitiesService,
@@ -72,7 +75,7 @@ export class PropertyService extends BaseService<
       .send<ClientPropertyDto, ClientCreatePropertyDto>(PROPERTY_PATTERN.CREATE, createPropertyContract)
       .toPromise();
 
-    const fieldResponses = await this.createEntityFields(propertyResponse.property_unit_assoc_id, createPropertyDto);
+    const fieldResponses = await this.createEntityFields(propertyResponse[this.entityIdKey], createPropertyDto);
 
     // merge all responses
     return { ...propertyResponse, ...fieldResponses };
@@ -84,7 +87,7 @@ export class PropertyService extends BaseService<
       pageOptionsDto
     ).toPromise();
 
-    const mappedData = await this.fetchAndMap(properties["data"], 'property_unit_assoc_id');
+    const mappedData = await this.fetchAndMap(properties["data"], this.entityIdKey);
 
     return { ...properties, data: mappedData };
   }
@@ -94,7 +97,7 @@ export class PropertyService extends BaseService<
       .send<ClientPropertyDto>(PROPERTY_PATTERN.FIND_ONE, propertyId)
       .toPromise();
 
-    const mappedData = await this.fetchAndMap([property], 'property_unit_assoc_id');
+    const mappedData = await this.fetchAndMap([property], this.entityIdKey);
 
     return { ...mappedData[0] };
   }
@@ -106,7 +109,7 @@ export class PropertyService extends BaseService<
     const propertyResponse = await this.propertyClient
       .send<ClientPropertyDto, ClientUpdatePropertyDto>(
         PROPERTY_PATTERN.UPDATE,
-        { property_unit_assoc_id: propertyId, ...updatePropertyContract }
+        { [this.entityIdKey]: propertyId, ...updatePropertyContract }
       )
       .toPromise();
 
