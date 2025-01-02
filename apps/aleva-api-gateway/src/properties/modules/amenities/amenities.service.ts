@@ -9,54 +9,32 @@ import {
   AMENITIES_PATTERN,
   AmenitiesDto as ClientAmenitiesDto,
   CreateAmenitiesDto as ClientCreateAmenitiesDto,
-  UpdateAmenitiesDto as ClientUpdateAmenitiesDto
+  UpdateAmenitiesDto as ClientUpdateAmenitiesDto,
+  ENTITY_AMENITIES_PATTERN,
+  EntityAmenityTypeEnum,
+  EntityAmenitiesDto as ClientEntityAmenitiesDto,
+  CreateEntityAmenitiesDto as ClientCreateEntityAmenitiesDto,
 } from '@app/contracts';
 
 // dto
 import { CreateAmenitiesDto } from './dto/create-amenities.dto';
 import { UpdateAmenitiesDto } from './dto/update-amenities.dto';
-import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
+// services
+import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
 
 @Injectable()
-export class AmenitiesService {
-  constructor(@Inject(PROPERTIES_CLIENT) private readonly amenitiesClient: ClientProxy) { }
-
-  async create(createAmenitiesDto: CreateAmenitiesDto): Promise<ClientAmenitiesDto> {
-    const createAmenitiesContract: CreateAmenitiesDto = { ...createAmenitiesDto };
-
-    return this.amenitiesClient.send<ClientAmenitiesDto, ClientCreateAmenitiesDto>(
-      AMENITIES_PATTERN.CREATE, createAmenitiesContract
-    ).toPromise();
-  }
-
-  async findAll(pageOptionsDto: PageOptionsDto): Promise<ClientAmenitiesDto[]> {
-    return this.amenitiesClient.send<ClientAmenitiesDto[]>(
-      AMENITIES_PATTERN.FIND_ALL,
-      pageOptionsDto
-    ).toPromise();
-  }
-
-  async findOne(amenitiesId: string): Promise<ClientAmenitiesDto> {
-    return this.amenitiesClient
-      .send<ClientAmenitiesDto>(AMENITIES_PATTERN.FIND_ONE, amenitiesId)
-      .toPromise();
-  }
-
-  async update(amenitiesId: string, updateAmenitiesDto: UpdateAmenitiesDto): Promise<ClientAmenitiesDto> {
-    const updateAmenitiesContract: UpdateAmenitiesDto = { ...updateAmenitiesDto };
-
-    return this.amenitiesClient.send<ClientAmenitiesDto, ClientUpdateAmenitiesDto>(
-      AMENITIES_PATTERN.UPDATE,
-      { amenity_id: amenitiesId, ...updateAmenitiesContract }
-    ).toPromise();
-  }
-
-  async remove(amenitiesId: string): Promise<void> {
-    return this.amenitiesClient.send<ClientAmenitiesDto>(
-      AMENITIES_PATTERN.DELETE,
-      amenitiesId
-    ).toPromise();
+export class AmenitiesService extends BaseService<
+  EntityAmenityTypeEnum,
+  CreateAmenitiesDto,
+  UpdateAmenitiesDto,
+  ClientAmenitiesDto,
+  ClientCreateAmenitiesDto,
+  ClientUpdateAmenitiesDto,
+  ClientEntityAmenitiesDto,
+  ClientCreateEntityAmenitiesDto
+> {
+  constructor(@Inject(PROPERTIES_CLIENT) amenitiesClient: ClientProxy) {
+    super('amenity_id', amenitiesClient, { ...AMENITIES_PATTERN, LINK_ENTITY: ENTITY_AMENITIES_PATTERN.CREATE, DELETE_BY_ENTITY: ENTITY_AMENITIES_PATTERN.DELETE_BY_ENTITY });
   }
 }
-

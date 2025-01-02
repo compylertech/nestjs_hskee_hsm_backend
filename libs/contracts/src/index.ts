@@ -101,5 +101,6 @@ export * from '@app/contracts/properties/amenities/amenities.pattern'
 
 export * from '@app/contracts/properties/entity-amenities/create-entity-amenities.dto'
 export * from '@app/contracts/properties/entity-amenities/entity-amenities.dto'
+export * from '@app/contracts/properties/entity-amenities/entity-amenities.enum'
 export * from '@app/contracts/properties/entity-amenities/update-entity-amenities.dto'
 export * from '@app/contracts/properties/entity-amenities/entity-amenities.patterns'

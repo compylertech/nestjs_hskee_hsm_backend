@@ -2,24 +2,15 @@ import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 // constants
-import { PROPERTIES_CLIENT, RESOURCE_CLIENT } from '../../../common/utils/constants';
+import { PROPERTIES_CLIENT } from '../../../common/utils/constants';
 
 // contracts
 import {
+  EntityMediaTypeEnum,
   PROPERTY_PATTERN,
   PropertyDto as ClientPropertyDto,
   CreatePropertyDto as ClientCreatePropertyDto,
   UpdatePropertyDto as ClientUpdatePropertyDto,
-
-  MEDIA_PATTERN,
-  MediaDto as ClientMediaDto,
-  CreateMediaDto as ClientCreateMediaDto,
-  UpdateMediaDto as ClientUpdateMediaDto,
-  
-  ENTITY_MEDIA_PATTERN,
-  EntityMediaTypeEnum,
-  EntityMediaDto as ClientEntityMediaDto,
-  CreateEntityMediaDto as ClientCreateEntityMediaDto,
 } from '@app/contracts';
 
 // dto
@@ -27,28 +18,22 @@ import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
+// service
+import { AmenitiesService } from '../amenities/amenities.service';
+import { MediaService } from 'apps/aleva-api-gateway/src/resources/modules/media/media.service';
+
 @Injectable()
 export class PropertyService {
   constructor(
-    @Inject(RESOURCE_CLIENT) private readonly resourceClient: ClientProxy,
+    private readonly mediaService: MediaService,
+    private readonly amenityService: AmenitiesService,
     @Inject(PROPERTIES_CLIENT) private readonly propertyClient: ClientProxy
   ) { }
 
-  // fetch and map media
-  private async fetchAndMapMedia(
-    properties: ClientPropertyDto[]
-  ): Promise<ClientPropertyDto[]> {
+  private async fetchAndMapMedia(properties: ClientPropertyDto[]): Promise<ClientPropertyDto[]> {
     const propertyIds = properties.map((property) => property.property_unit_assoc_id);
+    const mediaByProperty = await this.mediaService.fetchByEntityIDs(propertyIds, EntityMediaTypeEnum.PROPERTY);
 
-    // fetch all media linked to the properties
-    const mediaByProperty = await this.resourceClient
-      .send<Record<string, ClientMediaDto[]>>(MEDIA_PATTERN.FIND_BY_ENTITIES, {
-        entity_ids: propertyIds,
-        entity_type: EntityMediaTypeEnum.PROPERTY,
-      })
-      .toPromise();
-
-    // map media to their respective properties
     return properties.map((property) => ({
       ...property,
       media: mediaByProperty[property.property_unit_assoc_id] || [],
@@ -59,37 +44,18 @@ export class PropertyService {
     const { media, ...createPropertyContract } = createPropertyDto;
 
     // create the property
-    const propertyResponse = await this.propertyClient.send<ClientPropertyDto, ClientCreatePropertyDto>(
-      PROPERTY_PATTERN.CREATE,
-      createPropertyContract
-    ).toPromise();
+    const propertyResponse = await this.propertyClient
+      .send<ClientPropertyDto, ClientCreatePropertyDto>(PROPERTY_PATTERN.CREATE, createPropertyContract)
+      .toPromise();
 
-    // create media and link it to the property
     if (media && media.length > 0) {
-      const mediaResponse = await Promise.all(
-        media.map((mediaItem) =>
-          this.resourceClient
-            .send<ClientMediaDto, ClientCreateMediaDto>(MEDIA_PATTERN.CREATE, mediaItem)
-            .toPromise()
-        )
+      const mediaResponses = await this.mediaService.createAndLinkEntities(
+        propertyResponse.property_unit_assoc_id,
+        EntityMediaTypeEnum.PROPERTY,
+        media
       );
 
-      const entityMediaLinks = mediaResponse.map((media) => ({
-        entity_id: propertyResponse.property_unit_assoc_id,
-        media_id: media.media_id,
-        entity_type: EntityMediaTypeEnum.PROPERTY,
-        media_type: media.media_type,
-      }));
-
-      await Promise.all(
-        entityMediaLinks.map((link) =>
-          this.resourceClient
-            .send<ClientEntityMediaDto, ClientCreateEntityMediaDto>(ENTITY_MEDIA_PATTERN.CREATE, link)
-            .toPromise()
-        )
-      );
-
-      return { ...propertyResponse, media: mediaResponse };
+      return { ...propertyResponse, media: mediaResponses };
     }
 
     return { ...propertyResponse, media: [] };
@@ -128,52 +94,14 @@ export class PropertyService {
       .toPromise();
 
     if (media && media.length > 0) {
-      // fetch existing media
-      const existingMedia = await this.resourceClient
-        .send<ClientEntityMediaDto[]>(ENTITY_MEDIA_PATTERN.FIND_BY_ENTITY, {
-          entity_id: propertyId,
-          entity_type: EntityMediaTypeEnum.PROPERTY,
-        })
-        .toPromise();
+      const existingMedia = await this.mediaService.fetchByEntityIDs([propertyId], EntityMediaTypeEnum.PROPERTY);
+      const existingMediaIds = (existingMedia[propertyId] || []).map((m) => m.media_id);
 
-      const existingMediaIds = existingMedia.map((em) => em.media_id);
-
-      // separate new and existing media
       const newMedia = media.filter((m) => !m.media_id);
-      const existingMediaToUpdate = media.filter((m) => m.media_id && existingMediaIds.includes(m.media_id));
+      const mediaToUpdate = media.filter((m) => m.media_id && existingMediaIds.includes(m.media_id));
 
-      // create new media
-      const newMediaResponses = await Promise.all(
-        newMedia.map((mediaItem) =>
-          this.resourceClient
-            .send<ClientMediaDto, ClientCreateMediaDto>(MEDIA_PATTERN.CREATE, mediaItem)
-            .toPromise()
-        )
-      );
-
-      const newEntityMediaLinks = newMediaResponses.map((newMedia) => ({
-        entity_id: propertyId,
-        media_id: newMedia.media_id,
-        entity_type: EntityMediaTypeEnum.PROPERTY,
-        media_type: newMedia.media_type,
-      }));
-
-      await Promise.all(
-        newEntityMediaLinks.map((link) =>
-          this.resourceClient
-            .send<ClientEntityMediaDto, ClientCreateEntityMediaDto>(ENTITY_MEDIA_PATTERN.CREATE, link)
-            .toPromise()
-        )
-      );
-
-      // update existing media
-      const updatedMediaResponses = await Promise.all(
-        existingMediaToUpdate.map((mediaItem) =>
-          this.resourceClient
-            .send<ClientMediaDto, ClientUpdateMediaDto>(MEDIA_PATTERN.UPDATE, mediaItem)
-            .toPromise()
-        )
-      );
+      const newMediaResponses = await this.mediaService.createAndLinkEntities(propertyId, EntityMediaTypeEnum.PROPERTY, newMedia);
+      const updatedMediaResponses = await this.mediaService.updateEntities(mediaToUpdate);
 
       return { ...propertyResponse, media: [...newMediaResponses, ...updatedMediaResponses] };
     }
@@ -183,12 +111,7 @@ export class PropertyService {
 
   async remove(propertyId: string): Promise<void> {
     // remove entity-media links
-    await this.resourceClient
-      .send<void>(ENTITY_MEDIA_PATTERN.DELETE_BY_ENTITY, {
-        entity_id: propertyId,
-        entity_type: EntityMediaTypeEnum.PROPERTY,
-      })
-      .toPromise();
+    await this.mediaService.removeEntityLinks(propertyId, EntityMediaTypeEnum.PROPERTY);
 
     // remove the property
     await this.propertyClient.send<void>(PROPERTY_PATTERN.DELETE, propertyId).toPromise();

@@ -1,0 +1,71 @@
+{
+    "address": [
+      {
+        "address_1": "37830 Parrish Knolls Apt. 280\nAndrewhaven, PA 64505",
+        "address_2": "1844 Phillip Station",
+        "address_postalcode": "",
+        "address_type": "mailing",
+        "city": "Samanthafurt",
+        "country": "Belarus",
+        "emergency_address": false,
+        "primary": true,
+        "region": "Idaho"
+      }
+    ],
+    "amenities": [
+      {
+        "amenity_description": "Certainly sort buy item shoulder company night.",
+        "amenity_name": "public",
+        "amenity_short_name": "factor"
+      }
+    ],
+    "amount": 70891,
+    "commission": 604,
+    "description": "Account report just affect. We court lot about run PM smile career. Although tax understand remain know.\nFear cultural help require opportunity talk ago car. Protect article leader address.",
+    "floor_space": 55,
+    "has_balconies": true,
+    "has_parking_space": false,
+    "media": [
+      {
+        "caption": "Letter enjoy determine father while whole beautiful.",
+        "content_url": "http://www.willis.com/",
+        "description": "Hotel guess under collection artist head rich. Level door family low action.\nChance health religious cup economic purpose. This back sit wrong air for try. Save girl to because but believe along.",
+        "is_thumbnail": false,
+        "media_name": "financial",
+        "media_type": "video"
+      }
+    ],
+    "name": "Sherman-Burton",
+    "num_bathrooms": 4,
+    "num_garages": 0,
+    "num_units": 10,
+    "pets_allowed": true,
+    "property_status": "bought",
+    "property_type": "industrial",
+    "security_deposit": 2169,
+    "units": [
+      {
+        "has_amenities": false,
+        "property_floor_id": 3,
+        "property_status": "sold",
+        "property_unit_amount": 9708,
+        "property_unit_code": "Unit Q1",
+        "property_unit_commission": 72,
+        "property_unit_floor_space": 108,
+        "property_unit_notes": "Sister key number class about exactly choose.",
+        "property_unit_security_deposit": 37
+      }
+    ],
+    "utilities": [
+      {
+        "apply_to_units": false,
+        "billable_amount": 4782,
+        "billable_type": "utilities",
+        "description": "Red want hit occur down environment need place.",
+        "end_period": "2024-12-08",
+        "name": "practice",
+        "payment_type_id": 1,
+        "start_period": "2024-04-08"
+      }
+    ]
+  }

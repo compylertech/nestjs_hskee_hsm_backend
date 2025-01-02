@@ -7,17 +7,21 @@ import { PROPERTIES_CLIENT, RESOURCE_CLIENT } from '../../../common/utils/consta
 
 // services
 import { PropertyService } from './property.service';
+import { AmenitiesService } from '../amenities/amenities.service';
+import { MediaService } from 'apps/aleva-api-gateway/src/resources/modules/media/media.service';
+
 
 // controller
 import { PropertyController } from './property.controller';
 
 // config
 import { ClientConfigModule, ClientConfigService } from '../../../../../common/config';
-
 @Module({
   imports: [ClientConfigModule],
   controllers: [PropertyController],
   providers: [
+    MediaService,
+    AmenitiesService,
     PropertyService,
     {
       provide: PROPERTIES_CLIENT,

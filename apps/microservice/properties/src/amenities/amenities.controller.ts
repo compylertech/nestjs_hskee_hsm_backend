@@ -5,8 +5,11 @@ import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { AmenitiesService } from './amenities.service';
 
 // contracts
-import { CreateAmenitiesDto, UpdateAmenitiesDto, AMENITIES_PATTERN } from '@app/contracts';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+import { CreateAmenitiesDto, UpdateAmenitiesDto, AMENITIES_PATTERN } from '@app/contracts';
+
+// enum
+import { EntityAmenityTypeEnum } from '@app/contracts/properties/entity-amenities/entity-amenities.enum';
 
 @Controller('amenities')
 export class AmenitiesController {
@@ -48,10 +51,24 @@ export class AmenitiesController {
     }
   }
 
-  @MessagePattern(AMENITIES_PATTERN.UPDATE)
-  update(@Payload() updateAmenitiesDto: UpdateAmenitiesDto) {
+  @MessagePattern(AMENITIES_PATTERN.FIND_BY_ENTITIES)
+  async findByEntities(@Payload() payload: { entity_ids: string[]; entity_type: string }) {
+    const { entity_ids, entity_type } = payload;
+
     try {
-      return this.amenitiesService.update(updateAmenitiesDto.amenity_id, updateAmenitiesDto);
+      return await this.amenitiesService.findByEntity(entity_ids, entity_type as EntityAmenityTypeEnum)
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error finding amenities info`,
+      });
+    }
+  }
+
+  @MessagePattern(AMENITIES_PATTERN.UPDATE)
+  async update(@Payload() updateAmenitiesDto: UpdateAmenitiesDto) {
+    try {
+      return await this.amenitiesService.update(updateAmenitiesDto.amenity_id, updateAmenitiesDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -61,7 +78,7 @@ export class AmenitiesController {
   }
 
   @MessagePattern(AMENITIES_PATTERN.DELETE)
-  remove(@Payload() id: string) {
-    return this.amenitiesService.remove(id);
+  async remove(@Payload() id: string) {
+    return await this.amenitiesService.remove(id);
   }
 }

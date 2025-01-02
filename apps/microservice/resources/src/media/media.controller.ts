@@ -66,7 +66,6 @@ export class MediaController {
     }
   }
 
-
   @MessagePattern(MEDIA_PATTERN.UPDATE)
   async update(@Payload() updateMediaDto: UpdateMediaDto) {
     try {

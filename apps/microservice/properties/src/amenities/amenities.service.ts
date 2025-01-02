@@ -1,11 +1,15 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
+// enum
+import { EntityAmenityTypeEnum } from '@app/contracts/properties/entity-amenities/entity-amenities.enum';
+
 // entity
 import { Amenities } from './entities/amenities.entity';
+import { EntityAmenities } from '../entity-amenities/entities/entity-amenities.entity';
 
 // contracts
 import { AmenitiesDto, CreateAmenitiesDto, UpdateAmenitiesDto } from '@app/contracts';
@@ -17,8 +21,10 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Injectable()
 export class AmenitiesService {
-  constructor(@InjectRepository(Amenities) private amenitiesRepository: Repository<Amenities>) { }
-
+  constructor(
+    @InjectRepository(Amenities) private amenitiesRepository: Repository<Amenities>,
+    @InjectRepository(EntityAmenities) private entityAmenityRepository: Repository<EntityAmenities>
+  ) { }
 
   async create(createAmenitiesDto: CreateAmenitiesDto): Promise<Amenities> {
     const newAmenities = this.amenitiesRepository.create(createAmenitiesDto);
@@ -29,7 +35,7 @@ export class AmenitiesService {
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<AmenitiesDto>> {
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.amenitiesRepository.createQueryBuilder('amenities');
-    
+
     queryBuilder
       .orderBy('amenities.created_at', pageOptionsDto.order)
       .skip(options.skip)
@@ -46,6 +52,26 @@ export class AmenitiesService {
     const amenities = await this.findEntityById(id);
 
     return plainToInstance(AmenitiesDto, amenities, { excludeExtraneousValues: false });
+  }
+
+  async findByEntity(entity_ids: string[], entity_type: EntityAmenityTypeEnum): Promise<any> {
+    const amenity = await this.entityAmenityRepository.find({
+      where: {
+        entity_id: In(entity_ids),
+        entity_type: entity_type,
+      },
+      relations: ['amenity'],
+    });
+
+    const amenityByEntity = amenity.reduce((acc, curr) => {
+      if (!acc[curr.entity_id]) {
+        acc[curr.entity_id] = [];
+      }
+      acc[curr.entity_id].push(curr.amenity);
+      return acc;
+    }, {});
+
+    return amenityByEntity;
   }
 
   async update(id: string, updateAmenitiesDto: UpdateAmenitiesDto): Promise<AmenitiesDto> {

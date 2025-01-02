@@ -1,11 +1,9 @@
+import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { PartialType } from '@nestjs/mapped-types';
 import { IsArray, IsBoolean, IsEnum, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 // dto
-import { CreatePropertyDto } from './create-property.dto';
-import { PropertyStatus, CreateMediaDto, CreateUnitDto, UpdateMediaDto, UpdateUnitDto } from '@app/contracts';
-import { Type } from 'class-transformer';
+import { PropertyStatus, UpdateMediaDto, UpdateUnitDto, UpdateAmenitiesDto } from '@app/contracts';
 
 export class UpdatePropertyDto {
     @ApiProperty()
@@ -95,4 +93,10 @@ export class UpdatePropertyDto {
     @Type(() => UpdateMediaDto)
     @IsOptional()
     media?: UpdateMediaDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => UpdateAmenitiesDto)
+    @IsOptional()
+    amenities?: UpdateAmenitiesDto[];
 }

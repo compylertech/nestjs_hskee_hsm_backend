@@ -27,6 +27,7 @@ import { MediaController } from './media.controller';
       },
       inject: [ClientConfigService]
     }
-  ]
+  ],
+  exports:[MediaService]
 })
 export class MediaModule {}

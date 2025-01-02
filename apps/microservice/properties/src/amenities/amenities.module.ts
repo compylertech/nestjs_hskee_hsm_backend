@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 // entity
 import { Amenities } from './entities/amenities.entity';
-// import { EntityAmenities } from '../entity-amenities/entities/entity-amenities.entity';
+import { EntityAmenities } from '../entity-amenities/entities/entity-amenities.entity';
 
 // services
 import { AmenitiesService } from './amenities.service';
@@ -12,9 +12,8 @@ import { AmenitiesService } from './amenities.service';
 import { AmenitiesController } from './amenities.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Amenities])],
+  imports: [TypeOrmModule.forFeature([Amenities, EntityAmenities])],
   controllers: [AmenitiesController],
-  providers: [AmenitiesService],
-  // exports: [Amenities]
+  providers: [AmenitiesService]
 })
 export class AmenitiesModule {}
