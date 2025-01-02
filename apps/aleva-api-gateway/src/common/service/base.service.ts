@@ -23,7 +23,7 @@ export abstract class BaseService<
         }>
     ) { }
 
-    getDtoKeys(): string[] {
+    private getDtoKeys(): string[] {
         return this.dtoClass.keys();
     }
 
@@ -86,75 +86,15 @@ export abstract class BaseService<
     // create and process linked mappings including
     // intermediary table mappings.
     // E.g. property -> media via entity_media
-    async createEntityFieldsOld(
-        entityId: string,
-        fields: Array<{
-            field: string;
-            data: any[];
-            service: any;
-            entityType: any;
-        }>
-    ): Promise<Record<string, any[]>> {
-        const fieldResponses: Record<string, any[]> = {};
-
-        for (const handler of fields) {
-            if (handler.data && handler.data.length > 0) {
-                fieldResponses[handler.field] = await handler.service.createAndLinkEntities(
-                    entityId,
-                    handler.entityType,
-                    handler.data
-                );
-            } else {
-                fieldResponses[handler.field] = [];
-            }
-        }
-
-        return fieldResponses;
-    }
-
-    // async createEntityFields(
-    //     propertyResponse: TDto
-    //     // entityId: string,
-    //     // fields: Array<{
-    //     //     field: string;
-    //     //     data: any[];
-    //     //     service: any;
-    //     //     entityType: any;
-    //     // }>
-    // ): Promise<Record<string, any[]>> {
-        // const fieldResponses: Record<string, any[]> = {};
-        // const entityId = (propertyResponse as any)[this.tDtoID];
-
-        // for (const handler of this.mappings) {
-        //     if (propertyResponse[handler.mapKey] && (propertyResponse as any)[handler.mapKey].length > 0) {
-        //         (fieldResponses as any)[handler.mapKey] = await handler.service.createAndLinkEntities(
-        //             entityId,
-        //             handler.entityType,
-        //             (propertyResponse as any)[handler.mapKey]
-        //         );
-        //     } else {
-        //         (fieldResponses as any)[handler.mapKey]  = [];
-        //     }
-        // }
-
-        // return fieldResponses;
-    // }
-
     async createEntityFields<TDto>(
         entityId: string,
         propertyResponse: TDto
     ): Promise<Record<string, any[]>> {
-        // const entityId = (propertyResponse as any)[this.tDtoID];
     
         const fieldResponses = await Promise.all(
             this.mappings.map(async ({ mapKey, service, entityType }) => {
-                console.log(`\t entityId: ${entityId as String}`)
-                console.log(`\t mapKey: ${mapKey as String}`)
-                console.log(`\t entityId: ${entityId as String}`)
-                console.log(`\t entityType: ${entityType as String}`)
 
                 const data = (propertyResponse as any)[mapKey] || [];
-                // console.log(`\t data: ${JSON.stringify(data)}`)
 
                 if (data && data.length > 0) {
                     const linkedEntities = await service.createAndLinkEntities(
@@ -208,7 +148,6 @@ export abstract class BaseService<
         entityType: TDtoTypeEnum
     ): Promise<TEntityDto[]> {
         const entityDtoFields = this.getDtoKeys();
-        console.log(`entityDtoFields: ${entityDtoFields}`)
 
         return responses.map((response) => {
             const mappedFields = Object.keys(response)
