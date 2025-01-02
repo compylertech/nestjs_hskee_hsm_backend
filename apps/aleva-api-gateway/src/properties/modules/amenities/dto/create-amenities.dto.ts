@@ -1,6 +1,9 @@
+import { Type } from 'class-transformer';
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsOptional } from 'class-validator';
+import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
 
+// dto
+import { CreateMediaDto } from '@app/contracts';
 export class CreateAmenitiesDto {
   @ApiPropertyOptional({ description: 'Name of the amenity', example: 'Swimming Pool' })
   @IsString()
@@ -16,4 +19,10 @@ export class CreateAmenitiesDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateMediaDto)
+  @IsOptional()
+  media?: CreateMediaDto[];
 }

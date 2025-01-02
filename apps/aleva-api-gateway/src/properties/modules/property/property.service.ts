@@ -11,6 +11,7 @@ import {
   PropertyDto as ClientPropertyDto,
   CreatePropertyDto as ClientCreatePropertyDto,
   UpdatePropertyDto as ClientUpdatePropertyDto,
+  EntityAmenityTypeEnum,
 } from '@app/contracts';
 
 // dto
@@ -20,45 +21,61 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 // service
 import { AmenitiesService } from '../amenities/amenities.service';
+import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
 import { MediaService } from 'apps/aleva-api-gateway/src/resources/modules/media/media.service';
 
 @Injectable()
-export class PropertyService {
+export class PropertyService extends BaseService<
+  EntityAmenityTypeEnum | EntityMediaTypeEnum,
+  CreatePropertyDto,
+  UpdatePropertyDto,
+  ClientPropertyDto,
+  ClientCreatePropertyDto,
+  ClientUpdatePropertyDto,
+  null,
+  null
+> {
   constructor(
     private readonly mediaService: MediaService,
     private readonly amenityService: AmenitiesService,
     @Inject(PROPERTIES_CLIENT) private readonly propertyClient: ClientProxy
-  ) { }
-
-  private async fetchAndMapMedia(properties: ClientPropertyDto[]): Promise<ClientPropertyDto[]> {
-    const propertyIds = properties.map((property) => property.property_unit_assoc_id);
-    const mediaByProperty = await this.mediaService.fetchByEntityIDs(propertyIds, EntityMediaTypeEnum.PROPERTY);
-
-    return properties.map((property) => ({
-      ...property,
-      media: mediaByProperty[property.property_unit_assoc_id] || [],
-    }));
+  ) {
+    super(
+      'property_unit_assoc_id',
+      propertyClient,
+      {
+        ...PROPERTY_PATTERN,
+        LINK_ENTITY: '',
+        DELETE_BY_ENTITY: ''
+      },
+      null,
+      [
+        {
+          service: mediaService,
+          entityType: EntityMediaTypeEnum.PROPERTY,
+          mapKey: 'media',
+        },
+        {
+          service: amenityService,
+          entityType: EntityAmenityTypeEnum.PROPERTY,
+          mapKey: 'amenities',
+        },
+      ]
+    );
   }
 
   async create(createPropertyDto: CreatePropertyDto): Promise<ClientPropertyDto> {
-    const { media, ...createPropertyContract } = createPropertyDto;
+    const { media, amenities, ...createPropertyContract } = createPropertyDto;
 
     // create the property
     const propertyResponse = await this.propertyClient
       .send<ClientPropertyDto, ClientCreatePropertyDto>(PROPERTY_PATTERN.CREATE, createPropertyContract)
       .toPromise();
 
-    if (media && media.length > 0) {
-      const mediaResponses = await this.mediaService.createAndLinkEntities(
-        propertyResponse.property_unit_assoc_id,
-        EntityMediaTypeEnum.PROPERTY,
-        media
-      );
+    const fieldResponses = await this.createEntityFields(propertyResponse.property_unit_assoc_id, createPropertyDto);
 
-      return { ...propertyResponse, media: mediaResponses };
-    }
-
-    return { ...propertyResponse, media: [] };
+    // merge all responses
+    return { ...propertyResponse, ...fieldResponses };
   }
 
   async findAll(pageOptionsDto: PageOptionsDto): Promise<ClientPropertyDto[]> {
@@ -67,8 +84,9 @@ export class PropertyService {
       pageOptionsDto
     ).toPromise();
 
-    // fetch media
-    return this.fetchAndMapMedia(properties["data"]);
+    const mappedData = await this.fetchAndMap(properties["data"], 'property_unit_assoc_id');
+
+    return { ...properties, data: mappedData };
   }
 
   async findOne(propertyId: string): Promise<ClientPropertyDto> {
@@ -76,10 +94,9 @@ export class PropertyService {
       .send<ClientPropertyDto>(PROPERTY_PATTERN.FIND_ONE, propertyId)
       .toPromise();
 
-    // fetch media
-    const propertiesWithMedia = await this.fetchAndMapMedia([property]);
+    const mappedData = await this.fetchAndMap([property], 'property_unit_assoc_id');
 
-    return propertiesWithMedia[0];
+    return { ...mappedData[0] };
   }
 
   async update(propertyId: string, updatePropertyDto: UpdatePropertyDto): Promise<ClientPropertyDto> {

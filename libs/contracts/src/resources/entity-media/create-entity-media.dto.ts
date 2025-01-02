@@ -7,4 +7,8 @@ export class CreateEntityMediaDto {
   entity_id: string;
   entity_type: EntityMediaTypeEnum;
   media_type?: MediaType;
+
+  static keys(): string[] {
+    return ['media_id', 'media_type'];
+  }
 }

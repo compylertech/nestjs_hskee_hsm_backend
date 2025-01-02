@@ -128,8 +128,6 @@ export class MediaService {
       }
 
       mediaInfo.content_url = uploadResponse.data.contentUrl;
-      // const detectedType = uploader.getImageType();
-      // mediaInfo.media_type = detectedType || mediaInfo.media_type;
     }
 
     return mediaInfo;
