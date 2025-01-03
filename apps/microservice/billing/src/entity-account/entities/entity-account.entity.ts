@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Check, Index } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Check, Index, JoinColumn } from 'typeorm';
 
 // entity
 import { Account } from '../../account/entities/account.entity';
@@ -17,6 +17,7 @@ export class EntityAccount {
   account_id: string;
 
   @ManyToOne(() => Account, (account) => account.entity_accounts)
+  @JoinColumn({ name: 'account_id' })
   account: Account;
 
   @Column({

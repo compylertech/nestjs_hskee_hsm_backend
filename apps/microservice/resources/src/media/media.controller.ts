@@ -55,7 +55,7 @@ export class MediaController {
   @MessagePattern(MEDIA_PATTERN.FIND_BY_ENTITIES)
   async findMediaByEntities(@Payload() payload: { entity_ids: string[]; entity_type: string }) {
     const { entity_ids, entity_type } = payload;
-
+    
     try {
       return await this.mediaService.findByEntity(entity_ids, entity_type as EntityMediaTypeEnum)
     } catch (error) {

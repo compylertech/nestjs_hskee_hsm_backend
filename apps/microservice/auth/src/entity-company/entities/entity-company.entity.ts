@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 // enum
-import { CompanyTypeEnum, EntityTypeEnum } from '@app/contracts';
+import { CompanyTypeEnum, EntityCompanyTypeEnum } from '@app/contracts';
 
 @Entity('entity_company')
 @Check(`"entity_type" IN ('property', 'user')`)
@@ -31,7 +31,7 @@ export class EntityCompany {
 
     @Column({
         type: 'enum',
-        enum: EntityTypeEnum,
+        enum: EntityCompanyTypeEnum,
     })
-    entity_type: EntityTypeEnum;
+    entity_type: EntityCompanyTypeEnum;
 }

@@ -128,4 +128,38 @@ export class PropertyService extends BaseService<
     await this.removeEntityFields(propertyId);
   }
 
+  async updateOld(propertyId: string, updatePropertyDto: UpdatePropertyDto): Promise<ClientPropertyDto> {
+    const { media, amenities, account, address, ...updatePropertyContract } = updatePropertyDto;
+
+    // update entity details
+    const propertyResponse = await this.propertyClient
+      .send<ClientPropertyDto, ClientUpdatePropertyDto>(
+        PROPERTY_PATTERN.UPDATE,
+        { [this.entityIdKey]: propertyId, ...updatePropertyContract }
+      )
+      .toPromise();
+
+    if (media && media.length > 0) {
+      const existingMedia = await this.mediaService.fetchByEntityIDs([propertyId], EntityMediaTypeEnum.PROPERTY);
+      const existingMediaIds = (existingMedia[propertyId] || []).map((m) => m.media_id);
+
+      const newMedia = media.filter((m) => !m.media_id);
+      const mediaToUpdate = media.filter((m) => m.media_id && existingMediaIds.includes(m.media_id));
+
+      const newMediaResponses = await this.mediaService.createAndLinkEntities(propertyId, EntityMediaTypeEnum.PROPERTY, newMedia);
+      const updatedMediaResponses = await this.mediaService.updateEntities(mediaToUpdate);
+
+      return { ...propertyResponse, media: [...newMediaResponses, ...updatedMediaResponses] };
+    }
+
+    return { ...propertyResponse, media: [] };
+  }
+
+  async removeOld(propertyId: string): Promise<void> {
+    // remove entity-media links
+    await this.mediaService.removeEntityLinks(propertyId, EntityMediaTypeEnum.PROPERTY);
+
+    // remove the property
+    await this.propertyClient.send<void>(PROPERTY_PATTERN.DELETE, propertyId).toPromise();
+  }
 }
