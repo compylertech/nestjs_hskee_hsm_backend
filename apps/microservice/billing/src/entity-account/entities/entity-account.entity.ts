@@ -4,10 +4,10 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, Check, Index, JoinCo
 import { Account } from '../../account/entities/account.entity';
 
 // enum
-import { AccountTypeEnum, EntityAccountTypeEnum } from '@app/contracts';
+import { AccountTypeEnum, EntityAccountTypeEnum, EntityAccountTypeEnumChecks } from '@app/contracts';
 
 @Entity('entity_account')
-@Check(`"entity_type" IN ('property', 'user')`)
+@Check(`"entity_type" IN (${EntityAccountTypeEnumChecks})`)
 export class EntityAccount {
   @PrimaryGeneratedColumn('uuid')
   entity_account_id: string;

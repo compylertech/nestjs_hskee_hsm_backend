@@ -9,15 +9,13 @@ import {
 
 // enums
 import { MediaType } from '@app/contracts/resources/media/media.enum';
-import { EntityMediaTypeEnum } from '@app/contracts/resources/entity-media/entity-media.enum';
+import { EntityMediaTypeEnum, EntityMediaTypeEnumChecks } from '@app/contracts/resources/entity-media/entity-media.enum';
 
 // entity
 import { Media } from '../../media/entities/media.entity';
 
 @Entity('entity_media')
-@Check(
-    "entity_type IN ('property', 'user', 'units', 'amenities', 'entity_amenities', 'contract', 'maintenance_requests')"
-)
+@Check(`"entity_type" IN (${EntityMediaTypeEnumChecks})`)
 export class EntityMedia {
     @PrimaryGeneratedColumn('uuid')
     entity_media_id: string;

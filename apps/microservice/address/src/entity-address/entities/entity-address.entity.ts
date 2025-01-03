@@ -8,13 +8,13 @@ import {
 } from 'typeorm';
 
 // enum
-import { EntityAddressTypeEnum } from '@app/contracts';
+import { EntityAddressTypeEnum, EntityAddressTypeEnumChecks } from '@app/contracts';
 
 // entity
 import { Address } from '../../address/entities/address.entity';
 
 @Entity('entity_address')
-@Check(`"entity_type" IN ('property', 'user', 'pastrentalhistory', 'account', 'role')`)
+@Check(`"entity_type" IN (${EntityAddressTypeEnumChecks})`)
 export class EntityAddress {
     @PrimaryGeneratedColumn('uuid')
     entity_address_id: string;

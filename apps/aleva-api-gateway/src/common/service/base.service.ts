@@ -58,14 +58,14 @@ export abstract class BaseService<
     ): Promise<TDto[]> {
         const entityIds = entities.map((entity) => entity[identifierKey] as string);
 
-        // Fetch results for all top-level mappings
+        // fetch results for all top-level mappings
         const fetchResults = await Promise.all(
             this.mappings.map(({ service, entityType }) =>
                 service.fetchByEntityIDs(entityIds, entityType)
             )
         );
 
-        // Map results for top-level entities
+        // map results for top-level entities
         fetchResults.forEach((fetchedData, index) => {
             const { mapKey } = this.mappings[index];
             entities.forEach((entity) => {
@@ -74,7 +74,7 @@ export abstract class BaseService<
             });
         });
 
-        // Process nested mappings recursively
+        // process nested mappings recursively
         for (const { mapKey, service } of this.mappings) {
             const nestedEntities = entities.flatMap((entity) => (entity as any)[mapKey] || []);
             if (nestedEntities.length > 0) {
@@ -132,7 +132,7 @@ export abstract class BaseService<
                     // process the nested entities
                     const linkedEntities = await Promise.all(
                         data.map(async (item: any) => {
-                            const childFields = await service.createEntityFields(item[service.tDtoID] || entityId, item);
+                            const childFields = await service.createEntityFields(item[service.tDtoID] || entityId, item, `entity_${entityType}`);
                             return { ...item, ...childFields };
                         })
                     );
@@ -174,6 +174,7 @@ export abstract class BaseService<
             entityId,
             entityType as TDtoTypeEnum
         );
+
 
         // ENTITY_PATTERN
         await Promise.all(
@@ -265,7 +266,8 @@ export abstract class BaseService<
     async updateEntityFields(
         entityId: string,
         updateEntityDto: TApiUpdateDto,
-        updateEntityDtoContract: TUpdateDto
+        updateEntityDtoContract: TUpdateDto,
+        entityAuxType: any = null
     ): Promise<TDto> {
         const updatedFieldResponses: Record<string, any[]> = {};
     
@@ -283,7 +285,7 @@ export abstract class BaseService<
             const mapKeyIdString: string = mapKey as string;
     
             if (dataToUpdate && dataToUpdate.length > 0) {
-                const existingEntities = await service.fetchByEntityIDs([entityId], entityType);
+                const existingEntities = await service.fetchByEntityIDs([entityId], entityAuxType || entityType);
                 const existingEntityIds = (existingEntities[entityId] || []).map((e) => e[service.tDtoID]);
     
                 const newEntities = dataToUpdate.filter((entity) => !entity[service.tDtoID]);
@@ -292,7 +294,7 @@ export abstract class BaseService<
                 );
     
                 // create new entities and link them
-                const newEntityResponses = await service.createAndLinkEntities(entityId, entityType, newEntities);
+                const newEntityResponses = await service.createAndLinkEntities(entityId, entityAuxType || entityType, newEntities);
     
                 // update existing entities and handle nested fields
                 const updatedEntityResponses = await Promise.all(
@@ -300,7 +302,8 @@ export abstract class BaseService<
                         const nestedFieldResponse = await service.updateEntityFields(
                             entityId || entity[service.tDtoID], // TODO: Consider how nested children are stored.
                             entity,
-                            entity
+                            entity,
+                            `entity_${entityType}`
                         ); // recursive call for nested children
                         return { ...nestedFieldResponse, ...entity };
                     })
@@ -315,8 +318,7 @@ export abstract class BaseService<
         // merge updated field responses with entity response
         return { ...entityResponse, ...updatedFieldResponses };
     }
-
-    
+ 
     // update entities in bulk
     async updateEntities(entities: TUpdateDto[]): Promise<TDto[]> {
         console.log(`In here: ${JSON.stringify(entities)}`)
