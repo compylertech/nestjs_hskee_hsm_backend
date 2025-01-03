@@ -66,7 +66,7 @@ export class EntityMediaService {
 
   async remove(id: string): Promise<void> {
     const entityMedia = await this.findEntityById(id);
-    await this.entityMediaRepository.remove(entityMedia);
+    await this.entityMediaRepository.delete(entityMedia);
   }
 
   async deleteByEntity(entity_id: string, entity_type: EntityMediaTypeEnum): Promise<void> {

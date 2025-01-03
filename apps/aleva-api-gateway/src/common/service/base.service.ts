@@ -225,44 +225,6 @@ export abstract class BaseService<
 
     // update and process linked mappings
     // including intermediary table mappings.
-    async updateEntityFieldsOld(entityId: string, updateEntityDto: TApiUpdateDto, updateEntityDtoContract: TUpdateDto): Promise<TDto> {
-
-        const updatedFieldResponses: Record<string, any[]> = {};
-
-        // update details
-        const entityResponse = await this.client
-            .send<TDto, TUpdateDto>(
-                this.patterns.UPDATE,
-                { [this.tDtoID]: entityId, ...updateEntityDtoContract }
-            )
-            .toPromise();
-            
-        // process updates dynamically for all mappings
-        for (const { service, entityType, mapKey } of this.mappings) {
-            const dataToUpdate = (updateEntityDto as any)[mapKey] || [];
-            const mapKeyIdString: string = mapKey as string;
-
-            if (dataToUpdate && dataToUpdate.length > 0) {
-                const existingEntities = await service.fetchByEntityIDs([entityId], entityType);
-
-                const existingEntityIds = (existingEntities[entityId] || []).map((e) => e[service.tDtoID]);
-
-                const newEntities = dataToUpdate.filter((entity) => !entity[service.tDtoID]);
-                const entitiesToUpdate = dataToUpdate.filter((entity) => entity[service.tDtoID] && existingEntityIds.includes(entity[service.tDtoID]));
-
-                const newEntityResponses = await service.createAndLinkEntities(entityId, entityType, newEntities);
-                const updatedEntityResponses = await service.updateEntities(entitiesToUpdate);
-
-                updatedFieldResponses[mapKeyIdString] = [...newEntityResponses, ...updatedEntityResponses];
-            } else {
-                updatedFieldResponses[mapKeyIdString] = [];
-            }
-        }
-
-        // merge updated field responses with property response
-        return { ...entityResponse, ...updatedFieldResponses };
-    }
-
     async updateEntityFields(
         entityId: string,
         updateEntityDto: TApiUpdateDto,
@@ -321,7 +283,6 @@ export abstract class BaseService<
  
     // update entities in bulk
     async updateEntities(entities: TUpdateDto[]): Promise<TDto[]> {
-        console.log(`In here: ${JSON.stringify(entities)}`)
         return await Promise.all(
             entities.map(
                 (entity) => this.client.send<TDto, TUpdateDto>(this.patterns.UPDATE, entity).toPromise()
@@ -342,18 +303,16 @@ export abstract class BaseService<
     async removeEntityFields(entityId: string): Promise<void> {
         // remove all linked entities dynamically
         await Promise.all(
-            this.mappings.map(({ service, entityType }) =>
-                service.removeEntityLinks(entityId, entityType)
-            )
-        );
+            this.mappings.flatMap(({ service, entityType }) => [
+                // remove base entity type
+                service.removeEntityLinks(entityId, entityType), 
 
-        await Promise.all(
-            this.mappings.map(({ service, entityType }) =>
-                service.removeEntityLinks(entityId, `entity_${entityType}`)
-            )
+                // remove prefixed entity type
+                service.removeEntityLinks(entityId, `entity_${entityType}`) 
+            ])
         );
-
-        // remove the property
+    
+        // remove the main entity
         await this.client.send<void>(this.patterns.DELETE, entityId).toPromise();
     }
 }

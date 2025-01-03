@@ -99,32 +99,12 @@ export class AmenitiesService extends BaseService<
     return { ...mappedData[0] };
   }
 
-  async update(amenityId: string, updatePropertyDto: UpdateAmenitiesDto): Promise<ClientAmenitiesDto> {
-    const { media, ...updatePropertyContract } = updatePropertyDto;
-
-    // update amenity details
-    const amenitiesResponse = await this.amenitiesClient
-      .send<ClientAmenitiesDto, ClientUpdateAmenitiesDto>(
-        AMENITIES_PATTERN.UPDATE,
-        { [this.entityIdKey]: amenityId, ...updatePropertyContract }
-      )
-      .toPromise();
-
-    if (media && media.length > 0) {
-      const existingMedia = await this.mediaService.fetchByEntityIDs([amenityId], EntityMediaTypeEnum.AMENITIES);
-      const existingMediaIds = (existingMedia[amenityId] || []).map((m) => m.media_id);
-
-      const newMedia = media.filter((m) => !m.media_id);
-      const mediaToUpdate = media.filter((m) => m.media_id && existingMediaIds.includes(m.media_id));
-
-      const newMediaResponses = await this.mediaService.createAndLinkEntities(amenityId, EntityMediaTypeEnum.AMENITIES, newMedia);
-      const updatedMediaResponses = await this.mediaService.updateEntities(mediaToUpdate);
-
-      return { ...amenitiesResponse, media: [...newMediaResponses, ...updatedMediaResponses] };
+  async update(amenityId: string, updateAmenityDto: UpdateAmenitiesDto): Promise<ClientAmenitiesDto> {
+      const { media, ...updateAmenityContract } = updateAmenityDto;
+  
+      // update entity details
+      return await this.updateEntityFields(amenityId, updateAmenityDto, updateAmenityContract);
     }
-
-    return { ...amenitiesResponse, media: [] };
-  }
 
   async remove(amenityId: string): Promise<void> {
     // remove entity-media links
