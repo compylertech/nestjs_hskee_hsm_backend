@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { RouterModule } from '@nestjs/core';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
@@ -14,11 +15,27 @@ import { AddressService } from './address.service';
 // controller
 import { AddressController } from './address.controller';
 
+// module
+import { AddressModule } from './modules/address/address.module';
+
+// helpers
+import { appendSubPathsToBaseModule } from 'apps/common/utils/helpers';
+
 @Module({
-  imports: [ClientConfigModule],
+  imports: [
+    ClientConfigModule, 
+    AddressModule,
+    RouterModule.register([
+      {
+        path: '',
+        children: [
+          ...appendSubPathsToBaseModule('/', [AddressModule]),
+        ],
+      },
+    ]),
+  ],
   controllers: [AddressController],
-  providers: [
-    AddressService,
+  providers: [AddressService,
     {
       provide: ADDRESS_CLIENT,
       useFactory(configService: ClientConfigService) {
@@ -26,7 +43,6 @@ import { AddressController } from './address.controller';
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]
-    }
-  ]
+    }],
 })
-export class AddressModule {}
+export class AddressAppModule { }

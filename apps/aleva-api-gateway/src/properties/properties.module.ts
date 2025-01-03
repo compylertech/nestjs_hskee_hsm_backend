@@ -25,9 +25,9 @@ import { AmenitiesModule } from './modules/amenities/amenities.module';
 
 @Module({
   imports: [
+    AmenitiesModule,
     UnitModule,
     PropertyModule,
-    AmenitiesModule,
     ClientConfigModule,
     RouterModule.register([
       {
@@ -39,7 +39,8 @@ import { AmenitiesModule } from './modules/amenities/amenities.module';
     ]),
   ],
   controllers: [PropertiesController],
-  providers: [PropertiesService,
+  providers: [
+    PropertiesService,
     {
       provide: PROPERTIES_CLIENT,
       useFactory(configService: ClientConfigService) {
@@ -47,6 +48,7 @@ import { AmenitiesModule } from './modules/amenities/amenities.module';
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]
-    }],
+    }
+  ],
 })
 export class PropertiesModule { }

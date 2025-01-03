@@ -6,7 +6,7 @@ import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean, IsArray, ValidateNes
 import { PropertyStatus } from '@app/contracts/properties/property/property.enum';
 
 // dtos
-import { CreateAmenitiesDto, CreateMediaDto, CreateUnitDto } from '@app/contracts';
+import { CreateAccountDto, CreateAddressDto, CreateAmenitiesDto, CreateMediaDto, CreateUnitDto } from '@app/contracts';
 
 export class CreatePropertyDto {
   @ApiProperty()
@@ -78,15 +78,21 @@ export class CreatePropertyDto {
   @IsOptional()
   media?: CreateMediaDto[];
 
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => CreateUnitDto)
-  // @IsOptional()
-  // address?: CreateUnitDto[];
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateAddressDto)
+  @IsOptional()
+  address?: CreateAddressDto[];
 
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateAmenitiesDto)
   @IsOptional()
   amenities?: CreateAmenitiesDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateAccountDto)
+  @IsOptional()
+  account?: CreateAccountDto[];
 }

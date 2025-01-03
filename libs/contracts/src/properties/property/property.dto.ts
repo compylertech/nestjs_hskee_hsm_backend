@@ -2,7 +2,7 @@
 import { PropertyStatus } from "./property.enum";
 
 // dto
-import { AmenitiesDto, MediaDto, UnitDto } from "@app/contracts";
+import { AccountDto, AddressDto, AmenitiesDto, MediaDto, UnitDto } from "@app/contracts";
 
 export class PropertyDto {
   property_unit_assoc_id: string;
@@ -23,4 +23,6 @@ export class PropertyDto {
   units?: UnitDto[];
   media?: MediaDto[];
   amenities?: AmenitiesDto[];
+  account?: AccountDto[];
+  address?: AddressDto[];
 }

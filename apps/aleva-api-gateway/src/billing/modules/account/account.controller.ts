@@ -11,7 +11,7 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @ApiBearerAuth()
-@Controller('accountes')
+@Controller('account')
 export class AccountController {
   constructor(private readonly accountService: AccountService) { }
 

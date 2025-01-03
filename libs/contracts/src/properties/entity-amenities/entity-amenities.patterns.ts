@@ -4,5 +4,6 @@ export const ENTITY_AMENITIES_PATTERN = {
   CREATE: 'entityAmenities.create',
   UPDATE: 'entityAmenities.update',
   DELETE: 'entityAmenities.delete',
+  FIND_BY_ENTITY: 'entityAmenities.findByEntity',
   DELETE_BY_ENTITY: 'entityAmenities.deleteByEntity'
 };  

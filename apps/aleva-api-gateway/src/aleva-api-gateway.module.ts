@@ -21,7 +21,7 @@ import { AlevaApiGatewayService } from './aleva-api-gateway.service';
 // modules
 import { AuthModule } from './auth/auth.module';
 import { FormsModule } from './forms/forms.module';
-import { AddressModule } from './address/address.module';
+import { AddressAppModule } from './address/address.module';
 import { BookingModule } from './booking/booking.module';
 import { UserModule } from './auth/modules/users/users.module';
 import { PropertiesModule } from './properties/properties.module';
@@ -32,11 +32,12 @@ import { BillingModule } from './billing/billing.module';
 @Module({
   imports: [
     ClientConfigModule,
-    AuthModule, AddressModule, UserModule, FormsModule, 
+    AuthModule, AddressAppModule, UserModule, 
+    BillingModule,
+    ResourceModule,
+    PropertiesModule,
+    FormsModule,
     AttendanceLogModule,
-     ResourceModule,
-     BillingModule,
-      PropertiesModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -59,7 +60,7 @@ import { BillingModule } from './billing/billing.module';
         },
         template: {
           dir: __dirname + '../../../../apps/templates',
-          adapter: new HandlebarsAdapter(), 
+          adapter: new HandlebarsAdapter(),
           options: {
             strict: false
           },
@@ -91,4 +92,4 @@ import { BillingModule } from './billing/billing.module';
   ],
 })
 
-export class AlevaApiGatewayModule {}
+export class AlevaApiGatewayModule { }

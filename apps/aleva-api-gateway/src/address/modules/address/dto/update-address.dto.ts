@@ -3,6 +3,10 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 export class UpdateAddressDto {
   @IsString()
   @IsOptional()
+  address_id?: string;
+
+  @IsString()
+  @IsOptional()
   address_type?: string;
 
   @IsBoolean()

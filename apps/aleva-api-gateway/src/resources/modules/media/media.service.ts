@@ -7,7 +7,7 @@ import { RESOURCE_CLIENT } from '../../../common/utils/constants';
 // contracts
 import {
   EntityMediaTypeEnum,
-  
+
   MEDIA_PATTERN,
   MediaDto as ClientMediaDto,
   CreateMediaDto as ClientCreateMediaDto,
@@ -21,7 +21,6 @@ import {
 // dto
 import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
-import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 // service
 import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';

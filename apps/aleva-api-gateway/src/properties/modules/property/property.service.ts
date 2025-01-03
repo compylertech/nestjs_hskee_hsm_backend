@@ -4,11 +4,11 @@ import { ClientProxy } from '@nestjs/microservices';
 // constants
 import { PROPERTIES_CLIENT } from '../../../common/utils/constants';
 
-// contracts
+// contract
 import {
   EntityMediaTypeEnum,
   EntityAmenityTypeEnum,
-  
+
   PROPERTY_PATTERN,
   PropertyDto as ClientPropertyDto,
   CreatePropertyDto as ClientCreatePropertyDto,
@@ -24,6 +24,8 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import { AmenitiesService } from '../amenities/amenities.service';
 import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
 import { MediaService } from 'apps/aleva-api-gateway/src/resources/modules/media/media.service';
+import { AccountService } from 'apps/aleva-api-gateway/src/billing/modules/account/account.service';
+import { AddressService } from 'apps/aleva-api-gateway/src/address/modules/address/address.service';
 
 @Injectable()
 export class PropertyService extends BaseService<
@@ -36,10 +38,12 @@ export class PropertyService extends BaseService<
   null,
   null
 > {
-  private readonly entityIdKey = 'property_unit_assoc_id'; 
-  
+  private readonly entityIdKey = 'property_unit_assoc_id';
+
   constructor(
     private readonly mediaService: MediaService,
+    private readonly accountService: AccountService,
+    private readonly addressService: AddressService,
     private readonly amenityService: AmenitiesService,
     @Inject(PROPERTIES_CLIENT) private readonly propertyClient: ClientProxy
   ) {
@@ -63,12 +67,22 @@ export class PropertyService extends BaseService<
           entityType: EntityAmenityTypeEnum.PROPERTY,
           mapKey: 'amenities',
         },
+        {
+          service: accountService,
+          entityType: EntityAmenityTypeEnum.PROPERTY,
+          mapKey: 'account',
+        },
+        {
+          service: addressService,
+          entityType: EntityAmenityTypeEnum.PROPERTY,
+          mapKey: 'address',
+        },
       ]
     );
   }
 
   async create(createPropertyDto: CreatePropertyDto): Promise<ClientPropertyDto> {
-    const { media, amenities, ...createPropertyContract } = createPropertyDto;
+    const { media, amenities, account, address, ...createPropertyContract } = createPropertyDto;
 
     // create the property
     const propertyResponse = await this.propertyClient
@@ -103,37 +117,15 @@ export class PropertyService extends BaseService<
   }
 
   async update(propertyId: string, updatePropertyDto: UpdatePropertyDto): Promise<ClientPropertyDto> {
-    const { media, ...updatePropertyContract } = updatePropertyDto;
+    const { media, amenities, account, address, ...updatePropertyContract } = updatePropertyDto;
 
-    // update property details
-    const propertyResponse = await this.propertyClient
-      .send<ClientPropertyDto, ClientUpdatePropertyDto>(
-        PROPERTY_PATTERN.UPDATE,
-        { [this.entityIdKey]: propertyId, ...updatePropertyContract }
-      )
-      .toPromise();
-
-    if (media && media.length > 0) {
-      const existingMedia = await this.mediaService.fetchByEntityIDs([propertyId], EntityMediaTypeEnum.PROPERTY);
-      const existingMediaIds = (existingMedia[propertyId] || []).map((m) => m.media_id);
-
-      const newMedia = media.filter((m) => !m.media_id);
-      const mediaToUpdate = media.filter((m) => m.media_id && existingMediaIds.includes(m.media_id));
-
-      const newMediaResponses = await this.mediaService.createAndLinkEntities(propertyId, EntityMediaTypeEnum.PROPERTY, newMedia);
-      const updatedMediaResponses = await this.mediaService.updateEntities(mediaToUpdate);
-
-      return { ...propertyResponse, media: [...newMediaResponses, ...updatedMediaResponses] };
-    }
-
-    return { ...propertyResponse, media: [] };
+    // update entity details
+    return await this.updateEntityFields(propertyId, updatePropertyDto, updatePropertyContract);
   }
 
   async remove(propertyId: string): Promise<void> {
     // remove entity-media links
-    await this.mediaService.removeEntityLinks(propertyId, EntityMediaTypeEnum.PROPERTY);
-
-    // remove the property
-    await this.propertyClient.send<void>(PROPERTY_PATTERN.DELETE, propertyId).toPromise();
+    await this.removeEntityFields(propertyId);
   }
+
 }

@@ -16,6 +16,7 @@ import { BillingService } from './billing.service';
 import { BillingController } from './billing.controller';
 
 // module
+import { AccountModule } from './modules/account/account.module';
 import { InvoiceModule } from './modules/invoice/invoice.module';
 
 // helpers
@@ -24,14 +25,15 @@ import { appendSubPathsToBaseModule } from 'apps/common/utils/helpers';
 @Module({
   imports: [
     ClientConfigModule, 
+    AccountModule,
     InvoiceModule,
     RouterModule.register([
       {
         path: 'billing',
         children: [
-          ...appendSubPathsToBaseModule('/', [InvoiceModule]),
+          ...appendSubPathsToBaseModule('/', [InvoiceModule, AccountModule]),
         ],
-      },
+      }
     ]),
   ],
   controllers: [BillingController],

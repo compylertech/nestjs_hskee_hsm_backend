@@ -3,5 +3,6 @@ export const ADDRESS_PATTERN = {
     FIND_ONE: 'address.findOne',
     CREATE: 'address.create',
     UPDATE: 'address.update',
-    REMOVE: 'address.remove'
+    REMOVE: 'address.remove',
+    FIND_BY_ENTITIES: 'address.findByEntity'
 }

@@ -5,7 +5,7 @@ import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { AddressService } from './address.service';
 
 // contracts
-import { CreateAddressDto, UpdateAddressDto, ADDRESS_PATTERN } from '@app/contracts';
+import { CreateAddressDto, UpdateAddressDto, ADDRESS_PATTERN, EntityAddressTypeEnum } from '@app/contracts';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Controller('address')
@@ -48,10 +48,25 @@ export class AddressController {
     }
   }
 
-  @MessagePattern(ADDRESS_PATTERN.UPDATE)
-  update(@Payload() updateAddressDto: UpdateAddressDto) {
+  @MessagePattern(ADDRESS_PATTERN.FIND_BY_ENTITIES)
+  async findByEntities(@Payload() payload: { entity_ids: string[]; entity_type: string }) {
+    const { entity_ids, entity_type } = payload;
+
     try {
-      return this.addressService.update(updateAddressDto.address_id, updateAddressDto);
+      return await this.addressService.findByEntity(entity_ids, entity_type as EntityAddressTypeEnum)
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error finding address info`,
+      });
+    }
+  }
+
+
+  @MessagePattern(ADDRESS_PATTERN.UPDATE)
+  async update(@Payload() updateAddressDto: UpdateAddressDto) {
+    try {
+      return await this.addressService.update(updateAddressDto.address_id, updateAddressDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -61,7 +76,7 @@ export class AddressController {
   }
 
   @MessagePattern(ADDRESS_PATTERN.REMOVE)
-  remove(@Payload() id: string) {
-    return this.addressService.remove(id);
+  async remove(@Payload() id: string) {
+    await this.addressService.remove(id);
   }
 }

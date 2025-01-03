@@ -2,7 +2,7 @@
 import { PropertyStatus } from './property.enum';
 
 // dto
-import { CreateAmenitiesDto, CreateMediaDto, CreateUnitDto, UpdateAmenitiesDto, UpdateMediaDto, UpdateUnitDto } from '@app/contracts';
+import { CreateAccountDto, CreateAddressDto, CreateAmenitiesDto, CreateMediaDto, CreateUnitDto, UpdateAccountDto, UpdateAddressDto, UpdateAmenitiesDto, UpdateMediaDto, UpdateUnitDto } from '@app/contracts';
 
 export class CreatePropertyDto {
   name: string;
@@ -22,4 +22,6 @@ export class CreatePropertyDto {
   units?: CreateUnitDto[] | UpdateUnitDto[];
   media?: CreateMediaDto[] | UpdateMediaDto[];
   amenities?: CreateAmenitiesDto[] | UpdateAmenitiesDto[];
+  account?: CreateAccountDto[] | UpdateAccountDto [];
+  address?: CreateAddressDto[] | UpdateAddressDto[];
 }

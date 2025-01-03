@@ -17,7 +17,7 @@ export class PropertyController {
 
   @Post()
   @ApiOperation({ summary: 'Create Property' })
-  @ApiResponse({ status: 200, description: 'Successfully fetched propertys.', type: PropertyDto })
+  @ApiResponse({ status: 200, description: 'Successfully fetched properties.', type: PropertyDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async createProperty(@Body() createPropertyDto: CreatePropertyDto) {
     return this.propertyService.create(createPropertyDto);

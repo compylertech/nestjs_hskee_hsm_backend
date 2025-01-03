@@ -7,6 +7,7 @@ import { ClientConfigModule } from 'apps/common/config';
 
 // module
 import { AddressModule } from './address/address.module';
+import { EntityAddressModule } from './entity-address/entity-address.module';
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import { AddressModule } from './address/address.module';
       },
       inject: [ConfigService],
     }),
-    AddressModule, ClientConfigModule
+    AddressModule, EntityAddressModule, ClientConfigModule
   ],
   controllers: [],
   providers: [],

@@ -4,4 +4,5 @@ export const ACCOUNT_PATTERN = {
     CREATE: 'account.create',
     UPDATE: 'account.update',
     DELETE: 'account.delete',
+    FIND_BY_ENTITIES: 'account.findByEntity'
 };

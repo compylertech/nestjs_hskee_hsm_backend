@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -6,9 +6,10 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 
 // entity
 import { Account } from './entities/account.entity';
+import { EntityAccount } from '../entity-account/entities/entity-account.entity';
 
 // contracts
-import { AccountDto, CreateAccountDto, UpdateAccountDto } from '@app/contracts';
+import { AccountDto, CreateAccountDto, EntityAccountTypeEnum, UpdateAccountDto } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -17,8 +18,10 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Injectable()
 export class AccountService {
-  constructor(@InjectRepository(Account) private accountRepository: Repository<Account>) { }
-
+  constructor(
+    @InjectRepository(Account) private accountRepository: Repository<Account>,
+    @InjectRepository(EntityAccount) private entityAccountRepository: Repository<EntityAccount>
+  ) { }
 
   async create(createAccountDto: CreateAccountDto): Promise<Account> {
     const newAccount = this.accountRepository.create(createAccountDto);
@@ -46,6 +49,26 @@ export class AccountService {
     const account = await this.findEntityById(id);
 
     return plainToInstance(AccountDto, account, { excludeExtraneousValues: false });
+  }
+
+  async findByEntity(entity_ids: string[], entity_type: EntityAccountTypeEnum): Promise<any> {
+    const entityResponse = await this.entityAccountRepository.find({
+      where: {
+        entity_id: In(entity_ids),
+        entity_type: entity_type,
+      },
+      relations: ['account'],
+    });
+
+    const dataByEntity = entityResponse.reduce((acc, curr) => {
+      if (!acc[curr.entity_id]) {
+        acc[curr.entity_id] = [];
+      }
+      acc[curr.entity_id].push(curr.account);
+      return acc;
+    }, {});
+    
+    return dataByEntity;
   }
 
   async update(id: string, updateAccountDto: UpdateAccountDto): Promise<AccountDto> {

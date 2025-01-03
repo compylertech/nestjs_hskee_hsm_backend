@@ -7,7 +7,6 @@ import { ClientConfigModule } from 'apps/common/config';
 
 // module
 import { MediaModule } from './media/media.module';
-import { EntityMedia } from './entity-media/entities/entity-media.entity';
 import { EntityMediaModule } from './entity-media/entity-media.module';
 
 @Module({
@@ -23,13 +22,13 @@ import { EntityMediaModule } from './entity-media/entity-media.module';
 
         return {
           type: 'postgres',
-        host: configService.get<string>('DB_HOST'),
-        port: configService.get<number>('DB_PORT'),
-        username: configService.get<string>('DB_USERNAME'),
-        password: configService.get<string>('DB_PASSWORD'),
-        database: configService.get<string>('DB_DATABASE'),
-        autoLoadEntities: true,
-        synchronize: true,
+          host: configService.get<string>('DB_HOST'),
+          port: configService.get<number>('DB_PORT'),
+          username: configService.get<string>('DB_USERNAME'),
+          password: configService.get<string>('DB_PASSWORD'),
+          database: configService.get<string>('DB_DATABASE'),
+          autoLoadEntities: true,
+          synchronize: true,
           ...(isSslEnabled && {
             ssl: {
               rejectUnauthorized: true,

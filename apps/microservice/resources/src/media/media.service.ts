@@ -6,6 +6,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 
 // entity
 import { Media } from './entities/media.entity';
+import { EntityMedia } from '../entity-media/entities/entity-media.entity';
 
 // contracts
 import { MediaDto, CreateMediaDto, UpdateMediaDto, EntityMediaTypeEnum } from '@app/contracts';
@@ -14,8 +15,9 @@ import { MediaDto, CreateMediaDto, UpdateMediaDto, EntityMediaTypeEnum } from '@
 import { PageDto } from 'apps/common/dto/page.dto';
 import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+
+// external service
 import MediaUploaderService from 'apps/common/services/cloudinary/media_uploader';
-import { EntityMedia } from '../entity-media/entities/entity-media.entity';
 
 @Injectable()
 export class MediaService {

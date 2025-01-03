@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -6,9 +6,10 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 
 // entity
 import { Address } from './entities/address.entity';
+import { EntityAddress } from '../entity-address/entities/entity-address.entity';
 
 // contracts
-import { AddressDto, CreateAddressDto, UpdateAddressDto } from '@app/contracts';
+import { AddressDto, CreateAddressDto, EntityAddressTypeEnum, UpdateAddressDto } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -17,7 +18,10 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Injectable()
 export class AddressService {
-  constructor(@InjectRepository(Address) private addressRepository: Repository<Address>) { }
+  constructor(
+    @InjectRepository(Address) private addressRepository: Repository<Address>,
+    @InjectRepository(EntityAddress) private entityAddressRepository: Repository<EntityAddress>
+  ) { }
 
 
   async create(createAddressDto: CreateAddressDto): Promise<Address> {
@@ -29,7 +33,7 @@ export class AddressService {
   async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<AddressDto>> {
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.addressRepository.createQueryBuilder('address');
-    
+
     queryBuilder
       .orderBy('address.created_at', pageOptionsDto.order)
       .skip(options.skip)
@@ -46,6 +50,26 @@ export class AddressService {
     const address = await this.findEntityById(id);
 
     return plainToInstance(AddressDto, address, { excludeExtraneousValues: false });
+  }
+
+  async findByEntity(entity_ids: string[], entity_type: EntityAddressTypeEnum): Promise<any> {
+    const entityResponse = await this.entityAddressRepository.find({
+      where: {
+        entity_id: In(entity_ids),
+        entity_type: entity_type,
+      },
+      relations: ['address'],
+    });
+
+    const dataByEntity = entityResponse.reduce((acc, curr) => {
+      if (!acc[curr.entity_id]) {
+        acc[curr.entity_id] = [];
+      }
+      acc[curr.entity_id].push(curr.address);
+      return acc;
+    }, {});
+
+    return dataByEntity;
   }
 
   async update(id: string, updateAddressDto: UpdateAddressDto): Promise<AddressDto> {

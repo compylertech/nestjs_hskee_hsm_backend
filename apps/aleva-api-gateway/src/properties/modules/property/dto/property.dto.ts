@@ -6,7 +6,7 @@ import { IsString, IsNumber, IsOptional, IsEnum, IsBoolean, IsArray, ValidateNes
 import { PropertyStatus } from '@app/contracts/properties/property/property.enum';
 
 // dto
-import { AmenitiesDto, MediaDto, UnitDto } from '@app/contracts';
+import { AccountDto, AddressDto, AmenitiesDto, MediaDto, UnitDto } from '@app/contracts';
 
 export class PropertyDto {
     @ApiProperty()
@@ -86,4 +86,16 @@ export class PropertyDto {
     @Type(() => AmenitiesDto)
     @IsOptional()
     amenities?: AmenitiesDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => AccountDto)
+    @IsOptional()
+    account?: AccountDto[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => AddressDto)
+    @IsOptional()
+    address?: AddressDto[];
 }

@@ -5,7 +5,7 @@ import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { AccountService } from './account.service';
 
 // contracts
-import { CreateAccountDto, UpdateAccountDto, ACCOUNT_PATTERN } from '@app/contracts';
+import { CreateAccountDto, UpdateAccountDto, ACCOUNT_PATTERN, EntityAccountTypeEnum } from '@app/contracts';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Controller('account')
@@ -48,10 +48,24 @@ export class AccountController {
     }
   }
 
-  @MessagePattern(ACCOUNT_PATTERN.UPDATE)
-  update(@Payload() updateAccountDto: UpdateAccountDto) {
+  @MessagePattern(ACCOUNT_PATTERN.FIND_BY_ENTITIES)
+  async findByEntities(@Payload() payload: { entity_ids: string[]; entity_type: string }) {
+    const { entity_ids, entity_type } = payload;
+
     try {
-      return this.accountService.update(updateAccountDto.account_id, updateAccountDto);
+      return await this.accountService.findByEntity(entity_ids, entity_type as EntityAccountTypeEnum)
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error finding account info`,
+      });
+    }
+  }
+
+  @MessagePattern(ACCOUNT_PATTERN.UPDATE)
+  async update(@Payload() updateAccountDto: UpdateAccountDto) {
+    try {
+      return await this.accountService.update(updateAccountDto.account_id, updateAccountDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -61,7 +75,7 @@ export class AccountController {
   }
 
   @MessagePattern(ACCOUNT_PATTERN.DELETE)
-  remove(@Payload() id: string) {
-    return this.accountService.remove(id);
+  async remove(@Payload() id: string) {
+    await this.accountService.remove(id);
   }
 }

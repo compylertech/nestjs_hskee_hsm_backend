@@ -7,6 +7,9 @@ import { ClientConfigModule } from 'apps/common/config';
 
 // module
 import { InvoiceModule } from './invoice/invoice.module';
+import { AccountModule } from './account/account.module';
+import { EntityAccountModule } from './entity-account/entity-account.module';
+import { EntityBillableModule } from './entity-billable/entity-billable.module';
 
 @Module({
   imports: [
@@ -37,7 +40,8 @@ import { InvoiceModule } from './invoice/invoice.module';
       },
       inject: [ConfigService],
     }),
-    InvoiceModule, ClientConfigModule
+    InvoiceModule, AccountModule, EntityAccountModule, 
+    EntityBillableModule, ClientConfigModule
   ],
   controllers: [],
   providers: [],

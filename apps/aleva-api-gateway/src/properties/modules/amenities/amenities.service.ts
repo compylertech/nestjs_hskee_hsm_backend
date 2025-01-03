@@ -67,7 +67,7 @@ export class AmenitiesService extends BaseService<
   async create(createAmenitiesDto: CreateAmenitiesDto): Promise<ClientAmenitiesDto> {
     const { media, ...createPropertyContract } = createAmenitiesDto;
 
-    // create the property
+    // create the entity
     const amenitiesResponse = await this.amenitiesClient
       .send<ClientAmenitiesDto, ClientCreateAmenitiesDto>(AMENITIES_PATTERN.CREATE, createPropertyContract)
       .toPromise();

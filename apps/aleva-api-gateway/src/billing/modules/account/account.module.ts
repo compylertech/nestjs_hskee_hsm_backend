@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { BILLING } from 'apps/common/config/constants';
-import { BILLING_CLIENT } from '../../../common/utils/constants';
+import { ADDRESS, BILLING } from 'apps/common/config/constants';
+import { ADDRESS_CLIENT, BILLING_CLIENT } from '../../../common/utils/constants';
 
 // services
 import { AccountService } from './account.service';
@@ -14,9 +14,12 @@ import { AccountController } from './account.controller';
 // config
 import { ClientConfigModule, ClientConfigService } from '../../../../../common/config';
 
+// module
+import { AddressModule } from 'apps/aleva-api-gateway/src/address/modules/address/address.module';
+
 
 @Module({
-  imports: [ClientConfigModule],
+  imports: [ClientConfigModule, AddressModule],
   controllers: [AccountController],
   providers: [
     AccountService,
@@ -28,6 +31,7 @@ import { ClientConfigModule, ClientConfigService } from '../../../../../common/c
       },
       inject: [ClientConfigService]
     }
-  ]
+  ],
+  exports: [AccountService]
 })
 export class AccountModule {}
