@@ -4,6 +4,6 @@ export const ENTITY_ACCOUNT_PATTERN = {
     CREATE: 'entityAccount.create',
     UPDATE: 'entityAccount.update',
     DELETE: 'entityAccount.delete',
-    FIND_BY_ENTITY: 'entityAddress.findByEntity',
-    DELETE_BY_ENTITY: 'entityAddress.deleteByEntity'
+    FIND_BY_ENTITY: 'entityAccount.findByEntity',
+    DELETE_BY_ENTITY: 'entityAccount.deleteByEntity'
 };

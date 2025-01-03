@@ -76,6 +76,13 @@ export class AccountController {
 
   @MessagePattern(ACCOUNT_PATTERN.DELETE)
   async remove(@Payload() id: string) {
-    await this.accountService.remove(id);
+    try {
+      await this.accountService.remove(id);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error deleting account with id: ${id}`,
+      });
+    }
   }
 }

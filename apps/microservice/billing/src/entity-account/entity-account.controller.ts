@@ -80,17 +80,24 @@ export class EntityAccountController {
 
   @MessagePattern(ENTITY_ACCOUNT_PATTERN.DELETE)
   async remove(@Payload() id: string) {
-    await this.entityAccountService.remove(id);
+    try {
+      await this.entityAccountService.remove(id);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error deleting entityAccount with id: ${id}`,
+      });
+    }
   }
 
   @MessagePattern(ENTITY_ACCOUNT_PATTERN.DELETE_BY_ENTITY)
   async deleteByEntity(@Payload() payload: { entity_id: string; entity_type: string }): Promise<void> {
     const { entity_id, entity_type } = payload;
 
-    if (!Object.values(EntityAccountTypeEnum).includes(entity_type as EntityAccountTypeEnum)) {
-      throw new Error(`Invalid entity_type: ${entity_type}`);
+    if (Object.values(EntityAccountTypeEnum).includes(entity_type as EntityAccountTypeEnum)) {
+      await this.entityAccountService.deleteByEntity(entity_id, entity_type as EntityAccountTypeEnum);
+      // throw new Error(`Invalid entity_type: ${entity_type}`);
     }
 
-    await this.entityAccountService.deleteByEntity(entity_id, entity_type as EntityAccountTypeEnum);
   }
 }

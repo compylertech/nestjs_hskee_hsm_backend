@@ -89,10 +89,9 @@ export class EntityMediaController {
   async deleteByEntity(@Payload() payload: { entity_id: string; entity_type: string }): Promise<void> {
     const { entity_id, entity_type } = payload;
 
-    if (!Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
-      throw new Error(`Invalid entity_type: ${entity_type}`);
+    if (Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
+      await this.entityMediaService.deleteByEntity(entity_id, entity_type as EntityMediaTypeEnum);
+      // throw new Error(`Invalid entity_type: ${entity_type}`);
     }
-
-    await this.entityMediaService.deleteByEntity(entity_id, entity_type as EntityMediaTypeEnum);
   }
 }

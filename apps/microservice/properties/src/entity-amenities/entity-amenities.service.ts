@@ -8,7 +8,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { EntityAmenities } from './entities/entity-amenities.entity';
 
 // contracts
-import { EntityAmenitiesDto, CreateEntityAmenitiesDto, UpdateEntityAmenitiesDto } from '@app/contracts';
+import { EntityAmenitiesDto, CreateEntityAmenitiesDto, UpdateEntityAmenitiesDto, EntityAmenityTypeEnum } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -48,6 +48,12 @@ export class EntityAmenitiesService {
     return plainToInstance(EntityAmenitiesDto, entityAmenities, { excludeExtraneousValues: false });
   }
 
+  async findByEntity(entity_id: string, entity_type: EntityAmenityTypeEnum): Promise<EntityAmenities[]> {
+    return await this.entityAmenitiesRepository.find({
+      where: { entity_id, entity_type },
+    });
+  }
+
   async update(id: string, updateEntityAmenitiesDto: UpdateEntityAmenitiesDto): Promise<EntityAmenitiesDto> {
     const entityAmenities = await this.findEntityById(id);
 
@@ -61,6 +67,10 @@ export class EntityAmenitiesService {
   async remove(id: string): Promise<void> {
     const entityAmenities = await this.findEntityById(id);
     await this.entityAmenitiesRepository.remove(entityAmenities);
+  }
+
+  async deleteByEntity(entity_id: string, entity_type: EntityAmenityTypeEnum): Promise<void> {
+    await this.entityAmenitiesRepository.delete({ entity_id, entity_type });
   }
 
   private async findEntityById(id: string): Promise<EntityAmenities> {

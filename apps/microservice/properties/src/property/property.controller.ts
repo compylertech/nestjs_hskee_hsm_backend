@@ -62,6 +62,13 @@ export class PropertyController {
 
   @MessagePattern(PROPERTY_PATTERN.DELETE)
   async remove(@Payload() id: string) {
-    return await this.propertyService.remove(id);
+    try {
+      await this.propertyService.remove(id);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error deleting property with id: ${id}`,
+      });
+    }
   }
 }

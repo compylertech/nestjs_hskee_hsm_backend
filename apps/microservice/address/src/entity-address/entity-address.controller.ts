@@ -87,10 +87,9 @@ export class EntityAddressController {
   async deleteByEntity(@Payload() payload: { entity_id: string; entity_type: string }): Promise<void> {
     const { entity_id, entity_type } = payload;
 
-    if (!Object.values(EntityAddressTypeEnum).includes(entity_type as EntityAddressTypeEnum)) {
-      throw new Error(`Invalid entity_type: ${entity_type}`);
+    if (Object.values(EntityAddressTypeEnum).includes(entity_type as EntityAddressTypeEnum)) {
+      await this.entityAddressService.deleteByEntity(entity_id, entity_type as EntityAddressTypeEnum);
+      // throw new Error(`Invalid entity_type: ${entity_type}`);
     }
-
-    await this.entityAddressService.deleteByEntity(entity_id, entity_type as EntityAddressTypeEnum);
   }
 }

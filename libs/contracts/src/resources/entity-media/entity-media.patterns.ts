@@ -1,9 +1,9 @@
 export const ENTITY_MEDIA_PATTERN = {
-    FIND_ALL: 'enityMedia.findAll',
-    FIND_ONE: 'enityMedia.findOne',
-    CREATE: 'enityMedia.create',
-    UPDATE: 'enityMedia.update',
-    DELETE: 'enityMedia.delete',
-    FIND_BY_ENTITY: 'enityMedia.findByEntity',
-    DELETE_BY_ENTITY: 'enityMedia.deleteByEntity'
+    FIND_ALL: 'entityMedia.findAll',
+    FIND_ONE: 'entityMedia.findOne',
+    CREATE: 'entityMedia.create',
+    UPDATE: 'entityMedia.update',
+    DELETE: 'entityMedia.delete',
+    FIND_BY_ENTITY: 'entityMedia.findByEntity',
+    DELETE_BY_ENTITY: 'entityMedia.deleteByEntity'
 }

@@ -79,6 +79,13 @@ export class AmenitiesController {
 
   @MessagePattern(AMENITIES_PATTERN.DELETE)
   async remove(@Payload() id: string) {
-    return await this.amenitiesService.remove(id);
+    try {
+      await this.amenitiesService.remove(id);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || `Error deleting amenity with id: ${id}`,
+      });
+    }
   }
 }

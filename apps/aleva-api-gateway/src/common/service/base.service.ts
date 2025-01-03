@@ -347,6 +347,12 @@ export abstract class BaseService<
             )
         );
 
+        await Promise.all(
+            this.mappings.map(({ service, entityType }) =>
+                service.removeEntityLinks(entityId, `entity_${entityType}`)
+            )
+        );
+
         // remove the property
         await this.client.send<void>(this.patterns.DELETE, entityId).toPromise();
     }
