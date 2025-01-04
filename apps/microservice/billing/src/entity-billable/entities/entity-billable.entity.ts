@@ -47,4 +47,10 @@ export class EntityBillable {
 
     @Column({ type: 'timestamptz', nullable: true })
     end_period: Date | null;
+
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    created_at: Date;
+  
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
+    updated_at: Date;
 }

@@ -62,12 +62,15 @@ export class MediaService {
     return plainToInstance(MediaDto, media, { excludeExtraneousValues: false });
   }
 
-  async findByEntity(entity_ids: string[], entity_type: EntityMediaTypeEnum): Promise<any> {
+  async findByEntity(entity_ids: string[],
+    entity_type: EntityMediaTypeEnum | undefined = null
+  ): Promise<any> {
+    const whereCondition = entity_type
+      ? { entity_id: In(entity_ids), entity_type }
+      : { entity_id: In(entity_ids) };
+
     const media = await this.entityMediaRepository.find({
-      where: {
-        entity_id: In(entity_ids),
-        entity_type: entity_type,
-      },
+      where: whereCondition,
       relations: ['media'],
     });
 
@@ -75,12 +78,13 @@ export class MediaService {
       if (!acc[curr.entity_id]) {
         acc[curr.entity_id] = [];
       }
-      acc[curr.entity_id].push(curr.media);
+      acc[curr.entity_id].push(curr);
       return acc;
     }, {});
-    
+
     return mediaByEntity;
   }
+
 
   async update(id: string, updateMediaDto: UpdateMediaDto): Promise<MediaDto> {
     try {

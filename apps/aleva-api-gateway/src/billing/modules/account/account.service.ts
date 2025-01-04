@@ -29,15 +29,15 @@ import { AddressService } from 'apps/aleva-api-gateway/src/address/modules/addre
 
 @Injectable()
 export class AccountService extends BaseService<
-EntityAccountTypeEnum | EntityAddressTypeEnum,
-CreateAccountDto,
-UpdateAccountDto,
-ClientAccountDto,
-ClientCreateAccountDto,
-ClientUpdateAccountDto,
-ClientEntityAccountDto,
-ClientCreateEntityAccountDto
->{
+  EntityAccountTypeEnum | EntityAddressTypeEnum,
+  CreateAccountDto,
+  UpdateAccountDto,
+  ClientAccountDto,
+  ClientCreateAccountDto,
+  ClientUpdateAccountDto,
+  ClientEntityAccountDto,
+  ClientCreateEntityAccountDto
+> {
   public readonly entityIdKey = 'account_id';
 
   constructor(
@@ -76,34 +76,5 @@ ClientCreateEntityAccountDto
     // merge all responses
     return { ...entityResponse, ...fieldResponses };
   }
-
-  // async findAll(pageOptionsDto: PageOptionsDto): Promise<ClientAccountDto[]> {
-  //   return this.accountClient.send<ClientAccountDto[]>(
-  //     ACCOUNT_PATTERN.FIND_ALL,
-  //     pageOptionsDto
-  //   ).toPromise();
-  // }
-
-  // async findOne(accountId: string): Promise<ClientAccountDto> {
-  //   return this.accountClient
-  //     .send<ClientAccountDto>(ACCOUNT_PATTERN.FIND_ONE, accountId)
-  //     .toPromise();
-  // }
-
-  // async update(accountId: string, updateAccountDto: UpdateAccountDto): Promise<ClientAccountDto> {
-  //   const updateAccountContract: UpdateAccountDto = { ...updateAccountDto };
-
-  //   return this.accountClient.send<ClientAccountDto, ClientUpdateAccountDto>(
-  //     ACCOUNT_PATTERN.UPDATE,
-  //     { account_id: accountId, ...updateAccountContract }
-  //   ).toPromise();
-  // }
-
-  // async remove(accountId: string): Promise<void> {
-  //   return this.accountClient.send<ClientAccountDto>(
-  //     ACCOUNT_PATTERN.DELETE,
-  //     accountId
-  //   ).toPromise();
-  // }
 }
 

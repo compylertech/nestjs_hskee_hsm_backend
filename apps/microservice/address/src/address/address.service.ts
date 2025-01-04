@@ -52,12 +52,13 @@ export class AddressService {
     return plainToInstance(AddressDto, address, { excludeExtraneousValues: false });
   }
 
-  async findByEntity(entity_ids: string[], entity_type: EntityAddressTypeEnum): Promise<any> {
+  async findByEntity(entity_ids: string[], entity_type: EntityAddressTypeEnum | undefined = null): Promise<any> {
+    const whereCondition = entity_type
+      ? { entity_id: In(entity_ids), entity_type }
+      : { entity_id: In(entity_ids) };
+
     const entityResponse = await this.entityAddressRepository.find({
-      where: {
-        entity_id: In(entity_ids),
-        entity_type: entity_type,
-      },
+      where: whereCondition,
       relations: ['address'],
     });
 
@@ -65,7 +66,7 @@ export class AddressService {
       if (!acc[curr.entity_id]) {
         acc[curr.entity_id] = [];
       }
-      acc[curr.entity_id].push(curr.address);
+      acc[curr.entity_id].push(curr);
       return acc;
     }, {});
 

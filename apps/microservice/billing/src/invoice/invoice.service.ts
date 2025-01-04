@@ -62,7 +62,6 @@ export class InvoiceService {
     }
   }
 
-
   async update(id: string, updateInvoiceDto: UpdateInvoiceDto): Promise<InvoiceDto> {
     const invoice = await this.findEntityById(id);
 

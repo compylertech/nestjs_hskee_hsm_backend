@@ -54,12 +54,14 @@ export class AmenitiesService {
     return plainToInstance(AmenitiesDto, amenities, { excludeExtraneousValues: false });
   }
 
-  async findByEntity(entity_ids: string[], entity_type: EntityAmenityTypeEnum): Promise<any> {
+  async findByEntity(entity_ids: string[], entity_type: EntityAmenityTypeEnum | undefined = null): Promise<any> {
+
+    const whereCondition = entity_type
+    ? { entity_id: In(entity_ids), entity_type }
+    : { entity_id: In(entity_ids) };
+    
     const amenity = await this.entityAmenityRepository.find({
-      where: {
-        entity_id: In(entity_ids),
-        entity_type: entity_type,
-      },
+      where: whereCondition,
       relations: ['amenity'],
     });
 
@@ -67,7 +69,7 @@ export class AmenitiesService {
       if (!acc[curr.entity_id]) {
         acc[curr.entity_id] = [];
       }
-      acc[curr.entity_id].push(curr.amenity);
+      acc[curr.entity_id].push(curr);
       return acc;
     }, {});
 

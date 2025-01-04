@@ -91,7 +91,11 @@ export class EntityMediaController {
 
     if (Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
       await this.entityMediaService.deleteByEntity(entity_id, entity_type as EntityMediaTypeEnum);
+    } else {
+      console.log(`Invalid entity_type: ${entity_type}`)
       // throw new Error(`Invalid entity_type: ${entity_type}`);
     }
+
+
   }
 }

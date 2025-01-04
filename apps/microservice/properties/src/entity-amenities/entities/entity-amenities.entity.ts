@@ -12,10 +12,10 @@ import {
 import { Amenities } from '../../amenities/entities/amenities.entity';
 
 // enum
-import { EntityAmenityTypeEnum } from '@app/contracts/properties/entity-amenities/entity-amenities.enum';
+import { EntityAmenityTypeEnum, EntityAmenityTypeEnumChecks } from '@app/contracts/properties/entity-amenities/entity-amenities.enum';
 
 @Entity('entity_amenities')
-@Check(`"entity_type" IN ('property', 'unit')`)
+@Check(`"entity_type" IN (${EntityAmenityTypeEnumChecks})`)
 export class EntityAmenities {
     @PrimaryGeneratedColumn('uuid')
     entity_amenities_id: string;

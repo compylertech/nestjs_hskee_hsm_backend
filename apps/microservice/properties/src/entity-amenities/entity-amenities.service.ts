@@ -20,7 +20,7 @@ export class EntityAmenitiesService {
   constructor(@InjectRepository(EntityAmenities) private entityAmenitiesRepository: Repository<EntityAmenities>) { }
 
 
-  async create(createEntityAmenitiesDto: CreateEntityAmenitiesDto): Promise<EntityAmenities> {
+  async create(createEntityAmenitiesDto: CreateEntityAmenitiesDto): Promise<EntityAmenitiesDto> {
     const newEntityAmenities = this.entityAmenitiesRepository.create(createEntityAmenitiesDto);
 
     return this.entityAmenitiesRepository.save(newEntityAmenities);

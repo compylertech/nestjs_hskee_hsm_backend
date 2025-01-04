@@ -6,7 +6,6 @@ export enum EntityMediaTypeEnum {
     CONTRACT = 'contract',
     MAINTENANCE_REQUESTS = 'maintenance_requests',
     
-    // New prefixed values
     ENTITY_PROPERTY = 'entity_property',
     ENTITY_USER = 'entity_user',
     ENTITY_UNITS = 'entity_units',

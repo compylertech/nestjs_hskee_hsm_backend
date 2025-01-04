@@ -53,7 +53,7 @@ export class MediaController {
   }
 
   @MessagePattern(MEDIA_PATTERN.FIND_BY_ENTITIES)
-  async findMediaByEntities(@Payload() payload: { entity_ids: string[]; entity_type: string }) {
+  async findByEntities(@Payload() payload: { entity_ids: string[]; entity_type: string }) {
     const { entity_ids, entity_type } = payload;
     
     try {

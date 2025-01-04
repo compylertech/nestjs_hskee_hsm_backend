@@ -20,7 +20,7 @@ export class EntityAddressService {
   constructor(@InjectRepository(EntityAddress) private entityAddressRepository: Repository<EntityAddress>) { }
 
 
-  async create(createEntityAddressDto: CreateEntityAddressDto): Promise<EntityAddress> {
+  async create(createEntityAddressDto: CreateEntityAddressDto): Promise<EntityAddressDto> {
     const newEntityAddress = this.entityAddressRepository.create(createEntityAddressDto);
 
     return this.entityAddressRepository.save(newEntityAddress);

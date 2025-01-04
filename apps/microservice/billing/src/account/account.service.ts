@@ -51,12 +51,14 @@ export class AccountService {
     return plainToInstance(AccountDto, account, { excludeExtraneousValues: false });
   }
 
-  async findByEntity(entity_ids: string[], entity_type: EntityAccountTypeEnum): Promise<any> {
+  async findByEntity(entity_ids: string[], entity_type: EntityAccountTypeEnum  | undefined = null): Promise<any> {
+
+    const whereCondition = entity_type
+    ? { entity_id: In(entity_ids), entity_type }
+    : { entity_id: In(entity_ids) };
+
     const entityResponse = await this.entityAccountRepository.find({
-      where: {
-        entity_id: In(entity_ids),
-        entity_type: entity_type,
-      },
+      where: whereCondition,
       relations: ['account'],
     });
 
@@ -64,7 +66,7 @@ export class AccountService {
       if (!acc[curr.entity_id]) {
         acc[curr.entity_id] = [];
       }
-      acc[curr.entity_id].push(curr.account);
+      acc[curr.entity_id].push(curr);
       return acc;
     }, {});
     

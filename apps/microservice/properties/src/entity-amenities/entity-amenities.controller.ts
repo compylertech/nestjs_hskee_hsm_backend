@@ -94,9 +94,12 @@ export class EntityAmenitiesController {
   @MessagePattern(ENTITY_AMENITIES_PATTERN.DELETE_BY_ENTITY)
   async deleteByEntity(@Payload() payload: { entity_id: string; entity_type: string }): Promise<void> {
     const { entity_id, entity_type } = payload;
-
+    
     if (Object.values(EntityAmenityTypeEnum).includes(entity_type as EntityAmenityTypeEnum)) {
       await this.entityAmenitiesService.deleteByEntity(entity_id, entity_type as EntityAmenityTypeEnum);
+      // throw new Error(`Invalid entity_type: ${entity_type}`);
+    } else {
+      console.log(`Invalid entity_type: ${entity_type}`)
       // throw new Error(`Invalid entity_type: ${entity_type}`);
     }
   }

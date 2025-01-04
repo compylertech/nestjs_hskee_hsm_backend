@@ -39,10 +39,15 @@ import {
     @OneToMany(() => InvoiceItem, (item) => item.invoice, { cascade: true, eager: true })
     invoice_items: InvoiceItem[];
   
-    @CreateDateColumn()
+    // @CreateDateColumn()
+    // created_at: Date;
+  
+    // @UpdateDateColumn()
+    // updated_at: Date;
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     created_at: Date;
   
-    @UpdateDateColumn()
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updated_at: Date;
   }
   
@@ -67,10 +72,10 @@ import {
     @JoinColumn({ name: 'invoice_id' })
     invoice: Invoice;
 
-    @CreateDateColumn()
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     created_at: Date;
   
-    @UpdateDateColumn()
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP', onUpdate: 'CURRENT_TIMESTAMP' })
     updated_at: Date;
   }
   

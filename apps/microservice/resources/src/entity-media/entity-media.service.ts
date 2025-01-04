@@ -20,7 +20,7 @@ export class EntityMediaService {
   constructor(@InjectRepository(EntityMedia) private entityMediaRepository: Repository<EntityMedia>) { }
 
 
-  async create(createEntityMediaDto: CreateEntityMediaDto): Promise<EntityMedia> {
+  async create(createEntityMediaDto: CreateEntityMediaDto): Promise<EntityMediaDto> {
     const newEntityMedia = this.entityMediaRepository.create(createEntityMediaDto);
 
     return this.entityMediaRepository.save(newEntityMedia);

@@ -20,7 +20,7 @@ export class EntityAccountService {
   constructor(@InjectRepository(EntityAccount) private entityAccountRepository: Repository<EntityAccount>) { }
 
 
-  async create(createEntityAccountDto: CreateEntityAccountDto): Promise<EntityAccount> {
+  async create(createEntityAccountDto: CreateEntityAccountDto): Promise<EntityAccountDto> {
     const newEntityAccount = this.entityAccountRepository.create(createEntityAccountDto);
 
     return this.entityAccountRepository.save(newEntityAccount);

@@ -20,7 +20,7 @@ export class EntityBillableService {
   constructor(@InjectRepository(EntityBillable) private entityBillableRepository: Repository<EntityBillable>) { }
 
 
-  async create(createEntityBillableDto: CreateEntityBillableDto): Promise<EntityBillable> {
+  async create(createEntityBillableDto: CreateEntityBillableDto): Promise<EntityBillableDto> {
     const newEntityBillable = this.entityBillableRepository.create(createEntityBillableDto);
 
     return this.entityBillableRepository.save(newEntityBillable);
