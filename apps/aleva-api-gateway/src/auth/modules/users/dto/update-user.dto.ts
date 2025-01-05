@@ -73,7 +73,7 @@ export class UpdateUserDto {
 
   @ApiProperty({
     description: 'List of answers associated with the user',
-    type: [UpdateEntityQuestionnaireDto],
+    type: [EntityQuestionnaireDto],
     example: [
       {
         answer_id: "be583bfd-4609-4a64-a156-e7ab9b45337a",
@@ -88,7 +88,7 @@ export class UpdateUserDto {
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => UpdateEntityQuestionnaireDto)
+  @Type(() => EntityQuestionnaireDto)
   @IsOptional()
-  answers?: UpdateEntityQuestionnaireDto[];
+  answers?: EntityQuestionnaireDto[];
 }

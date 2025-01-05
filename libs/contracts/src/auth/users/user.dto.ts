@@ -1,4 +1,4 @@
-import { AttendanceLogDto, UpdateEntityQuestionnaireDto } from "@app/contracts";
+import { AttendanceLogDto, EntityQuestionnaireDto, UpdateEntityQuestionnaireDto } from "@app/contracts";
 
 
 export class UserDto {
@@ -36,5 +36,5 @@ export class UserDto {
   updated_at?: string;
 
   attendance_logs?: AttendanceLogDto[];
-  answers?: UpdateEntityQuestionnaireDto[];
+  answers?: UpdateEntityQuestionnaireDto[] | EntityQuestionnaireDto[];
 }
