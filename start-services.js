@@ -63,7 +63,7 @@ function startServices() {
 
 // Main function to kill processes and start services
 async function main() {
-  // await killProcessesOnPorts();
+  await killProcessesOnPorts();
   startServices();
 }
 
