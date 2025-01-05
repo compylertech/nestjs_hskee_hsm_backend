@@ -103,7 +103,7 @@ export class PropertyService extends BaseService<
 
     const mappedData = await this.fetchAndMap(properties["data"], this.entityIdKey);
 
-    return { ...properties, data: mappedData };
+    return { ...properties, ...mappedData };
   }
 
   async findOne(propertyId: string): Promise<ClientPropertyDto> {

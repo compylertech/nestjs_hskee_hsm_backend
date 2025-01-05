@@ -3,6 +3,16 @@ import { ClientProxy } from '@nestjs/microservices';
 // meta
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
+type LinkedEntity = {
+    created_at?: string; // or Date
+    updated_at?: string; // or Date
+    [key: string]: any; // other properties
+};
+
+type ConsolidatedEntity<TDto, TEntityDto> = {
+    created?: TDto;
+    linked?: TEntityDto;
+  };
 export abstract class BaseService<
     TDtoTypeEnum,
     TApiCreateDto extends TCreateDto,
@@ -61,6 +71,7 @@ export abstract class BaseService<
                 for (const entity of entities) {
                     const relatedData = fetchResult[entity[identifierKey]] || [];
                     entity[mapKey] = relatedData;
+                    console.log(`relatedData: ${JSON.stringify(relatedData)}`)
 
                     // recursively fetch and map child relationships if needed
                     if (relatedData.length > 0) {
@@ -193,7 +204,7 @@ export abstract class BaseService<
         entityId: string,
         entityType: TDtoTypeEnum,
         entities: TCreateDto[]
-    ): Promise<{ created: TDto; linked: TEntityDto }[]> {
+    ): Promise< ConsolidatedEntity<TDto, TEntityDto>[]> {
         // create entities
         const createdEntities = await Promise.all(
             entities.map((entity) =>
@@ -216,13 +227,13 @@ export abstract class BaseService<
         );
 
         // merge linked data into created entities
-        const consolidatedEntities = createdEntities.map((created, index) => {
-            const linked = linkedEntities[index];
+        const consolidatedEntities: ConsolidatedEntity<TDto, TEntityDto>[] = createdEntities.map((created, index) => {
+            const linked  = linkedEntities[index] as LinkedEntity;
             const { created_at, updated_at, ...linkedWithoutTimestamps } = linked;
 
             return {
                 created: { ...created },
-                linked: { ...linkedWithoutTimestamps }
+                linked: { ...linkedWithoutTimestamps } as TEntityDto
             };
         });
 
