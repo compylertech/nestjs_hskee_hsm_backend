@@ -70,8 +70,9 @@ export abstract class BaseService<
                 // map the fetched data back to the entities
                 for (const entity of entities) {
                     const relatedData = fetchResult[entity[identifierKey]] || [];
-                    entity[mapKey] = relatedData;
+                    entity[mapKey] =  relatedData.map((item) => item[`${mapKey as string}`]);
                     console.log(`relatedData: ${JSON.stringify(relatedData)}`)
+                    console.log(`relatedDataMapped: ${JSON.stringify(relatedData.map((item) => item[`${mapKey as string}`]))}`)
 
                     // recursively fetch and map child relationships if needed
                     if (relatedData.length > 0) {

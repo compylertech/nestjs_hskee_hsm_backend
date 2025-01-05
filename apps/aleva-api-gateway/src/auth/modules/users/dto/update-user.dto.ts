@@ -6,6 +6,7 @@ import { IsArray, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from '
 import { EntityQuestionnaireDto } from './entity-questionnaire.dto';
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
 import { UpdateAttendanceLogDto } from '../../attendance_log/dto/update-attendance-log.dto';
+import { UpdateEntityQuestionnaireDto } from '@app/contracts';
 
 export class UpdateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })
@@ -72,7 +73,7 @@ export class UpdateUserDto {
 
   @ApiProperty({
     description: 'List of answers associated with the user',
-    type: [EntityQuestionnaireDto],
+    type: [UpdateEntityQuestionnaireDto],
     example: [
       {
         answer_id: "be583bfd-4609-4a64-a156-e7ab9b45337a",
@@ -87,7 +88,7 @@ export class UpdateUserDto {
   })
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => EntityQuestionnaireDto)
+  @Type(() => UpdateEntityQuestionnaireDto)
   @IsOptional()
-  answers?: EntityQuestionnaireDto[];
+  answers?: UpdateEntityQuestionnaireDto[];
 }
