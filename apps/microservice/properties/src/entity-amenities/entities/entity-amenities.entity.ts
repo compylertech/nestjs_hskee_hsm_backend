@@ -26,7 +26,7 @@ export class EntityAmenities {
 
     @ManyToOne(() => Amenities, (amenity) => amenity.amenity_id, { eager: true })
     @JoinColumn({ name: 'amenity_id' })
-    amenity: Amenities;
+    amenities: Amenities;
 
     @Column({ type: 'uuid' })
     @Index()

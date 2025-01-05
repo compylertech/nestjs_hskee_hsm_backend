@@ -62,7 +62,7 @@ export class AmenitiesService {
     
     const amenity = await this.entityAmenityRepository.find({
       where: whereCondition,
-      relations: ['amenity'],
+      relations: ['amenities'],
     });
 
     const amenityByEntity = amenity.reduce((acc, curr) => {

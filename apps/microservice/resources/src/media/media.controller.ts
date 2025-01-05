@@ -57,6 +57,11 @@ export class MediaController {
     const { entity_ids, entity_type } = payload;
     
     try {
+
+      if (!Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
+        return
+      }
+
       return await this.mediaService.findByEntity(entity_ids, entity_type as EntityMediaTypeEnum)
     } catch (error) {
       throw new RpcException({

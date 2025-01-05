@@ -1,0 +1,765 @@
+This is the code:
+
+```
+protected async fetchAndMap(
+        entities: TDto[],
+        identifierKey: keyof TDto,
+        entityAuxType: any = null
+    ): Promise<TDto[]> {
+        console.log(`entities: ${JSON.stringify(entities)}`);
+        console.log(`identifierKey: ${identifierKey as string}`);
+        console.log(`entityAuxType: ${entityAuxType}`);
+
+        const entityIds = Array.from(
+            new Set(entities.map((entity) => entity[identifierKey] as string))
+        );
+
+        // process each mapping to fetch top-level and linked child entities
+        await Promise.all(
+            this.mappings.map(async ({ service, entityType, mapKey }) => {
+                const mappingMappedKey = `${mapKey as string}`;
+
+                console.log(`\tservice: ${service.tDtoID}`); // the identifier for the service (i.e. media_id is for the media service)
+                console.log(`\tentityType: ${entityType}`);
+                console.log(`\tmapKey: ${mapKey as string}`);
+
+                // fetch top-level entities for the current mapping
+                const existingEntities = await service.fetchByEntityIDs(entityIds, entityAuxType || entityType);
+
+                console.log(`\texistingEntities: ${JSON.stringify(existingEntities)}`);
+
+                if (!existingEntities) return;
+
+                // map linked entity IDs
+                const linkedEntityIdMap = Object.keys(existingEntities).reduce((acc, parentId) => {
+                    const entityList = existingEntities[parentId] || [];
+                    console.log(`\t\tentityList: ${JSON.stringify(entityList)}`);
+
+                    entityList.forEach((entity) => {
+                        const linkedEntityIdKey = Object.keys(entity).find((key) =>
+                            /^entity_.*_id$/.test(key)
+                        );
+
+                        console.log(`\t\tlinkedEntityIdKey: ${linkedEntityIdKey}`);
+
+                        if (linkedEntityIdKey) {
+                            acc[parentId] = acc[parentId] || {
+                                parentId,
+                                entityId: [],
+                                childMapKey: mappingMappedKey,
+                                mapKey: entity['entity_type'],
+                            };
+                            acc[parentId].entityId.push(entity[linkedEntityIdKey]);
+                        }
+                    });
+                    return acc;
+                }, {} as Record<string, { parentId: string; entityId: string[]; mapKey: string; childMapKey: string }>);
+
+                console.log(`\t\t\tlinkedEntityIdMap: ${JSON.stringify(linkedEntityIdMap)}`);
+
+                // map top-level results to the entities
+                entities.forEach((entity) => {
+                    const id = entity[identifierKey] as string;
+                    if (existingEntities[id]) {
+                        entity[mappingMappedKey] = existingEntities[id].map((result) => result[mapKey]);
+                    }
+                });
+
+                console.log(`\t\t\tentities: ${JSON.stringify(entities)}`);
+
+                // recursively fetch child entities
+                await Promise.all(
+                    Object.values(linkedEntityIdMap).map(async (linkedEntity) => {
+                        console.log(`\t\t\t\tlinkedEntity: ${JSON.stringify(linkedEntity)}`);
+
+                        if (linkedEntity["entityId"].length > 0) {
+                            const childEntities = await Promise.all(
+                                linkedEntity["entityId"].map((linkedId) =>
+                                    this.fetchAndMap(
+                                        existingEntities[linkedEntity.parentId].map((entity) => ({
+                                            // ...entity,
+                                            ...entity[linkedEntity["childMapKey"]],
+                                            [`entity_key`]: linkedId,
+                                        })) as TDto[],
+                                        `entity_key` as keyof TDto,
+                                        `entity_${linkedEntity["childMapKey"]}`
+                                    )
+                                )
+                            );
+
+                            console.log(`\t\t\t\tchildEntities: ${JSON.stringify(childEntities)}`);
+
+                            // attach child entities to the parent
+                            entities.forEach((entity) => {
+                                const id = entity[identifierKey] as string;
+                                if (id === linkedEntity.parentId) {
+                                    entity[linkedEntity.childMapKey] = childEntities.flat();
+                                }
+                            });
+
+                            console.log(`\t\t\t\tentities: ${JSON.stringify(entities)}`);
+                        }
+                    })
+                );
+            })
+        );
+
+        // console.log(`Final mapped entities: ${JSON.stringify(entities)}`);
+        return entities;
+    }
+```
+
+
+This is the logs
+
+entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[]}]
+identifierKey: property_unit_assoc_id
+entityAuxType: null
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+        existingEntities: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":[{"entity_amenities_id":"14c7353b-69e8-4a25-83d3-92f98467ee08","amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","apply_to_units":false,"created_at":"2025-01-04T16:47:25.129Z","updated_at":"2025-01-04T16:47:25.129Z","amenities":{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}}]}
+                entityList: [{"entity_amenities_id":"14c7353b-69e8-4a25-83d3-92f98467ee08","amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","apply_to_units":false,"created_at":"2025-01-04T16:47:25.129Z","updated_at":"2025-01-04T16:47:25.129Z","amenities":{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}}]
+                linkedEntityIdKey: entity_amenities_id
+                        linkedEntityIdMap: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":{"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["14c7353b-69e8-4a25-83d3-92f98467ee08"],"childMapKey":"amenities","mapKey":"property"}}
+                        entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}]}]
+                                linkedEntity: {"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["14c7353b-69e8-4a25-83d3-92f98467ee08"],"childMapKey":"amenities","mapKey":"property"}
+entities: [{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee08"}]
+identifierKey: entity_key
+entityAuxType: entity_amenities
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":[{"entity_address_id":"445e5349-8da1-40bc-80a0-997a4cbeea70","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","address_id":"1a252ec5-27c5-4956-a83b-80534241984e","emergency_address":false,"address":{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"}},{"entity_address_id":"14c7353b-69e8-4a25-83d3-92f98467ee09","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","address_id":"1a252ec5-27c5-4956-a83b-80534241984e","emergency_address":false,"address":{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"}}]}
+                entityList: [{"entity_address_id":"445e5349-8da1-40bc-80a0-997a4cbeea70","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","address_id":"1a252ec5-27c5-4956-a83b-80534241984e","emergency_address":false,"address":{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"}},{"entity_address_id":"14c7353b-69e8-4a25-83d3-92f98467ee09","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","address_id":"1a252ec5-27c5-4956-a83b-80534241984e","emergency_address":false,"address":{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"}}]
+                linkedEntityIdKey: entity_address_id
+                linkedEntityIdKey: entity_address_id
+                        linkedEntityIdMap: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":{"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["445e5349-8da1-40bc-80a0-997a4cbeea70","14c7353b-69e8-4a25-83d3-92f98467ee09"],"childMapKey":"address","mapKey":"property"}}
+                        entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}],"address":[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"}]}]
+                                linkedEntity: {"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["445e5349-8da1-40bc-80a0-997a4cbeea70","14c7353b-69e8-4a25-83d3-92f98467ee09"],"childMapKey":"address","mapKey":"property"}
+entities: [{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"}]
+identifierKey: entity_key
+entityAuxType: entity_address
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+entities: [{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"}]
+identifierKey: entity_key
+entityAuxType: entity_address
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+        existingEntities: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":[{"entity_account_id":"40789193-d9f2-442f-9636-6e3fcb1ec62b","account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","account_type":"savings","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","created_at":"2025-01-04T16:47:25.180Z","updated_at":"2025-01-04T16:47:25.180Z","account":{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z"}}]}
+                entityList: [{"entity_account_id":"40789193-d9f2-442f-9636-6e3fcb1ec62b","account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","account_type":"savings","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","created_at":"2025-01-04T16:47:25.180Z","updated_at":"2025-01-04T16:47:25.180Z","account":{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z"}}]
+                linkedEntityIdKey: entity_account_id
+                        linkedEntityIdMap: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":{"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["40789193-d9f2-442f-9636-6e3fcb1ec62b"],"childMapKey":"account","mapKey":"property"}}
+                        entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}],"address":[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"}],"account":[{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z"}]}]
+                                linkedEntity: {"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["40789193-d9f2-442f-9636-6e3fcb1ec62b"],"childMapKey":"account","mapKey":"property"}
+entities: [{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z","entity_key":"40789193-d9f2-442f-9636-6e3fcb1ec62b"}]
+identifierKey: entity_key
+entityAuxType: entity_account
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":[{"entity_media_id":"473f88f5-cbe4-4460-81b0-d831a9d62d14","media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","media_type":"image","created_at":"2025-01-04T16:47:30.157Z","updated_at":"2025-01-04T16:47:30.157Z","media":{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z"}}]}
+                entityList: [{"entity_media_id":"473f88f5-cbe4-4460-81b0-d831a9d62d14","media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","entity_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entity_type":"property","media_type":"image","created_at":"2025-01-04T16:47:30.157Z","updated_at":"2025-01-04T16:47:30.157Z","media":{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z"}}]
+                linkedEntityIdKey: entity_media_id
+                        linkedEntityIdMap: {"a8457e1a-c65d-4e82-af65-842ba32e6d3f":{"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["473f88f5-cbe4-4460-81b0-d831a9d62d14"],"childMapKey":"media","mapKey":"property"}}
+                        entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}],"address":[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z"}],"account":[{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z"}],"media":[{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z"}]}]
+                                linkedEntity: {"parentId":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","entityId":["473f88f5-cbe4-4460-81b0-d831a9d62d14"],"childMapKey":"media","mapKey":"property"}
+entities: [{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z","entity_key":"473f88f5-cbe4-4460-81b0-d831a9d62d14"}]
+identifierKey: entity_key
+entityAuxType: entity_media
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+                                childEntities: [[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"}],[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"}]]
+                                entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}],"address":[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"}],"account":[{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z"}],"media":[{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z"}]}]
+        existingEntities: {"40789193-d9f2-442f-9636-6e3fcb1ec62b":[{"entity_address_id":"1c8d99a6-2861-425f-9ecf-bb45fd87e947","entity_id":"40789193-d9f2-442f-9636-6e3fcb1ec62b","entity_type":"entity_account","address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","emergency_address":false,"address":{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z"}},{"entity_address_id":"34e2b0bf-2d60-4514-af27-890ef5e2d358","entity_id":"40789193-d9f2-442f-9636-6e3fcb1ec62b","entity_type":"entity_account","address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","emergency_address":false,"address":{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z"}}]}
+                entityList: [{"entity_address_id":"1c8d99a6-2861-425f-9ecf-bb45fd87e947","entity_id":"40789193-d9f2-442f-9636-6e3fcb1ec62b","entity_type":"entity_account","address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","emergency_address":false,"address":{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z"}},{"entity_address_id":"34e2b0bf-2d60-4514-af27-890ef5e2d358","entity_id":"40789193-d9f2-442f-9636-6e3fcb1ec62b","entity_type":"entity_account","address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","emergency_address":false,"address":{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z"}}]
+                linkedEntityIdKey: entity_address_id
+                linkedEntityIdKey: entity_address_id
+                        linkedEntityIdMap: {"40789193-d9f2-442f-9636-6e3fcb1ec62b":{"parentId":"40789193-d9f2-442f-9636-6e3fcb1ec62b","entityId":["1c8d99a6-2861-425f-9ecf-bb45fd87e947","34e2b0bf-2d60-4514-af27-890ef5e2d358"],"childMapKey":"address","mapKey":"entity_account"}}
+                        entities: [{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z","entity_key":"40789193-d9f2-442f-9636-6e3fcb1ec62b","address":[{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z"}]}]
+                                linkedEntity: {"parentId":"40789193-d9f2-442f-9636-6e3fcb1ec62b","entityId":["1c8d99a6-2861-425f-9ecf-bb45fd87e947","34e2b0bf-2d60-4514-af27-890ef5e2d358"],"childMapKey":"address","mapKey":"entity_account"}
+entities: [{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"}]
+identifierKey: entity_key
+entityAuxType: entity_address
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+entities: [{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"}]
+identifierKey: entity_key
+entityAuxType: entity_address
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: {"14c7353b-69e8-4a25-83d3-92f98467ee08":[{"entity_media_id":"be4cd25a-2de4-4815-abd9-2699f3d3add0","media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","entity_id":"14c7353b-69e8-4a25-83d3-92f98467ee08","entity_type":"entity_amenities","media_type":"image","created_at":"2025-01-04T16:47:27.853Z","updated_at":"2025-01-04T16:47:27.853Z","media":{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z"}},{"entity_media_id":"09fcd542-4661-44da-b66d-7e2c3feedfb8","media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","entity_id":"14c7353b-69e8-4a25-83d3-92f98467ee08","entity_type":"entity_amenities","media_type":"image","created_at":"2025-01-04T16:47:27.817Z","updated_at":"2025-01-04T16:47:27.817Z","media":{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z"}}]}
+                entityList: [{"entity_media_id":"be4cd25a-2de4-4815-abd9-2699f3d3add0","media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","entity_id":"14c7353b-69e8-4a25-83d3-92f98467ee08","entity_type":"entity_amenities","media_type":"image","created_at":"2025-01-04T16:47:27.853Z","updated_at":"2025-01-04T16:47:27.853Z","media":{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z"}},{"entity_media_id":"09fcd542-4661-44da-b66d-7e2c3feedfb8","media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","entity_id":"14c7353b-69e8-4a25-83d3-92f98467ee08","entity_type":"entity_amenities","media_type":"image","created_at":"2025-01-04T16:47:27.817Z","updated_at":"2025-01-04T16:47:27.817Z","media":{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z"}}]
+                linkedEntityIdKey: entity_media_id
+                linkedEntityIdKey: entity_media_id
+                        linkedEntityIdMap: {"14c7353b-69e8-4a25-83d3-92f98467ee08":{"parentId":"14c7353b-69e8-4a25-83d3-92f98467ee08","entityId":["be4cd25a-2de4-4815-abd9-2699f3d3add0","09fcd542-4661-44da-b66d-7e2c3feedfb8"],"childMapKey":"media","mapKey":"entity_amenities"}}
+                        entities: [{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee08","media":[{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z"}]}]
+                                linkedEntity: {"parentId":"14c7353b-69e8-4a25-83d3-92f98467ee08","entityId":["be4cd25a-2de4-4815-abd9-2699f3d3add0","09fcd542-4661-44da-b66d-7e2c3feedfb8"],"childMapKey":"media","mapKey":"entity_amenities"}
+entities: [{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"}]
+identifierKey: entity_key
+entityAuxType: entity_media
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+entities: [{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"}]
+identifierKey: entity_key
+entityAuxType: entity_media
+        service: media_id
+        entityType: property
+        mapKey: media
+        service: amenity_id
+        entityType: property
+        mapKey: amenities
+        service: account_id
+        entityType: property
+        mapKey: account
+        service: address_id
+        entityType: property
+        mapKey: address
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+                                childEntities: [[{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z","entity_key":"473f88f5-cbe4-4460-81b0-d831a9d62d14"}]]
+                                entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}],"address":[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"}],"account":[{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z"}],"media":[{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z","entity_key":"473f88f5-cbe4-4460-81b0-d831a9d62d14"}]}]
+                                childEntities: [[{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"}],[{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"}]]
+                                entities: [{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z","entity_key":"40789193-d9f2-442f-9636-6e3fcb1ec62b","address":[{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"}]}]
+                                childEntities: [[{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z","entity_key":"40789193-d9f2-442f-9636-6e3fcb1ec62b","address":[{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"}]}]]
+                                entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z"}],"address":[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"}],"account":[{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z","entity_key":"40789193-d9f2-442f-9636-6e3fcb1ec62b","address":[{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"}]}],"media":[{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z","entity_key":"473f88f5-cbe4-4460-81b0-d831a9d62d14"}]}]
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+        existingEntities: undefined
+                                childEntities: [[{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"}],[{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"}]]
+                                entities: [{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee08","media":[{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"}]}]
+                                childEntities: [[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee08","media":[{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"}]}]]
+                                entities: [{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[],"amenities":[{"amenity_id":"833a69ce-5576-4ba1-a24a-04f80f0628af","amenity_name":"updated2 Swimming Pool","amenity_short_name":"Pool","description":"A luxurious swimming pool","created_at":"2025-01-04T16:47:25.123Z","updated_at":"2025-01-04T16:47:25.123Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee08","media":[{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"be4cd25a-2de4-4815-abd9-2699f3d3add0"},{"media_id":"205a673a-3319-48bb-afb0-39d5ec84f4d9","media_name":"updated4 example2","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:27.807Z","updated_at":"2025-01-04T16:47:27.807Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"},{"media_id":"0acffbd4-3202-4eeb-b6b7-4d16c6b02f23","media_name":"updated3 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:26.496Z","updated_at":"2025-01-04T16:47:26.496Z","entity_key":"09fcd542-4661-44da-b66d-7e2c3feedfb8"}]}],"address":[{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"445e5349-8da1-40bc-80a0-997a4cbeea70"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"},{"address_id":"1a252ec5-27c5-4956-a83b-80534241984e","address_type":"billing","primary":true,"address_1":"updated7 No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:53:32.411Z","entity_key":"14c7353b-69e8-4a25-83d3-92f98467ee09"}],"account":[{"account_id":"84fe9e8d-4b37-4321-9604-6e024de2d556","bank_account_name":"updated5 John Doe","bank_account_number":"123456789","account_type":"savings","account_branch_name":"Downtown Branch","created_at":"2025-01-04T16:47:25.167Z","updated_at":"2025-01-04T16:47:25.167Z","entity_key":"40789193-d9f2-442f-9636-6e3fcb1ec62b","address":[{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"1c8d99a6-2861-425f-9ecf-bb45fd87e947"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"},{"address_id":"f35e93ac-45a6-44ce-808c-4dc62c5ea217","address_type":"billing","primary":true,"address_1":"updated6 account No. 3 Gem Street","city":"Adjiringanor","region":"Greater Accra","country":"Ghana","address_postalcode":"00233","created_at":"2025-01-04T16:47:25.214Z","updated_at":"2025-01-04T16:53:32.445Z","entity_key":"34e2b0bf-2d60-4514-af27-890ef5e2d358"}]}],"media":[{"media_id":"4de6fdf3-7fab-4d5b-bf79-93ea7613d783","media_name":"updated1 example1","media_type":"image","content_url":"https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png","is_thumbnail":false,"caption":"An example media caption","description":"This is an example media description.","created_at":"2025-01-04T16:47:30.153Z","updated_at":"2025-01-04T16:47:30.153Z","entity_key":"473f88f5-cbe4-4460-81b0-d831a9d62d14"}]}]
+                            
+This is the output:
+
+{
+    "property_unit_assoc_id": "a8457e1a-c65d-4e82-af65-842ba32e6d3f",
+    "name": "updated0 property",
+    "amount": "0.00",
+    "security_deposit": "0.00",
+    "commission": "0.00",
+    "floor_space": "0.00",
+    "num_units": 0,
+    "num_bathrooms": 0,
+    "num_garages": 0,
+    "has_balconies": true,
+    "has_parking_space": true,
+    "pets_allowed": true,
+    "description": "string",
+    "property_status": "occupied",
+    "created_at": "2025-01-04T16:47:25.068Z",
+    "updated_at": "2025-01-04T16:47:25.068Z",
+    "property_type": {
+      "property_type_id": 2,
+      "name": "hotel",
+      "description": "test",
+      "created_at": "2024-12-31T05:27:17.144Z",
+      "updated_at": "2024-12-31T05:27:17.144Z"
+    },
+    "units": [],
+    "amenities": [
+      {
+        "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+        "amenity_name": "updated2 Swimming Pool",
+        "amenity_short_name": "Pool",
+        "description": "A luxurious swimming pool",
+        "created_at": "2025-01-04T16:47:25.123Z",
+        "updated_at": "2025-01-04T16:47:25.123Z",
+        "entity_key": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+        "media": [
+          {
+            "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+            "media_name": "updated4 example2",
+            "media_type": "image",
+            "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png",
+            "is_thumbnail": false,
+            "caption": "An example media caption",
+            "description": "This is an example media description.",
+            "created_at": "2025-01-04T16:47:27.807Z",
+            "updated_at": "2025-01-04T16:47:27.807Z",
+            "entity_key": "be4cd25a-2de4-4815-abd9-2699f3d3add0"
+          },
+          {
+            "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+            "media_name": "updated3 example1",
+            "media_type": "image",
+            "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png",
+            "is_thumbnail": false,
+            "caption": "An example media caption",
+            "description": "This is an example media description.",
+            "created_at": "2025-01-04T16:47:26.496Z",
+            "updated_at": "2025-01-04T16:47:26.496Z",
+            "entity_key": "be4cd25a-2de4-4815-abd9-2699f3d3add0"
+          },
+          {
+            "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+            "media_name": "updated4 example2",
+            "media_type": "image",
+            "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png",
+            "is_thumbnail": false,
+            "caption": "An example media caption",
+            "description": "This is an example media description.",
+            "created_at": "2025-01-04T16:47:27.807Z",
+            "updated_at": "2025-01-04T16:47:27.807Z",
+            "entity_key": "09fcd542-4661-44da-b66d-7e2c3feedfb8"
+          },
+          {
+            "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+            "media_name": "updated3 example1",
+            "media_type": "image",
+            "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png",
+            "is_thumbnail": false,
+            "caption": "An example media caption",
+            "description": "This is an example media description.",
+            "created_at": "2025-01-04T16:47:26.496Z",
+            "updated_at": "2025-01-04T16:47:26.496Z",
+            "entity_key": "09fcd542-4661-44da-b66d-7e2c3feedfb8"
+          }
+        ]
+      }
+    ],
+    "address": [
+      {
+        "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+        "address_type": "billing",
+        "primary": true,
+        "address_1": "updated7 No. 3 Gem Street",
+        "city": "Adjiringanor",
+        "region": "Greater Accra",
+        "country": "Ghana",
+        "address_postalcode": "00233",
+        "created_at": "2025-01-04T16:47:25.167Z",
+        "updated_at": "2025-01-04T16:53:32.411Z",
+        "entity_key": "445e5349-8da1-40bc-80a0-997a4cbeea70"
+      },
+      {
+        "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+        "address_type": "billing",
+        "primary": true,
+        "address_1": "updated7 No. 3 Gem Street",
+        "city": "Adjiringanor",
+        "region": "Greater Accra",
+        "country": "Ghana",
+        "address_postalcode": "00233",
+        "created_at": "2025-01-04T16:47:25.167Z",
+        "updated_at": "2025-01-04T16:53:32.411Z",
+        "entity_key": "445e5349-8da1-40bc-80a0-997a4cbeea70"
+      },
+      {
+        "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+        "address_type": "billing",
+        "primary": true,
+        "address_1": "updated7 No. 3 Gem Street",
+        "city": "Adjiringanor",
+        "region": "Greater Accra",
+        "country": "Ghana",
+        "address_postalcode": "00233",
+        "created_at": "2025-01-04T16:47:25.167Z",
+        "updated_at": "2025-01-04T16:53:32.411Z",
+        "entity_key": "14c7353b-69e8-4a25-83d3-92f98467ee09"
+      },
+      {
+        "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+        "address_type": "billing",
+        "primary": true,
+        "address_1": "updated7 No. 3 Gem Street",
+        "city": "Adjiringanor",
+        "region": "Greater Accra",
+        "country": "Ghana",
+        "address_postalcode": "00233",
+        "created_at": "2025-01-04T16:47:25.167Z",
+        "updated_at": "2025-01-04T16:53:32.411Z",
+        "entity_key": "14c7353b-69e8-4a25-83d3-92f98467ee09"
+      }
+    ],
+    "account": [
+      {
+        "account_id": "84fe9e8d-4b37-4321-9604-6e024de2d556",
+        "bank_account_name": "updated5 John Doe",
+        "bank_account_number": "123456789",
+        "account_type": "savings",
+        "account_branch_name": "Downtown Branch",
+        "created_at": "2025-01-04T16:47:25.167Z",
+        "updated_at": "2025-01-04T16:47:25.167Z",
+        "entity_key": "40789193-d9f2-442f-9636-6e3fcb1ec62b",
+        "address": [
+          {
+            "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+            "address_type": "billing",
+            "primary": true,
+            "address_1": "updated6 account No. 3 Gem Street",
+            "city": "Adjiringanor",
+            "region": "Greater Accra",
+            "country": "Ghana",
+            "address_postalcode": "00233",
+            "created_at": "2025-01-04T16:47:25.214Z",
+            "updated_at": "2025-01-04T16:53:32.445Z",
+            "entity_key": "1c8d99a6-2861-425f-9ecf-bb45fd87e947"
+          },
+          {
+            "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+            "address_type": "billing",
+            "primary": true,
+            "address_1": "updated6 account No. 3 Gem Street",
+            "city": "Adjiringanor",
+            "region": "Greater Accra",
+            "country": "Ghana",
+            "address_postalcode": "00233",
+            "created_at": "2025-01-04T16:47:25.214Z",
+            "updated_at": "2025-01-04T16:53:32.445Z",
+            "entity_key": "1c8d99a6-2861-425f-9ecf-bb45fd87e947"
+          },
+          {
+            "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+            "address_type": "billing",
+            "primary": true,
+            "address_1": "updated6 account No. 3 Gem Street",
+            "city": "Adjiringanor",
+            "region": "Greater Accra",
+            "country": "Ghana",
+            "address_postalcode": "00233",
+            "created_at": "2025-01-04T16:47:25.214Z",
+            "updated_at": "2025-01-04T16:53:32.445Z",
+            "entity_key": "34e2b0bf-2d60-4514-af27-890ef5e2d358"
+          },
+          {
+            "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+            "address_type": "billing",
+            "primary": true,
+            "address_1": "updated6 account No. 3 Gem Street",
+            "city": "Adjiringanor",
+            "region": "Greater Accra",
+            "country": "Ghana",
+            "address_postalcode": "00233",
+            "created_at": "2025-01-04T16:47:25.214Z",
+            "updated_at": "2025-01-04T16:53:32.445Z",
+            "entity_key": "34e2b0bf-2d60-4514-af27-890ef5e2d358"
+          }
+        ]
+      }
+    ],
+    "media": [
+      {
+        "media_id": "4de6fdf3-7fab-4d5b-bf79-93ea7613d783",
+        "media_name": "updated1 example1",
+        "media_type": "image",
+        "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735934568/undefined/media/updated1_example1.png",
+        "is_thumbnail": false,
+        "caption": "An example media caption",
+        "description": "This is an example media description.",
+        "created_at": "2025-01-04T16:47:30.153Z",
+        "updated_at": "2025-01-04T16:47:30.153Z",
+        "entity_key": "473f88f5-cbe4-4460-81b0-d831a9d62d14"
+      }
+    ]
+  }
+
+  consider  the nested children in the following:
+  - amenities -> media 
+
+  "amenities": [
+    {
+      "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+      "amenity_name": "updated2 Swimming Pool",
+      "amenity_short_name": "Pool",
+      "description": "A luxurious swimming pool",
+      "created_at": "2025-01-04T16:47:25.123Z",
+      "updated_at": "2025-01-04T16:47:25.123Z",
+      "entity_key": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+      "media": [
+        {
+          "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+          "media_name": "updated4 example2",
+          "media_type": "image",
+          "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png",
+          "is_thumbnail": false,
+          "caption": "An example media caption",
+          "description": "This is an example media description.",
+          "created_at": "2025-01-04T16:47:27.807Z",
+          "updated_at": "2025-01-04T16:47:27.807Z",
+          "entity_key": "be4cd25a-2de4-4815-abd9-2699f3d3add0"
+        },
+        {
+          "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+          "media_name": "updated3 example1",
+          "media_type": "image",
+          "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png",
+          "is_thumbnail": false,
+          "caption": "An example media caption",
+          "description": "This is an example media description.",
+          "created_at": "2025-01-04T16:47:26.496Z",
+          "updated_at": "2025-01-04T16:47:26.496Z",
+          "entity_key": "be4cd25a-2de4-4815-abd9-2699f3d3add0"
+        },
+        {
+          "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+          "media_name": "updated4 example2",
+          "media_type": "image",
+          "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png",
+          "is_thumbnail": false,
+          "caption": "An example media caption",
+          "description": "This is an example media description.",
+          "created_at": "2025-01-04T16:47:27.807Z",
+          "updated_at": "2025-01-04T16:47:27.807Z",
+          "entity_key": "09fcd542-4661-44da-b66d-7e2c3feedfb8"
+        },
+        {
+          "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+          "media_name": "updated3 example1",
+          "media_type": "image",
+          "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png",
+          "is_thumbnail": false,
+          "caption": "An example media caption",
+          "description": "This is an example media description.",
+          "created_at": "2025-01-04T16:47:26.496Z",
+          "updated_at": "2025-01-04T16:47:26.496Z",
+          "entity_key": "09fcd542-4661-44da-b66d-7e2c3feedfb8"
+        }
+      ]
+    }
+  ],
+
+  - address
+  "address": [
+    {
+      "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+      "address_type": "billing",
+      "primary": true,
+      "address_1": "updated7 No. 3 Gem Street",
+      "city": "Adjiringanor",
+      "region": "Greater Accra",
+      "country": "Ghana",
+      "address_postalcode": "00233",
+      "created_at": "2025-01-04T16:47:25.167Z",
+      "updated_at": "2025-01-04T16:53:32.411Z",
+      "entity_key": "445e5349-8da1-40bc-80a0-997a4cbeea70"
+    },
+    {
+      "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+      "address_type": "billing",
+      "primary": true,
+      "address_1": "updated7 No. 3 Gem Street",
+      "city": "Adjiringanor",
+      "region": "Greater Accra",
+      "country": "Ghana",
+      "address_postalcode": "00233",
+      "created_at": "2025-01-04T16:47:25.167Z",
+      "updated_at": "2025-01-04T16:53:32.411Z",
+      "entity_key": "445e5349-8da1-40bc-80a0-997a4cbeea70"
+    },
+    {
+      "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+      "address_type": "billing",
+      "primary": true,
+      "address_1": "updated7 No. 3 Gem Street",
+      "city": "Adjiringanor",
+      "region": "Greater Accra",
+      "country": "Ghana",
+      "address_postalcode": "00233",
+      "created_at": "2025-01-04T16:47:25.167Z",
+      "updated_at": "2025-01-04T16:53:32.411Z",
+      "entity_key": "14c7353b-69e8-4a25-83d3-92f98467ee09"
+    },
+    {
+      "address_id": "1a252ec5-27c5-4956-a83b-80534241984e",
+      "address_type": "billing",
+      "primary": true,
+      "address_1": "updated7 No. 3 Gem Street",
+      "city": "Adjiringanor",
+      "region": "Greater Accra",
+      "country": "Ghana",
+      "address_postalcode": "00233",
+      "created_at": "2025-01-04T16:47:25.167Z",
+      "updated_at": "2025-01-04T16:53:32.411Z",
+      "entity_key": "14c7353b-69e8-4a25-83d3-92f98467ee09"
+    }
+  ],
+
+  - account -> address
+
+  "account": [
+    {
+      "account_id": "84fe9e8d-4b37-4321-9604-6e024de2d556",
+      "bank_account_name": "updated5 John Doe",
+      "bank_account_number": "123456789",
+      "account_type": "savings",
+      "account_branch_name": "Downtown Branch",
+      "created_at": "2025-01-04T16:47:25.167Z",
+      "updated_at": "2025-01-04T16:47:25.167Z",
+      "entity_key": "40789193-d9f2-442f-9636-6e3fcb1ec62b",
+      "address": [
+        {
+          "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+          "address_type": "billing",
+          "primary": true,
+          "address_1": "updated6 account No. 3 Gem Street",
+          "city": "Adjiringanor",
+          "region": "Greater Accra",
+          "country": "Ghana",
+          "address_postalcode": "00233",
+          "created_at": "2025-01-04T16:47:25.214Z",
+          "updated_at": "2025-01-04T16:53:32.445Z",
+          "entity_key": "1c8d99a6-2861-425f-9ecf-bb45fd87e947"
+        },
+        {
+          "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+          "address_type": "billing",
+          "primary": true,
+          "address_1": "updated6 account No. 3 Gem Street",
+          "city": "Adjiringanor",
+          "region": "Greater Accra",
+          "country": "Ghana",
+          "address_postalcode": "00233",
+          "created_at": "2025-01-04T16:47:25.214Z",
+          "updated_at": "2025-01-04T16:53:32.445Z",
+          "entity_key": "1c8d99a6-2861-425f-9ecf-bb45fd87e947"
+        },
+        {
+          "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+          "address_type": "billing",
+          "primary": true,
+          "address_1": "updated6 account No. 3 Gem Street",
+          "city": "Adjiringanor",
+          "region": "Greater Accra",
+          "country": "Ghana",
+          "address_postalcode": "00233",
+          "created_at": "2025-01-04T16:47:25.214Z",
+          "updated_at": "2025-01-04T16:53:32.445Z",
+          "entity_key": "34e2b0bf-2d60-4514-af27-890ef5e2d358"
+        },
+        {
+          "address_id": "f35e93ac-45a6-44ce-808c-4dc62c5ea217",
+          "address_type": "billing",
+          "primary": true,
+          "address_1": "updated6 account No. 3 Gem Street",
+          "city": "Adjiringanor",
+          "region": "Greater Accra",
+          "country": "Ghana",
+          "address_postalcode": "00233",
+          "created_at": "2025-01-04T16:47:25.214Z",
+          "updated_at": "2025-01-04T16:53:32.445Z",
+          "entity_key": "34e2b0bf-2d60-4514-af27-890ef5e2d358"
+        }
+      ]
+    }
+  ],
+
+  The children are duplicated. I think it is because of how `entity_key` is mapped but I am not sure help me rectify this so that i don't have duplciate child objects.

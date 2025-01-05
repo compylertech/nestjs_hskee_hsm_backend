@@ -56,6 +56,10 @@ export class AmenitiesController {
     const { entity_ids, entity_type } = payload;
 
     try {
+      if (!Object.values(EntityAmenityTypeEnum).includes(entity_type as EntityAmenityTypeEnum)) {
+        return
+      }
+
       return await this.amenitiesService.findByEntity(entity_ids, entity_type as EntityAmenityTypeEnum)
     } catch (error) {
       throw new RpcException({

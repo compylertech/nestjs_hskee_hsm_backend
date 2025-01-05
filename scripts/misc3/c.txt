@@ -1,0 +1,57 @@
+The `fetchAndMap` functionality should work like as outlined below. Given the initial `entities` array and a key identifier `identifierKey` I want to be able to `fetchByEntityIDs` for the top-level and linked child entities. The function `fetchByEntityIDs` searches by `entityIDs` and `entityType` by iterating through each service (i.e. `this.mappings.map(async ({ service, entityType, mapKey }) => {})`). For a given `entityID` "a8457e1a-c65d-4e82-af65-842ba32e6d3f" and `entityType` "amenities", we have the following from data `existingEntities` from the `fetchByEntityIDs` call. 
+
+entityIds: ["a8457e1a-c65d-4e82-af65-842ba32e6d3f"]
+
+// link to amenity
+existingEntities: {
+    "a8457e1a-c65d-4e82-af65-842ba32e6d3f": [
+      {The `fetchAndMap` functionality should work like as outlined below. Given the initial `entities` array and a key identifier `identifierKey` I want to be able to `fetchByEntityIDs` for the top-level and linked child entities. The function `fetchByEntityIDs` searches by `entityIDs` and `entityType` by iterating through each service (i.e. `this.mappings.map(async ({ service, entityType, mapKey }) => {})`). For a given `entityID` "a8457e1a-c65d-4e82-af65-842ba32e6d3f" and `entityType` "amenities", we have the following from data `existingEntities` from the `fetchByEntityIDs` call. 
+
+entityIds: ["a8457e1a-c65d-4e82-af65-842ba32e6d3f"]
+
+// link to amenity
+existingEntities: {
+    "a8457e1a-c65d-4e82-af65-842ba32e6d3f": [
+      {
+        "entity_amenities_id": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+        "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+        "entity_id": "a8457e1a-c65d-4e82-af65-842ba32e6d3f",
+        "entity_type": "property",
+        "apply_to_units": false,
+        "created_at": "2025-01-04T16:47:25.129Z",
+        "updated_at": "2025-01-04T16:47:25.129Z",
+        "amenity": {
+          "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+          "amenity_name": "updated2 Swimming Pool",
+          "amenity_short_name": "Pool",
+          "description": "A luxurious swimming pool",
+          "created_at": "2025-01-04T16:47:25.123Z",
+          "updated_at": "2025-01-04T16:47:25.123Z"
+        }
+      }
+    ]
+  }
+
+Now to find any linked children to this amenities, object we have to find a mapping between the `entityID` "a8457e1a-c65d-4e82-af65-842ba32e6d3f" and the respective `entity_amenities_id` field which can be found using regex as (`const linkedEntityIdKey = Object.keys(entity).find((key) => /^entity_.*_id$/.test(key));`). Given that we have to search each of the services we iterate with (i.e. `this.mappings.map(async ({ service, entityType, mapKey }) => {})`) and check if the `entity_amenities_id` id value which in this case is "14c7353b-69e8-4a25-83d3-92f98467ee08" can be found using the `fetchByEntityIDs` method. For the child entities we add an auxType value of `entity_${mapKey}` here since we are dealing with amenities in the inital mapkey we would be looking for children of the type `entity_amenities` in all the other services. We do this recursively to map out the data.
+  
+        "entity_amenities_id": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+        "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+        "entity_id": "a8457e1a-c65d-4e82-af65-842ba32e6d3f",
+        "entity_type": "property",
+        "apply_to_units": false,
+        "created_at": "2025-01-04T16:47:25.129Z",
+        "updated_at": "2025-01-04T16:47:25.129Z",
+        "amenity": {
+          "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+          "amenity_name": "updated2 Swimming Pool",
+          "amenity_short_name": "Pool",
+          "description": "A luxurious swimming pool",
+          "created_at": "2025-01-04T16:47:25.123Z",
+          "updated_at": "2025-01-04T16:47:25.123Z"
+        }
+      }
+    ]
+  }
+
+Now to find any linked children to this amenities, object we have to find a mapping between the `entityID` "a8457e1a-c65d-4e82-af65-842ba32e6d3f" and the respective `entity_amenities_id` field which can be found using regex as (`const linkedEntityIdKey = Object.keys(entity).find((key) => /^entity_.*_id$/.test(key));`). Given that we have to search each of the services we iterate with (i.e. `this.mappings.map(async ({ service, entityType, mapKey }) => {})`) and check if the `entity_amenities_id` id value which in this case is "14c7353b-69e8-4a25-83d3-92f98467ee08" can be found using the `fetchByEntityIDs` method. For the child entities we add an auxType value of `entity_${mapKey}` here since we are dealing with amenities in the inital mapkey we would be looking for children of the type `entity_amenities` in all the other services. We do this recursively to map out the data.
+  

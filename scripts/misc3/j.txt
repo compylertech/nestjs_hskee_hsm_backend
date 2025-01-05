@@ -1,0 +1,242 @@
+// address
+address_id	address_type	primary	address_1	city	region	country	address_postalcode
+1a252ec5-27c5-4956-a83b-80534241984e	billing	TRUE	updated7 No. 3 Gem Street	Adjiringanor	Greater Accra	Ghana	00233
+f35e93ac-45a6-44ce-808c-4dc62c5ea217	billing	TRUE	updated6 account No. 3 Gem Street	Adjiringanor	Greater Accra	Ghana	00233
+
+// entity_address
+entity_address_id	entity_id	entity_type	address_id	emergency_address
+445e5349-8da1-40bc-80a0-997a4cbee470	a8457e1a-c65d-4e82-af65-842ba32e6d3f	property	1a252ec5-27c5-4956-a83b-80534241984e	FALSE
+1c8d99a6-2861-425f-9ecf-bb45fd87e947	40789193-d9f2-442f-9636-6e3fcb1ec62b	entity_account	f35e93ac-45a6-44ce-808c-4dc62c5ea217	FALSE
+34e2b0bf-2d60-4514-af27-890ef5e2d358	40789193-d9f2-442f-9636-6e3fcb1ec62b	entity_account	f35e93ac-45a6-44ce-808c-4dc62c5ea217	FALSE
+14c7353b-69e8-4a25-83d3-92f98467e09d	a8457e1a-c65d-4e82-af65-842ba32e6d3f	property	1a252ec5-27c5-4956-a83b-80534241984e	FALSE
+
+// account
+account_id	bank_account_name	bank_account_number	account_type	account_branch_name
+84fe9e8d-4b37-4321-9604-6e024de2d556	updated5 John Doe	123456789	savings	Downtown Branch
+
+// entity_account
+entity_account_id	account_id	account_type	entity_id	entity_type	created_at
+40789193-d9f2-442f-9636-6e3fcb1ec62b	84fe9e8d-4b37-4321-9604-6e024de2d556	savings	a8457e1a-c65d-4e82-af65-842ba32e6d3f	property	2025-01-04 16:47:25.180
+
+// amenities
+amenity_id	amenity_name	amenity_short_name	description	created_at	updated_at
+833a69ce-5576-4ba1-a24a-04f80f0628af	updated2 Swimming Pool	Pool	A luxurious swimming pool	2025-01-04 16:47:25.123	2025-01-04 16:47:25.123
+
+// entity_amenities
+entity_amenity_id	amenity_id	entity_id	entity_type	apply_to_units
+14c7353b-69e8-4a25-83d3-92f98467ee08	833a69ce-5576-4ba1-a24a-04f80f0628af	a8457e1a-c65d-4e82-af65-842ba32e6d3f	property
+
+// media
+media_id	media_name	media_type	content_url	is_thumbnail	caption	description
+205a673a-3319-48bb-afb0-39d5ec84f4d9	updated4 example2	image	https://res.cloudinary.com/example	FALSE	An example media caption	This is an example media description
+0acffbd4-3202-4eeb-b6b7-4d16c6b02f23	updated3 example1	image	https://res.cloudinary.com/example	FALSE	An example media caption	This is an example media description
+4de6fdf3-7fab-4d5b-bf79-93ea7613d783	updated1 example1	image	https://res.cloudinary.com/example	FALSE	An example media caption	This is an example media description
+
+// entity_media
+entity_media_id	media_id	entity_id	entity_type
+be4cd25a-2de4-4815-abd9-2699f3d3add0	205a673a-3319-48bb-afb0-39d5ec84f4d9	14c7353b-69e8-4a25-83d3-92f98467ee08	entity_amenities
+473f88f5-cbe4-4460-81b0-d831ea9d62d14	4de6fdf3-7fab-4d5b-bf79-93ea7613d783	a8457e1a-c65d-4e82-af65-842ba32e6d3f	property
+09fcd542-4661-44da-b66d-7e23cfeedfb8	0acffbd4-3202-4eeb-b6b7-4d16c6b02f23	14c7353b-69e8-4a25-83d3-92f98467ee08	entity_amenities
+
+
+These are the tables with the relationsips. You are given an initial info
+
+// global mapping passed
+[
+    {
+        service: mediaService,
+        entityServiceType: EntityMediaTypeEnum.PROPERTY,
+        mapKey: 'media',
+    },
+    {
+        service: amenityService,
+        entityServiceType: EntityAmenityTypeEnum.PROPERTY,
+        mapKey: 'amenities',
+    },
+    {
+        service: accountService,
+        entityServiceType: EntityAmenityTypeEnum.PROPERTY,
+        mapKey: 'account',
+    },
+    {
+        service: addressService,
+        entityServiceType: EntityAmenityTypeEnum.PROPERTY,
+        mapKey: 'address',
+    }
+]
+
+
+// entities
+entities = 
+[{"property_unit_assoc_id":"a8457e1a-c65d-4e82-af65-842ba32e6d3f","name":"updated0 property","amount":"0.00","security_deposit":"0.00","commission":"0.00","floor_space":"0.00","num_units":0,"num_bathrooms":0,"num_garages":0,"has_balconies":true,"has_parking_space":true,"pets_allowed":true,"description":"string","property_status":"occupied","created_at":"2025-01-04T16:47:25.068Z","updated_at":"2025-01-04T16:47:25.068Z","property_type":{"property_type_id":2,"name":"hotel","description":"test","created_at":"2024-12-31T05:27:17.144Z","updated_at":"2024-12-31T05:27:17.144Z"},"units":[]}]
+
+// identifierKey
+identifierKey = "property_unit_assoc_id"
+
+
+and you have a helper function `fetchByEntityIDs` with the method signature:
+
+```
+async fetchByEntityIDs(entityIDs: string[], entityType: TDtoTypeEnum | undefined = null)
+```
+Sample response from `fetchByEntityIDs`. Notice that we passed ["a8457e1a-c65d-4e82-af65-842ba32e6d3f"] as the `entityIDs` argument and `entityType` = "property". What it did was search on the entity_amenities table for the result. (This is because the mapping.service determines which table to search on).
+
+fetchByEntityIDsResult = {
+  "a8457e1a-c65d-4e82-af65-842ba32e6d3f": [
+    {
+      "entity_amenities_id": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+      "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+      "entity_id": "a8457e1a-c65d-4e82-af65-842ba32e6d3f",
+      "entity_type": "property",
+      "apply_to_units": false,
+      "created_at": "2025-01-04T16:47:25.129Z",
+      "updated_at": "2025-01-04T16:47:25.129Z",
+      "amenities": {
+        "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+        "amenity_name": "updated2 Swimming Pool",
+        "amenity_short_name": "Pool",
+        "description": "A luxurious swimming pool",
+        "created_at": "2025-01-04T16:47:25.123Z",
+        "updated_at": "2025-01-04T16:47:25.123Z"
+      }
+    }
+  ]
+}
+
+The method `fetchByEntityIDs` takes in a list of ids and searches the entity_table based on `entityType` provided. `entityIDs` searches on the `entity_id` column and `entityType` is searched on the `entity_type` column.
+
+To find nested child relationships, we search on the entity_*_id key from the result and use that as the `entityIDs` and iterate through the service map prefixing the mapKey with `entity_`. 
+
+Since we have that we would add this to the top-level of the initial `entities` object associated with the respective `entityIds`. To search for child elements we have to look at the `fetchByEntityIDsResult` and find the `entity_*_id` of the associated parent `entity_id` ("a8457e1a-c65d-4e82-af65-842ba32e6d3f") which in this case would be `"entity_amenities_id": "14c7353b-69e8-4a25-83d3-92f98467ee08"`. This would now be the id we would use to search when trying to mapout the child entity related data. 
+
+To find nested child relationships, we search on the entity_*_id key from the result and use that as the `entityIDs` and iterate through the service map prefixing the mapKey with `entity_`.  So the subsequent call for the child to a service lets say media service would be `fetchByEntityIDs(["14c7353b-69e8-4a25-83d3-92f98467ee08"], "entity_amenities"). This should then pick up all related media and we can then map that to the child amenities entityid ("14c7353b-69e8-4a25-83d3-92f98467ee08") of the parent id ("a8457e1a-c65d-4e82-af65-842ba32e6d3f"). The entityType passed is `entity_amenities` because the parent mapKey was the `amenities` key.
+
+// result for subsequent nested child call to fetchByEntityIDs
+fetchByEntityIDsResult = {
+  "14c7353b-69e8-4a25-83d3-92f98467ee08": [
+    {
+      "entity_media_id": "be4cd25a-2de4-4815-abd9-2699f3d3add0",
+      "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+      "entity_id": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+      "entity_type": "entity_amenities",
+      "media_type": "image",
+      "created_at": "2025-01-04T16:47:27.853Z",
+      "updated_at": "2025-01-04T16:47:27.853Z",
+      "media": {
+        "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+        "media_name": "updated4 example2",
+        "media_type": "image",
+        "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png",
+        "is_thumbnail": false,
+        "caption": "An example media caption",
+        "description": "This is an example media description.",
+        "created_at": "2025-01-04T16:47:27.807Z",
+        "updated_at": "2025-01-04T16:47:27.807Z"
+      }
+    },
+    {
+      "entity_media_id": "09fcd542-4661-44da-b66d-7e2c3feedfb8",
+      "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+      "entity_id": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+      "entity_type": "entity_amenities",
+      "media_type": "image",
+      "created_at": "2025-01-04T16:47:27.817Z",
+      "updated_at": "2025-01-04T16:47:27.817Z",
+      "media": {
+        "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+        "media_name": "updated3 example1",
+        "media_type": "image",
+        "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png",
+        "is_thumbnail": false,
+        "caption": "An example media caption",
+        "description": "This is an example media description.",
+        "created_at": "2025-01-04T16:47:26.496Z",
+        "updated_at": "2025-01-04T16:47:26.496Z"
+      }
+    }
+  ]
+}
+
+
+Again since we are on the "media" service we only care about the objects with `mapKey` "media".
+
+"media": [
+    {
+        "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+        "media_name": "updated4 example2",
+        "media_type": "image",
+        "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png",
+        "is_thumbnail": false,
+        "caption": "An example media caption",
+        "description": "This is an example media description.",
+        "created_at": "2025-01-04T16:47:27.807Z",
+        "updated_at": "2025-01-04T16:47:27.807Z"
+      },
+      {
+        "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+        "media_name": "updated3 example1",
+        "media_type": "image",
+        "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png",
+        "is_thumbnail": false,
+        "caption": "An example media caption",
+        "description": "This is an example media description.",
+        "created_at": "2025-01-04T16:47:26.496Z",
+        "updated_at": "2025-01-04T16:47:26.496Z"
+      }
+]
+
+// media
+media_id	media_name	media_type	content_url	is_thumbnail	caption	description
+205a673a-3319-48bb-afb0-39d5ec84f4d9	updated4 example2	image	https://res.cloudinary.com/example	FALSE	An example media caption	This is an example media description
+0acffbd4-3202-4eeb-b6b7-4d16c6b02f23	updated3 example1	image	https://res.cloudinary.com/example	FALSE	An example media caption	This is an example media description
+4de6fdf3-7fab-4d5b-bf79-93ea7613d783	updated1 example1	image	https://res.cloudinary.com/example	FALSE	An example media caption	This is an example media description
+
+// entity_media
+entity_media_id	media_id	entity_id	entity_type
+be4cd25a-2de4-4815-abd9-2699f3d3add0	205a673a-3319-48bb-afb0-39d5ec84f4d9	14c7353b-69e8-4a25-83d3-92f98467ee08	entity_amenities
+473f88f5-cbe4-4460-81b0-d831ea9d62d14	4de6fdf3-7fab-4d5b-bf79-93ea7613d783	a8457e1a-c65d-4e82-af65-842ba32e6d3f	property
+09fcd542-4661-44da-b66d-7e23cfeedfb8	0acffbd4-3202-4eeb-b6b7-4d16c6b02f23	14c7353b-69e8-4a25-83d3-92f98467ee08	entity_amenities
+
+In the end the mapping for that should result in below for the amenites mapKey and the child mapkey "media"
+
+
+The below would be the key that would then be added to the initial parent `entities`
+
+"amenities": [
+      {
+        "amenity_id": "833a69ce-5576-4ba1-a24a-04f80f0628af",
+        "amenity_name": "updated2 Swimming Pool",
+        "amenity_short_name": "Pool",
+        "description": "A luxurious swimming pool",
+        "created_at": "2025-01-04T16:47:25.123Z",
+        "updated_at": "2025-01-04T16:47:25.123Z",
+        "entity_key": "14c7353b-69e8-4a25-83d3-92f98467ee08",
+        "media": [
+          {
+            "media_id": "205a673a-3319-48bb-afb0-39d5ec84f4d9",
+            "media_name": "updated4 example2",
+            "media_type": "image",
+            "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated4_example2.png",
+            "is_thumbnail": false,
+            "caption": "An example media caption",
+            "description": "This is an example media description.",
+            "created_at": "2025-01-04T16:47:27.807Z",
+            "updated_at": "2025-01-04T16:47:27.807Z"
+          },
+          {
+            "media_id": "0acffbd4-3202-4eeb-b6b7-4d16c6b02f23",
+            "media_name": "updated3 example1",
+            "media_type": "image",
+            "content_url": "https://res.cloudinary.com/dm42zhzrf/image/upload/v1735935613/undefined/media/updated3_example1.png",
+            "is_thumbnail": false,
+            "caption": "An example media caption",
+            "description": "This is an example media description.",
+            "created_at": "2025-01-04T16:47:26.496Z",
+            "updated_at": "2025-01-04T16:47:26.496Z"
+          }
+        ]
+      }
+    ]
+
+
+It should be able to loop through the mapping and based on the service and mapkey find the related information.

@@ -53,6 +53,9 @@ export class AddressController {
     const { entity_ids, entity_type } = payload;
 
     try {
+      if (!Object.values(EntityAddressTypeEnum).includes(entity_type as EntityAddressTypeEnum)) {
+        return
+      }
       return await this.addressService.findByEntity(entity_ids, entity_type as EntityAddressTypeEnum)
     } catch (error) {
       throw new RpcException({

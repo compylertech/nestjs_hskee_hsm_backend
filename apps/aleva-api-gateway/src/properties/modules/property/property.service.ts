@@ -58,14 +58,14 @@ export class PropertyService extends BaseService<
       null,
       [
         {
-          service: mediaService,
-          entityType: EntityMediaTypeEnum.PROPERTY,
-          mapKey: 'media',
-        },
-        {
           service: amenityService,
           entityType: EntityAmenityTypeEnum.PROPERTY,
           mapKey: 'amenities',
+        },
+        {
+          service: mediaService,
+          entityType: EntityMediaTypeEnum.PROPERTY,
+          mapKey: 'media',
         },
         {
           service: accountService,

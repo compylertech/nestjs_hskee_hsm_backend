@@ -53,6 +53,10 @@ export class AccountController {
     const { entity_ids, entity_type } = payload;
 
     try {
+      if (!Object.values(EntityAccountTypeEnum).includes(entity_type as EntityAccountTypeEnum)) {
+        return
+      }
+
       return await this.accountService.findByEntity(entity_ids, entity_type as EntityAccountTypeEnum)
     } catch (error) {
       throw new RpcException({
