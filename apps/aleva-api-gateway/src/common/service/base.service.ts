@@ -70,7 +70,7 @@ export abstract class BaseService<
                 // map the fetched data back to the entities
                 for (const entity of entities) {
                     const relatedData = fetchResult[entity[identifierKey]] || [];
-                    entity[mapKey] =  relatedData.map((item) => item[`${mapKey as string}`]);
+                    entity[mapKey] =  relatedData;
                     console.log(`relatedData: ${JSON.stringify(relatedData)}`)
                     console.log(`relatedDataMapped: ${JSON.stringify(relatedData.map((item) => item[`${mapKey as string}`]))}`)
 
@@ -82,7 +82,15 @@ export abstract class BaseService<
                         await this.fetchAndMap(relatedData, childIdentifierKey, childAuxKey);
                     }
                 }
+                for (const entity of entities) {
+                    const relatedData = fetchResult[entity[identifierKey]] || [];
+                    entity[mapKey] =  relatedData.map((item) => item[`${mapKey as string}`]);
+                    console.log(`relatedData: ${JSON.stringify(relatedData)}`)
+                    console.log(`relatedDataMapped: ${JSON.stringify(relatedData.map((item) => item[`${mapKey as string}`]))}`)
+                }
             }
+
+            
         }
 
         return entities;
