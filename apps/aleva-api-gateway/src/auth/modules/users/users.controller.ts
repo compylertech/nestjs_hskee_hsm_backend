@@ -12,7 +12,6 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 // pipes
 import { transformUserToDto } from './pipes/user-transform.pipe';
-import { EntityQuestionnaireDto, UpdateEntityQuestionnaireDto } from '@app/contracts';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
@@ -61,22 +60,12 @@ export class UsersController {
           return {
             ...answer,
             entity_id: answer.entity_id || id,
-          }
+          } 
         });
       }
 
       let usersQueryResponse = await this.usersService.update(id, updateUserDto);
-
-      if (!Array.isArray(usersQueryResponse.answers)) {
-        // Convert single EntityQuestionnaireDto to an array
-        updateUserDto.answers = [updateUserDto.answers as unknown as EntityQuestionnaireDto];
-      } else {
-        // Ensure all elements are of the correct type
-        updateUserDto.answers = updateUserDto.answers.map(answer => {
-          return answer as EntityQuestionnaireDto;
-        });
-      }
-
+      
       return transformUserToDto(usersQueryResponse);
 
     } catch (error) {

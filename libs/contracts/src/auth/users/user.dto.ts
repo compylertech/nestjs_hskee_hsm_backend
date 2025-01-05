@@ -36,5 +36,5 @@ export class UserDto {
   updated_at?: string;
 
   attendance_logs?: AttendanceLogDto[];
-  answers?: UpdateEntityQuestionnaireDto[] | EntityQuestionnaireDto[];
+  answers?: UpdateEntityQuestionnaireDto[] | EntityQuestionnaireDto[] | EntityQuestionnaireDto; // TODO: Resolve this
 }

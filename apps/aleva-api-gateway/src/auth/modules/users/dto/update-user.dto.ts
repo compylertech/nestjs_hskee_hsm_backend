@@ -6,7 +6,6 @@ import { IsArray, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from '
 import { EntityQuestionnaireDto } from './entity-questionnaire.dto';
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
 import { UpdateAttendanceLogDto } from '../../attendance_log/dto/update-attendance-log.dto';
-import { UpdateEntityQuestionnaireDto } from '@app/contracts';
 
 export class UpdateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })

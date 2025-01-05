@@ -12,6 +12,7 @@ import { UpdateUserDto as GatewayUpdateUserDto } from '../dto/update-user.dto';
 
 // contracts
 import { UserDto, CreateUserDto as MicroserviceCreateUserDto } from '@app/contracts';
+import { EntityQuestionnaire } from '@app/modules';
 
 
 export function transformUserToDto(user: User | UserDto): UserDto| {} {
@@ -64,7 +65,7 @@ export function transformUserToDto(user: User | UserDto): UserDto| {} {
             emergency_contact_email,
             emergency_contact_relation,
             emergency_contact_number,
-        } as UserEmergencyInfoDto,
+        } as UserEmergencyInfoDto
     });
 }
 
