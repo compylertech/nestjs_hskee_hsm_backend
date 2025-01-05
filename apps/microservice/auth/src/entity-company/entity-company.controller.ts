@@ -51,7 +51,7 @@ export class EntityCompanyController {
   @MessagePattern(ENTITY_COMPANY_PATTERN.UPDATE)
   update(@Payload() updateEntityCompanyDto: UpdateEntityCompanyDto) {
     try {
-      return this.entityCompanyService.update(updateEntityCompanyDto.entityCompany_id, updateEntityCompanyDto);
+      return this.entityCompanyService.update(updateEntityCompanyDto.entity_company_id, updateEntityCompanyDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

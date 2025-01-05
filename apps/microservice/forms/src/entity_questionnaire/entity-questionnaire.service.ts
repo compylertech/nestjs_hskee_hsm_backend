@@ -20,11 +20,11 @@ export class EntityQuestionnaireService {
   constructor(@InjectRepository(EntityQuestionnaire) private entityQuestionnaireRepository: Repository<EntityQuestionnaire>) { }
 
   async create(createEntityQuestionnaireDto: CreateEntityQuestionnaireDto): Promise<EntityQuestionnaire[]> {
-    const newEntityQuestionnaire = this.entityQuestionnaireRepository.create(createEntityQuestionnaireDto);
+    const newEntityQuestionnaire = await this.entityQuestionnaireRepository.create(createEntityQuestionnaireDto);
     const savedEntity = await this.entityQuestionnaireRepository.save(newEntityQuestionnaire);
 
     // return transformed entity data
-    const { result } = await this.queryEntityQuestionnaire(savedEntity ? [savedEntity[0].entity_id] : null);
+    const { result } = await this.queryEntityQuestionnaire(savedEntity ? [savedEntity.entity_id] : null);
 
     return result;
   }

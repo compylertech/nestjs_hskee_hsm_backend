@@ -1,5 +1,16 @@
 import { AttendanceLogDto, EntityQuestionnaireDto, UpdateEntityQuestionnaireDto } from "@app/contracts";
-
+export class UserBaseDto {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  gender: string;
+  date_of_birth: string;
+  email: string;
+  password: string;
+  phone_number: string;
+  identification_number: string;
+  photo_url?: string;
+}
 
 export class UserDto {
   user_id: string;

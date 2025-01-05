@@ -8,7 +8,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { AttendanceLog } from './entities/attendance-log.entity';
 
 // contracts
-import { AttendanceLogDto, CreateAttendanceLogDto, UpdateAttendanceLogDto } from '@app/contracts';
+import { AttendanceLogDto, CreateAttendanceLogDto, UpdateAttendanceLogDto, UserBaseDto } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -32,6 +32,18 @@ export class AttendanceLogService {
     
     queryBuilder
       .orderBy('attendance_log.created_at', pageOptionsDto.order)
+      .leftJoin('attendance_log.user', 'user')
+      .addSelect([
+        'user.user_id',
+        'user.first_name',
+        'user.last_name',
+        'user.gender',
+        'user.date_of_birth',
+        'user.email',
+        'user.phone_number',
+        'user.identification_number',
+        'user.photo_url',
+      ])
       .skip(options.skip)
       .take(options.limit);
 
@@ -39,6 +51,17 @@ export class AttendanceLogService {
     const { entities } = await queryBuilder.getRawAndEntities();
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     const transformedEntities = plainToInstance(AttendanceLogDto, entities, { excludeExtraneousValues: false });
+
+    // const transformedEntities = entities.map((attendanceLog) => {
+    //   const transformed = plainToInstance(AttendanceLogDto, attendanceLog, { excludeExtraneousValues: false });
+      
+    //   // Transform user relation explicitly
+    //   if (attendanceLog.user) {
+    //     transformed.user_id = plainToInstance(UserBaseDto, attendanceLog.user, { excludeExtraneousValues: false });
+    //   }
+      
+    //   return transformed;
+    // });
 
     return new PageDto(transformedEntities, pageMetaDto);
   }
@@ -69,7 +92,10 @@ export class AttendanceLogService {
       throw new BadRequestException(`Invalid UUID: ${id}`);
     }
 
-    const attendanceLog = await this.attendanceLogRepository.findOne({ where: { attendance_log_id: id } });
+    const attendanceLog = await this.attendanceLogRepository.findOne({ 
+      where: { attendance_log_id: id },
+      relations: ['user']
+     });
 
     if (!attendanceLog) {
       throw new NotFoundException(`AttendanceLog with ID ${id} not found`);

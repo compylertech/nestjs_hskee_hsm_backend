@@ -22,8 +22,9 @@ export class QuestionnaireService {
   ) { }
 
   async create(createQuestionnaireDto: CreateQuestionnaireDto): Promise<QuestionnaireDto> {
-    const newQuestionnaire = this.questionnaireRepository.create(createQuestionnaireDto);
-    const savedEntity = this.questionnaireRepository.save(newQuestionnaire);
+    const newQuestionnaire = await this.questionnaireRepository.create(createQuestionnaireDto);
+    const savedEntity = await this.questionnaireRepository.save(newQuestionnaire);
+
     const transformedEntities = plainToInstance(QuestionnaireDto, savedEntity, { excludeExtraneousValues: false });
 
     return transformedEntities;

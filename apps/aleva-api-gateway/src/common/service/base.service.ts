@@ -43,118 +43,53 @@ export abstract class BaseService<
      * @param identifierKey The key used to identify entities.
      * @param entityChildAuxKey Auxiliary key for nested relationships.
      */
-    // async fetchAndMap(
-    //     entities: any[],
-    //     identifierKey: string,
-    //     entityChildAuxKey: string | null = null
-    // ): Promise<any> {
-    //     for (const mapItem of this.mappings) {
-    //         const { service, entityType, mapKey } = mapItem;
-    //         const entityServiceType = entityType;
-    //         console.log(`mapKey: ${mapKey as string}`)
-    //         console.log(`entityType: ${entityType}`)
-    //         console.log(`identifierKey: ${identifierKey}`)
-    //         console.log(`entityChildAuxKey: ${entityChildAuxKey}`)
-
-    //         // extract the entity IDs from the entities array
-    //         const entityIDs = entities.map((entity) => entity[identifierKey]);
-    //         console.log(`entities: ${JSON.stringify(entities)}`)
-    //         console.log(`entityIDs: ${JSON.stringify(entityIDs)}`)
-
-    //         // fetch related data
-    //         const fetchResult = await service.fetchByEntityIDs(entityIDs, entityChildAuxKey || entityServiceType);
-    //         console.log(`fetchResult: ${JSON.stringify(fetchResult)}`)
-
-    //         if (fetchResult) {
-
-    //             // map the fetched data back to the entities
-    //             for (const entity of entities) {
-    //                 const relatedData = fetchResult[entity[identifierKey]] || [];
-    //                 entity[mapKey] =  relatedData;
-    //                 let flatT  = relatedData.map((item) => item[`${mapKey as string}`]);
-    //                 console.log(`relatedData: ${JSON.stringify(relatedData)}`)
-    //                 console.log(`relatedDataMapped: ${JSON.stringify(flatT)}`)
-
-    //                 // recursively fetch and map child relationships if needed
-    //                 if (relatedData.length > 0) {
-    //                     const childIdentifierKey = `entity_${mapKey as string}_id`;
-    //                     console.log(`childIdentifierKey: ${childIdentifierKey}`)
-    //                     const childAuxKey = `entity_${mapKey as string}`;
-    //                     await this.fetchAndMap(relatedData, childIdentifierKey, childAuxKey);
-    //                 }
-    //             }
-    //         }
-
-            
-    //     }
-
-    //     return entities;
-    // }
     async fetchAndMap(
         entities: any[],
         identifierKey: string,
         entityChildAuxKey: string | null = null
-    ): Promise<void> {
+    ): Promise<any> {
         for (const mapItem of this.mappings) {
             const { service, entityType, mapKey } = mapItem;
             const entityServiceType = entityType;
+            console.log(`mapKey: ${mapKey as string}`)
+            console.log(`entityType: ${entityType}`)
+            console.log(`identifierKey: ${identifierKey}`)
+            console.log(`entityChildAuxKey: ${entityChildAuxKey}`)
 
-            // Extract IDs from entities
+            // extract the entity IDs from the entities array
             const entityIDs = entities.map((entity) => entity[identifierKey]);
+            console.log(`entities: ${JSON.stringify(entities)}`)
+            console.log(`entityIDs: ${JSON.stringify(entityIDs)}`)
 
-            // Fetch related data
+            // fetch related data
             const fetchResult = await service.fetchByEntityIDs(entityIDs, entityChildAuxKey || entityServiceType);
+            console.log(`fetchResult: ${JSON.stringify(fetchResult)}`)
 
-            // Update entities dynamically
-            for (const entity of entities) {
-                const relatedData = fetchResult[entity[identifierKey]] || [];
+            if (fetchResult) {
 
-                // Condense related data dynamically
-                entity[mapKey] = relatedData.map((item: any) => {
-                    const condensed = { ...item };
+                // map the fetched data back to the entities
+                for (const entity of entities) {
+                    const relatedData = fetchResult[entity[identifierKey]] || [];
+                    entity[mapKey] =  relatedData;
+                    let flatT  = relatedData.map((item) => item[`${mapKey as string}`]);
+                    console.log(`relatedData: ${JSON.stringify(relatedData)}`)
+                    console.log(`relatedDataMapped: ${JSON.stringify(flatT)}`)
 
-                    // Merge related objects (e.g., "media", "address", etc.)
-                    Object.keys(item).forEach((key) => {
-                        if (Array.isArray(item[key]) || typeof item[key] === 'object') {
-                            condensed[key] = this.condenseRelatedData(item[key]);
-                        }
-                    });
-
-                    return condensed;
-                });
-
-                // Recursively fetch child relationships
-                if (relatedData.length > 0) {
-                    const childIdentifierKey = `entity_${mapKey as string}_id`;
-                    const childAuxKey = `entity_${mapKey as string}`;
-                    await this.fetchAndMap(relatedData, childIdentifierKey, childAuxKey);
+                    // recursively fetch and map child relationships if needed
+                    if (relatedData.length > 0) {
+                        const childIdentifierKey = `entity_${mapKey as string}_id`;
+                        console.log(`childIdentifierKey: ${childIdentifierKey}`)
+                        const childAuxKey = `entity_${mapKey as string}`;
+                        await this.fetchAndMap(relatedData, childIdentifierKey, childAuxKey);
+                    }
                 }
             }
+
+            
         }
+
+        return entities;
     }
-
-    /**
-     * Dynamically condenses related data for nested objects or arrays.
-     * @param relatedData The data to condense.
-     */
-    private condenseRelatedData(relatedData: any): any {
-        if (Array.isArray(relatedData)) {
-            return relatedData.map((item) => this.condenseRelatedData(item));
-        } else if (typeof relatedData === 'object') {
-            const condensed = { ...relatedData };
-
-            // Simplify nested objects or arrays
-            Object.keys(condensed).forEach((key) => {
-                if (Array.isArray(condensed[key]) || typeof condensed[key] === 'object') {
-                    condensed[key] = this.condenseRelatedData(condensed[key]);
-                }
-            });
-
-            return condensed;
-        }
-        return relatedData; // Return as-is for primitive values
-    }
-
 
     // entity mapping
     private async mapEntityFields<TDto, TEntityDto>(
