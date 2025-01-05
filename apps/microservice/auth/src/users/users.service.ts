@@ -16,6 +16,7 @@ import { UserDto, CreateUserDto, UpdateUserDto } from '@app/contracts';
 import { PageDto } from 'apps/common/dto/page.dto';
 import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+import { UserQueryPageOptionDto } from 'apps/aleva-api-gateway/src/auth/modules/users/page-options/page-query.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,7 +30,7 @@ export class UsersService {
     return this.userRepository.save(newUser);
   }
 
-  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<UserDto>> {
+  async findAll(pageOptionsDto: UserQueryPageOptionDto): Promise<PageDto<UserDto>> {
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.userRepository.createQueryBuilder('user');
 
@@ -39,6 +40,20 @@ export class UsersService {
       .orderBy('user.created_at', pageOptionsDto.order)
       .skip(options.skip)
       .take(options.limit);
+
+    if (pageOptionsDto.user_status === 'is_approved') {
+      queryBuilder.andWhere('user.is_approved = :is_approved', { is_approved: true });
+    } else if (pageOptionsDto.user_status === 'is_disabled') {
+      queryBuilder.andWhere('user.is_disabled = :is_disabled', { is_disabled: true });
+    } else if (pageOptionsDto.user_status === 'is_verified') {
+      queryBuilder.andWhere('user.is_verified = :is_verified', { is_verified: true });
+    } else if (pageOptionsDto.user_status === 'is_subscribed') {
+      queryBuilder.andWhere('user.is_subscribed = :is_subscribed', { is_subscribed: true });
+    } else if (pageOptionsDto.user_status === 'is_onboarded') {
+      queryBuilder.andWhere('user.is_onboarded = :is_onboarded', { is_onboarded: true });
+    } else if (pageOptionsDto.user_status === 'is_rejected') {
+      queryBuilder.andWhere('user.is_rejected = :is_rejected', { is_rejected: true });
+    }
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();

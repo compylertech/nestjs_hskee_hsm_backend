@@ -1,5 +1,5 @@
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query, BadRequestException } from '@nestjs/common';
 
 // services
 import { UsersService } from './users.service';
@@ -8,10 +8,10 @@ import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 // pipes
 import { transformUserToDto } from './pipes/user-transform.pipe';
+import { UserQueryPageOptionDto } from './page-options/page-query.dto';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
@@ -32,7 +32,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Fetch All Users' })
   @ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
-  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+  async findAll(@Query() pageOptionsDto: UserQueryPageOptionDto) {
     let query = await this.usersService.findAll(pageOptionsDto);
     query["data"] = query["data"].map((user) => transformUserToDto(user))
     return query;

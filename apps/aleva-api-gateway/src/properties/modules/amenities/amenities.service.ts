@@ -86,7 +86,7 @@ export class AmenitiesService extends BaseService<
 
     const mappedData = await this.fetchAndMap(amenitiesResponse["data"], this.entityIdKey);
 
-    return { ...amenitiesResponse, data: mappedData };
+    return { ...amenitiesResponse, ...mappedData };
   }
 
   async findOne(amenityId: string): Promise<ClientAmenitiesDto> {

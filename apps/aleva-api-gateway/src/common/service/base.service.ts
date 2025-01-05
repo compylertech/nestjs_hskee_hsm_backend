@@ -47,7 +47,7 @@ export abstract class BaseService<
         entities: any[],
         identifierKey: string,
         entityChildAuxKey: string | null = null
-    ): Promise<any> {
+    ): Promise<TDto[]> {
         for (const mapItem of this.mappings) {
             const { service, entityType, mapKey } = mapItem;
             const entityServiceType = entityType;

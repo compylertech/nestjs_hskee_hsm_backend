@@ -52,17 +52,6 @@ export class AttendanceLogService {
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     const transformedEntities = plainToInstance(AttendanceLogDto, entities, { excludeExtraneousValues: false });
 
-    // const transformedEntities = entities.map((attendanceLog) => {
-    //   const transformed = plainToInstance(AttendanceLogDto, attendanceLog, { excludeExtraneousValues: false });
-      
-    //   // Transform user relation explicitly
-    //   if (attendanceLog.user) {
-    //     transformed.user_id = plainToInstance(UserBaseDto, attendanceLog.user, { excludeExtraneousValues: false });
-    //   }
-      
-    //   return transformed;
-    // });
-
     return new PageDto(transformedEntities, pageMetaDto);
   }
 
