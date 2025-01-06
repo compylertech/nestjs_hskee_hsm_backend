@@ -42,45 +42,51 @@ export class QuestionnaireService {
     ).toPromise();
   }
 
-  async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto, entityId?: string[]): Promise<any[]> {
-    // fetch questionnaire responses
+  async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto, entityId?: string[]): Promise<PageDto<any[]>> {
+    // Fetch questionnaire responses
     const responses = await this.questionnaireClient
-      .send<PageDto<any[]>, { pageOptionsDto: PageOptionsDto; entityId?: string[] }>(QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES, { pageOptionsDto, entityId })
+      .send<PageDto<{ user_id: string }[]>, { pageOptionsDto: PageOptionsDto; entityId?: string[] }>(
+        QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES,
+        { pageOptionsDto, entityId }
+      )
       .toPromise();
-
+  
     if (!responses?.data?.length) {
       return responses;
     }
-
-    // extract unique user IDs
+  
+    // Extract unique user IDs
     const userIds = [...new Set(responses.data.map(item => item.user_id))];
-
+  
     if (userIds.length) {
-      // fetch related users in parallel
+      // Fetch related users in parallel
       const relatedUsers = await this.fetchRelatedUsers(userIds as string[]);
-
+  
       const userMap = new Map(relatedUsers.map(user => [user.user_id, user]));
-
-      // map responses with related user info
-      responses.data = responses.data.map(user => ({
+  
+      // Map responses with related user info and create a new PageDto
+      const updatedData = responses.data.map(user => ({
         ...user,
         user: userMap.get(user.user_id) || null,
       }));
+  
+      return { ...responses, data: updatedData };
     }
-
+  
     return responses;
   }
-
-  // communicate with users microservice
+  
+  // Communicate with users microservice
   private async fetchRelatedUsers(userIds: string[]): Promise<UserBaseDto[]> {
     if (!userIds?.length) {
       return [];
     }
-
+  
     return this.usersClient
       .send<UserBaseDto[], string[]>(USERS_PATTERNS.FETCH_RELATION_USERS, userIds)
       .toPromise();
   }
+  
 
 
   async findOne(questionnaireId: string): Promise<ClientQuestionnaireDto> {
