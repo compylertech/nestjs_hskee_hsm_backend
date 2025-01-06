@@ -19,6 +19,7 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import { CreateQuestionnaireDto } from './dto/create-questionnaire.dto';
 import { UpdateQuestionnaireDto } from './dto/update-questionnaire.dto';
 import { PageDto } from 'apps/common/dto/page.dto';
+import { QuestionnaireResponse } from './interfaces/questionnaire.interface';
 
 @Injectable()
 export class QuestionnaireService {
@@ -45,7 +46,7 @@ export class QuestionnaireService {
   async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto, entityId?: string[]): Promise<PageDto<any[]>> {
     // Fetch questionnaire responses
     const responses = await this.questionnaireClient
-      .send<PageDto<any[][]>, { pageOptionsDto: PageOptionsDto; entityId?: string[] }>(
+      .send<PageDto<QuestionnaireResponse>, { pageOptionsDto: PageOptionsDto; entityId?: string[] }>(
         QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES,
         { pageOptionsDto, entityId }
       )
