@@ -6,6 +6,9 @@ import { IsArray, IsDate, IsEmail, IsOptional, IsString, ValidateNested } from '
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
 import { CreateAttendanceLogDto } from '../../attendance_log/dto/create-attendance-log.dto';
 
+// contracts
+import { CreateAddressDto, CreateMediaDto } from '@app/contracts';
+
 export class CreateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })
   @IsString()
@@ -20,9 +23,11 @@ export class CreateUserDto {
   gender: string;
 
   @ApiProperty({ description: 'Date of birth', example: '2024-11-26' })
-  @IsDate()
-  @Type(() => Date)
-  date_of_birth: Date;
+  // @IsDate()
+  // @Type(() => Date)
+  // date_of_birth: Date;
+  @IsString()
+  date_of_birth: string;
 
   @ApiProperty({ description: 'Email address of the user', example: 'johndoe@compyler.io' })
   @IsEmail()
@@ -62,4 +67,16 @@ export class CreateUserDto {
   @Type(() => CreateAttendanceLogDto)
   @IsOptional()
   attendance_logs?: CreateAttendanceLogDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateMediaDto)
+  @IsOptional()
+  media?: CreateMediaDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateAddressDto)
+  @IsOptional()
+  address?: CreateAddressDto[];
 }

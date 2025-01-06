@@ -14,6 +14,7 @@ import { QuestionnaireDto, CreateQuestionnaireDto, UpdateQuestionnaireDto } from
 import { PageDto } from 'apps/common/dto/page.dto';
 import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
+import { QuestionniareQueryPageOptionDto } from 'apps/aleva-api-gateway/src/forms/modules/questionnaire/page-options/page-query.dto';
 
 @Injectable()
 export class QuestionnaireService {
@@ -30,10 +31,11 @@ export class QuestionnaireService {
     return transformedEntities;
   }
 
-  async findAll(pageOptionsDto: PageOptionsDto): Promise<PageDto<QuestionnaireDto>> {
+  async findAll(pageOptionsDto: QuestionniareQueryPageOptionDto): Promise<PageDto<QuestionnaireDto>> {
     const options = plainToInstance(PageOptionsDto, pageOptionsDto);
     const queryBuilder = this.questionnaireRepository.createQueryBuilder('questionnaire');
 
+    console.log(`pageOptionsDto: ${pageOptionsDto.tag}`)
     queryBuilder
       .leftJoinAndSelect('questionnaire.questions', 'questions')
       .leftJoinAndSelect('questions.answers', 'answers')
@@ -41,7 +43,12 @@ export class QuestionnaireService {
       .where('eq.entity_type = :entityType', { entityType: 'questions' }) // filter by entity_type
       .andWhere('eq.question_id IS NOT NULL') // ensure question_id exists 
       .andWhere('eq.answer_id = answers.answer_id') // ensure it matches only answers in entity_questionnaire
-      .orderBy('questionnaire.created_at', pageOptionsDto.order)
+    
+    if (pageOptionsDto.tag) {
+      queryBuilder.andWhere('questionnaire.tag = :tag', { tag: pageOptionsDto.tag });
+    } 
+      
+    queryBuilder.orderBy('questionnaire.created_at', pageOptionsDto.order)
       .skip(options.skip)
       .take(options.limit);
 

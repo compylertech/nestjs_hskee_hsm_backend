@@ -1,4 +1,4 @@
-import { AttendanceLogDto, EntityQuestionnaireDto, UpdateEntityQuestionnaireDto } from "@app/contracts";
+import { AddressDto, AttendanceLogDto, EntityQuestionnaireDto, MediaDto, UpdateEntityQuestionnaireDto } from "@app/contracts";
 export class UserBaseDto {
   user_id: string;
   first_name: string;
@@ -6,7 +6,6 @@ export class UserBaseDto {
   gender: string;
   date_of_birth: string;
   email: string;
-  password: string;
   phone_number: string;
   identification_number: string;
   photo_url?: string;
@@ -19,7 +18,7 @@ export class UserDto {
   gender: string;
   date_of_birth: string;
   email: string;
-  password: string;
+  password?: string;
   phone_number: string;
   identification_number: string;
   photo_url?: string;
@@ -48,4 +47,7 @@ export class UserDto {
 
   attendance_logs?: AttendanceLogDto[];
   answers?: UpdateEntityQuestionnaireDto[] | EntityQuestionnaireDto[] | EntityQuestionnaireDto; // TODO: Resolve this
+
+  media?: MediaDto[];
+  address?: AddressDto[];
 }

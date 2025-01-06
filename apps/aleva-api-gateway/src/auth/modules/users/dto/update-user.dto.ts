@@ -7,6 +7,9 @@ import { EntityQuestionnaireDto } from './entity-questionnaire.dto';
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
 import { UpdateAttendanceLogDto } from '../../attendance_log/dto/update-attendance-log.dto';
 
+// contracts
+import { UpdateAddressDto, UpdateMediaDto } from '@app/contracts';
+
 export class UpdateUserDto {
   @ApiProperty({ description: 'First name of the user', example: 'John' })
   @IsOptional()
@@ -30,9 +33,11 @@ export class UpdateUserDto {
 
   @ApiProperty({ description: 'Date of birth', example: '2024-11-26' })
   @IsOptional()
-  @IsDate()
-  @Type(() => Date)
-  date_of_birth?: Date;
+  // @IsDate()
+  // @Type(() => Date)
+  // date_of_birth?: Date;
+  @IsString()
+  date_of_birth: string;
 
   @ApiProperty({ description: 'Email address of the user', example: 'johndoe@compyler.io' })
   @IsOptional()
@@ -90,4 +95,16 @@ export class UpdateUserDto {
   @Type(() => EntityQuestionnaireDto)
   @IsOptional()
   answers?: EntityQuestionnaireDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateMediaDto)
+  @IsOptional()
+  media?: UpdateMediaDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateAddressDto)
+  @IsOptional()
+  address?: UpdateAddressDto[];
 }

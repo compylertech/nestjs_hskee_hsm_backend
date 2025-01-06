@@ -1,10 +1,10 @@
-import { CreateAttendanceLogDto, UpdateAttendanceLogDto } from "@app/contracts";
+import { CreateAddressDto, CreateAttendanceLogDto, CreateMediaDto, UpdateAddressDto, UpdateAttendanceLogDto, UpdateMediaDto } from "@app/contracts";
 
 export class CreateUserDto {
   first_name: string;
   last_name: string;
   gender: string;
-  date_of_birth?: string;
+  date_of_birth?: string; // TODO: take a look change from string to Date
   email: string;
   phone_number: string;
   identification_number: string;
@@ -32,4 +32,7 @@ export class CreateUserDto {
   emergency_contact_number?: string;
 
   attendance_logs?: CreateAttendanceLogDto[];
+
+  media?: CreateMediaDto[] | UpdateMediaDto[];
+  address?: CreateAddressDto[] | UpdateAddressDto[];
 }

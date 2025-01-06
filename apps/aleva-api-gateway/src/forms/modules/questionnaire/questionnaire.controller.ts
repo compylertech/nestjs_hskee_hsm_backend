@@ -1,3 +1,4 @@
+import { plainToInstance } from 'class-transformer';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Controller, Post, Get, Patch, Delete, Body, Param, Query, HttpCode } from '@nestjs/common';
 
@@ -12,7 +13,7 @@ import { UpdateQuestionnaireDto } from './dto/update-questionnaire.dto';
 // page-meta
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import { FetchResponsesDto } from './dto/fetch-question-response.dto';
-import { plainToInstance } from 'class-transformer';
+import { QuestionniareQueryPageOptionDto } from './page-options/page-query.dto';
 
 @ApiBearerAuth()
 @Controller('questionnaires')
@@ -31,7 +32,7 @@ export class QuestionnaireController {
   @ApiOperation({ summary: 'Fetch All Questionnaire' })
   @ApiResponse({ status: 200, description: 'Successfully fetched questionnaire.', type: QuestionnaireDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
-  async findAll(@Query() pageOptionsDto: PageOptionsDto) {
+  async findAll(@Query() pageOptionsDto: QuestionniareQueryPageOptionDto) {
     let query = await this.questionnaireService.findAll(pageOptionsDto);
     return query;
   }

@@ -15,8 +15,13 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { QuestionnaireService } from 'apps/aleva-api-gateway/src/forms/modules/questionnaire/questionnaire.service';
 
+// module
+import { MailModule } from '@app/modules/messaging/src/mail/mail.module';
+import { MediaModule } from 'apps/aleva-api-gateway/src/resources/modules/media/media.module';
+import { AddressModule } from 'apps/aleva-api-gateway/src/address/modules/address/address.module';
+
 @Module({
-  imports: [ClientConfigModule],
+  imports: [ClientConfigModule, MediaModule, AddressModule, MailModule],
   controllers: [UsersController],
   providers: [
     UsersService,

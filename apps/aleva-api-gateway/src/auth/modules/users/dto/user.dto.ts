@@ -3,13 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsDate, IsOptional, ValidateNested, IsArray } from 'class-validator';
 
 // contracts
-import { AttendanceLogDto } from '@app/contracts';
+import { AddressDto, AttendanceLogDto, MediaDto } from '@app/contracts';
 
 // dtos
 import { EntityQuestionnaireDto } from './entity-questionnaire.dto';
 import { UserAuthInfoDto, UserEmergencyInfoDto } from './user-utils.dto';
-
-
 export class UserDto {
   @ApiProperty({ description: 'User ID', example: '5c3e3e10-0467-4466-86db-412987e75b0e' })
   @IsString()
@@ -87,4 +85,16 @@ export class UserDto {
   @Type(() => EntityQuestionnaireDto)
   @IsOptional()
   answers?: EntityQuestionnaireDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => MediaDto)
+  @IsOptional()
+  media?: MediaDto[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AddressDto)
+  @IsOptional()
+  address?: AddressDto[];
 }

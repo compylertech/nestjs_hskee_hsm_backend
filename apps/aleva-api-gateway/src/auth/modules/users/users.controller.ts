@@ -3,6 +3,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query, Bad
 
 // services
 import { UsersService } from './users.service';
+import { MailService } from '@app/modules/messaging/src/mail/mail.service';
 
 // dto
 import { UserDto } from './dto/user.dto';
@@ -16,7 +17,8 @@ import { UserQueryPageOptionDto } from './page-options/page-query.dto';
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly mailService: MailService
   ) { }
 
   @Post()
@@ -25,6 +27,10 @@ export class UsersController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async create(@Body() createUserDto: CreateUserDto) {
     let query = await this.usersService.create(createUserDto);
+
+    // if (query) {
+    //   this.mailService.sendOnboardingMail()
+    // }
     return transformUserToDto(query);
   }
 

@@ -54,6 +54,9 @@ export class UsersService {
     } else if (pageOptionsDto.user_status === 'is_rejected') {
       queryBuilder.andWhere('user.is_rejected = :is_rejected', { is_rejected: true });
     }
+    queryBuilder.orderBy('user.created_at', pageOptionsDto.order)
+    .skip(options.skip)
+    .take(options.limit);
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
