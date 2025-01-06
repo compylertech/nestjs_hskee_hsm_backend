@@ -102,7 +102,7 @@ export function transformGatewayUserDto(dto: GatewayCreateUserDto | GatewayUpdat
         emergency_contact_number: dto.user_emergency_info?.emergency_contact_number,
 
         // add password if it exists
-        ...(dto.user_auth_info.password ? { password: dto.user_auth_info.password } : {}),
+        ...(dto.user_auth_info?.password ? { password: dto.user_auth_info?.password } : {}),
 
         // take care of dates
         ...(dto.date_of_birth ? { date_of_birth: format(new Date(dto?.date_of_birth), 'yyyy-MM-dd') } : {}),

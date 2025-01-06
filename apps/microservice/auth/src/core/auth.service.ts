@@ -67,8 +67,7 @@ export class AuthService {
         } catch (error) {
             throw new BadRequestException(`Error resetting password: ${error.message}`);
         }
-
-
+        
         return { message: 'Password reset successfully' };
     }
 
