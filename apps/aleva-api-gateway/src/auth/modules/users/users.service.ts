@@ -206,7 +206,7 @@ export class UsersService extends BaseService<
     createEntityQuestionnaireDto: CreateEntityQuestionnaireDto[]
   ): Promise<EntityQuestionnaireDto[]> {
 
-    return await this.formsClient.send<EntityQuestionnaireDto, ClientCreateEntityQuestionnaireDto[]>(
+    return await this.formsClient.send<EntityQuestionnaireDto[], ClientCreateEntityQuestionnaireDto[]>(
       ENTITY_QUESTIONNAIRE_PATTERN.CREATE,
       createEntityQuestionnaireDto
     ).toPromise();
