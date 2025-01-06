@@ -374,19 +374,18 @@ export abstract class BaseService<
     async removeEntityFields(entityId: string): Promise<void> {
         // dynamically remove all linked entities for all combinations of entity types and map keys
         await Promise.all(
-            this.mappings.flatMap(({ service, entityType, mapKey }) => {
+            await this.mappings.flatMap(async ({ service, entityType, mapKey }) => {
                 // console.log(`Processing removal for entity: ${entityId}, type: ${entityType}, mapKey: ${mapKey as String}`);
 
                 // generate all possible combinations of mapKeys and remove links
-                return this.mappings.flatMap(({ mapKey: otherMapKey }) => {
+                await this.mappings.flatMap(async ({ mapKey: otherMapKey }) => {
                     // console.log(`Deleting: ${service.client["port"]} | ${entityId} | ${entityType} | entity_${otherMapKey as string}`);
-                    return [
+                 
                         // remove prefixed entity type for the current mapKey
-                        service.removeEntityLinks(entityId, `entity_${otherMapKey as string}`),
+                        await service.removeEntityLinks(entityId, `entity_${otherMapKey as string}`);
 
                         // remove base entity type for the current mapKey
-                        service.removeEntityLinks(entityId, entityType)
-                    ];
+                        await service.removeEntityLinks(entityId, entityType);
                 });
             })
         );

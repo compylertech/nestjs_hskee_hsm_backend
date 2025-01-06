@@ -213,6 +213,22 @@ export class UsersService extends BaseService<
 
   }
 
+  async sendQrCodeEmail(sendOnboardingMailDto: OnboardingMailDto): Promise<any> {
+    const sendOnboardingMail = plainToInstance(OnboardingMailDto, sendOnboardingMailDto);
+
+    return await this.mailClient.send<any, OnboardingMailDto>(
+      MAIL_PATTERN.MAIL_QR_CODE_SEND, sendOnboardingMail
+    ).toPromise();
+  }
+
+  async sendWelcomeEmail(welcomeMailDto: WelcomeMailDto): Promise<any> {
+    const sendWelcomeMail = plainToInstance(WelcomeMailDto, welcomeMailDto);
+
+    return await this.mailClient.send<any, WelcomeMailDto>(
+      MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
+    ).toPromise();
+  }
+
   // communicate with forms microservice
   private async createEntityQuestionnaire(
     createEntityQuestionnaireDto: CreateEntityQuestionnaireDto[]
@@ -252,22 +268,6 @@ export class UsersService extends BaseService<
     }
 
     return userResponse;
-  }
-
-  async sendQrCodeEmail(sendOnboardingMailDto: OnboardingMailDto): Promise<any> {
-    const sendOnboardingMail = plainToInstance(OnboardingMailDto, sendOnboardingMailDto);
-
-    return await this.mailClient.send<any, OnboardingMailDto>(
-      MAIL_PATTERN.MAIL_QR_CODE_SEND, sendOnboardingMail
-    ).toPromise();
-  }
-
-  async sendWelcomeEmail(welcomeMailDto: WelcomeMailDto): Promise<any> {
-    const sendWelcomeMail = plainToInstance(WelcomeMailDto, welcomeMailDto);
-
-    return await this.mailClient.send<any, WelcomeMailDto>(
-      MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
-    ).toPromise();
   }
 
 }

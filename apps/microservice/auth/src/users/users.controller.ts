@@ -51,9 +51,9 @@ export class UsersController {
   }
 
   @MessagePattern(USERS_PATTERNS.UPDATE)
-  update(@Payload() updateUserDto: UpdateUserDto) {
+  async update(@Payload() updateUserDto: UpdateUserDto) {
     try {
-      return this.usersService.update(updateUserDto.user_id, updateUserDto);
+      return await this.usersService.update(updateUserDto.user_id, updateUserDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -62,13 +62,25 @@ export class UsersController {
     }
   }
 
-  @MessagePattern(USERS_PATTERNS.REMOVE)
+  @MessagePattern(USERS_PATTERNS.DELETE)
   async remove(@Payload() id: string) {
-    await this.usersService.remove(id);
+    try {
+      await this.usersService.remove(id);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message,
+      });
+    }
   }
 
   @MessagePattern(USERS_PATTERNS.FIND_ONE_EMAIL)
   async findUserByEMail(@Payload() email: string) {
     return await this.usersService.findUserByEmail(email);
+  }
+
+  @MessagePattern(USERS_PATTERNS.FETCH_RELATION_USERS)
+  async fetchRelatedUsers(@Payload() userIds: string []) {
+    return await this.usersService.findByUserIds(userIds);
   }
 }

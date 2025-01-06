@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
@@ -10,7 +10,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { User } from './entities/user.entity';
 
 // contracts
-import { UserDto, CreateUserDto, UpdateUserDto } from '@app/contracts';
+import { UserDto, CreateUserDto, UpdateUserDto, UserBaseDto } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -72,6 +72,20 @@ export class UsersService {
     return plainToInstance(UserDto, user, { excludeExtraneousValues: false });
   }
 
+  async findByUserIds(userIds: string[]): Promise<UserBaseDto[]> {
+    if (!userIds.every(id => isUUID(id))) {
+      throw new BadRequestException('One or more user IDs are invalid');
+    }
+
+    const users = await this.userRepository.findBy({ user_id: In(userIds) });
+
+    if (!users.length) {
+      throw new NotFoundException('No users found for the provided user IDs');
+    }
+
+    return plainToInstance(UserBaseDto, users, { excludeExtraneousValues: true });
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
     const user = await this.getUserEntityById(id);
 
@@ -101,7 +115,7 @@ export class UsersService {
     return user;
   }
 
-  // Find a user by email
+  // find a user by email
   async findUserByEmail(email: string): Promise<UserDto | undefined> {
     const user = this.userRepository.findOne({ where: { email: email } });
 
@@ -112,7 +126,7 @@ export class UsersService {
     return plainToInstance(UserDto, user, { excludeExtraneousValues: false });
   }
 
-  // Validate password reset token
+  // validate password reset token
   async validateResetToken(email: string, token: string): Promise<boolean> {
     const user = await this.findUserByEmail(email);
     if (!user) {
@@ -122,7 +136,7 @@ export class UsersService {
     return token === user.reset_token;
   }
 
-  // Update user's password
+  // update user's password
   async updatePassword(userId: string, newPassword: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { user_id: userId } });
     if (!user) {
@@ -134,7 +148,7 @@ export class UsersService {
     await this.userRepository.save(user);
   }
 
-  // Set reset token
+  // set reset token
   async setResetToken(email: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { email: email } });
 
@@ -146,13 +160,13 @@ export class UsersService {
     await this.userRepository.save(user);
   }
 
-  // Verify email token
+  // verify email token
   async verifyEmailToken(token: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { verification_token: token } });
     return !!user;
   }
 
-  // Mark email as verified
+  // mark email as verified
   async markEmailAsVerified(token: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { verification_token: token } });
 
@@ -164,7 +178,7 @@ export class UsersService {
     await this.userRepository.save(user);
   }
 
-  // Unsubscribe user from emails
+  // unsubscribe user from emails
   async unsubscribeFromEmails(userId: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { user_id: userId } });
 
@@ -176,7 +190,7 @@ export class UsersService {
     await this.userRepository.save(user);
   }
 
-  // Subscribe user to emails
+  // subscribe user to emails
   async subscribeToEmails(userId: string): Promise<void> {
     const user = await this.userRepository.findOne({ where: { user_id: userId } });
 
