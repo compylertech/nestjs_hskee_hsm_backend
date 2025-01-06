@@ -104,14 +104,16 @@ export class EntityQuestionnaireService {
   async createEntityQuestionnaireRecords(questions: any[]): Promise<void> {
     const entityQuestionnairePromises = questions.flatMap((question) => {
       return question.answers.map((answer) => {
-        return this.create({
+
+        let entityRecord = plainToInstance(CreateEntityQuestionnaireDto,  {
           entity_id: answer.answer_id,
           entity_type: "questions",
           questionnaire_id: question.questionnaire_id,
           answer_id: answer.answer_id,
           question_id: question.question_id,
           mark_as_read: false,
-        });
+        }, { excludeExtraneousValues: false });
+        return this.create([entityRecord]);
       });
     });
 

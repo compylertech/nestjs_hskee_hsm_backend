@@ -55,11 +55,13 @@ export class EntityMediaController {
     const { entity_id, entity_type } = payload;
 
     try {
-      if (!Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
-        throw new Error(`Invalid entity_type: ${entity_type}`);
+      if (Object.values(EntityMediaTypeEnum).includes(entity_type as EntityMediaTypeEnum)) {
+        return await this.entityMediaService.findByEntity(entity_id, entity_type as EntityMediaTypeEnum);
+      } else {
+        console.log(`Invalid entity_type: ${entity_type}`)
       }
-
-      return await this.entityMediaService.findByEntity(entity_id, entity_type as EntityMediaTypeEnum);
+      return {}
+      
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

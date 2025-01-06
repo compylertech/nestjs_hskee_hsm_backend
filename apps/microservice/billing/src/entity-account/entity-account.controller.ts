@@ -53,11 +53,13 @@ export class EntityAccountController {
     const { entity_id, entity_type } = payload;
 
     try {
-      if (!Object.values(EntityAccountTypeEnum).includes(entity_type as EntityAccountTypeEnum)) {
-        throw new Error(`Invalid entity_type: ${entity_type}`);
+      if (Object.values(EntityAccountTypeEnum).includes(entity_type as EntityAccountTypeEnum)) {
+        return await this.entityAccountService.findByEntity(entity_id, entity_type as EntityAccountTypeEnum);
+      } else {
+        console.log(`Invalid entity_type: ${entity_type}`)
       }
-
-      return await this.entityAccountService.findByEntity(entity_id, entity_type as EntityAccountTypeEnum);
+      
+      return {}
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

@@ -52,16 +52,16 @@ export class AuthService {
         AUTH_PATTERN.RESET_PASSWORD,
         resetPasswordDto,
       );
-      
+
       return response;
     } catch (error) {
       throw error;
     }
   }
 
-  changePassword(changePasswordDto: ChangePasswordDto) {
+ async changePassword(changePasswordDto: ChangePasswordDto) {
     try {
-      return this.authClient.send<{}, ClientChangePasswordDto>(
+      return await this.authClient.send<{}, ClientChangePasswordDto>(
         AUTH_PATTERN.CHANGE_PASSWORD,
         changePasswordDto,
       );
@@ -70,9 +70,9 @@ export class AuthService {
     }
   }
 
-  verifyEmail(verifyEmailDto: VerifyEmailDto) {
+  async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     try {
-      return this.authClient.send<{}, ClientVerifyEmailDto>(
+      return await this.authClient.send<{}, ClientVerifyEmailDto>(
         AUTH_PATTERN.VERIFY_EMAIL,
         verifyEmailDto,
       );
@@ -81,9 +81,9 @@ export class AuthService {
     }
   }
 
-  unsubscribeEmail(mailActionDto: MailActionDto) {
+  async unsubscribeEmail(mailActionDto: MailActionDto) {
     try {
-      return this.authClient.send<{}, ClientMailActionDto>(
+      return await this.authClient.send<{}, ClientMailActionDto>(
         AUTH_PATTERN.MAIL_UNSUBSCRIBE,
         mailActionDto,
       );
@@ -92,9 +92,9 @@ export class AuthService {
     }
   }
 
-  subscribeEmail(mailActionDto: MailActionDto) {
+  async subscribeEmail(mailActionDto: MailActionDto) {
     try {
-      return this.authClient.send<{}, ClientMailActionDto>(
+      return await this.authClient.send<{}, ClientMailActionDto>(
         AUTH_PATTERN.MAIL_SUBSCRIBE,
         mailActionDto,
       );

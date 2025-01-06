@@ -53,11 +53,13 @@ export class EntityAddressController {
     const { entity_id, entity_type } = payload;
 
     try {
-      if (!Object.values(EntityAddressTypeEnum).includes(entity_type as EntityAddressTypeEnum)) {
-        throw new Error(`Invalid entity_type: ${entity_type}`);
+      if (Object.values(EntityAddressTypeEnum).includes(entity_type as EntityAddressTypeEnum)) {
+        return await this.entityAddressService.findByEntity(entity_id, entity_type as EntityAddressTypeEnum);
+      } else {
+        console.log(`Invalid entity_type: ${entity_type}`)
       }
-
-      return await this.entityAddressService.findByEntity(entity_id, entity_type as EntityAddressTypeEnum);
+      
+      return {}
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

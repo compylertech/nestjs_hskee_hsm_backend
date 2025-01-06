@@ -53,11 +53,13 @@ export class EntityAmenitiesController {
     const { entity_id, entity_type } = payload;
 
     try {
-      if (!Object.values(EntityAmenityTypeEnum).includes(entity_type as EntityAmenityTypeEnum)) {
-        throw new Error(`Invalid entity_type: ${entity_type}`);
+      if (Object.values(EntityAmenityTypeEnum).includes(entity_type as EntityAmenityTypeEnum)) {
+        return await this.entityAmenitiesService.findByEntity(entity_id, entity_type as EntityAmenityTypeEnum);
+      } else {
+        console.log(`Invalid entity_type: ${entity_type}`)
       }
-
-      return await this.entityAmenitiesService.findByEntity(entity_id, entity_type as EntityAmenityTypeEnum);
+      
+      return {}
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
