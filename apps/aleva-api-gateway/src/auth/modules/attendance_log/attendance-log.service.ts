@@ -37,6 +37,14 @@ export class AttendanceLogService {
     ).toPromise();
   }
 
+  async findLastCheckInTime(user_id: string): Promise<ClientAttendanceLogDto> {
+    const response = await this.attendanceLogClient
+      .send<ClientAttendanceLogDto>(ATTENDANCE_LOG_PATTERN.FIND_LAST_CHECK_IN, user_id)
+      .toPromise();
+
+    return response;
+  }
+
   async findOne(attendanceLogId: string): Promise<ClientAttendanceLogDto> {
     return this.attendanceLogClient
       .send<ClientAttendanceLogDto>(ATTENDANCE_LOG_PATTERN.FIND_ONE, attendanceLogId)

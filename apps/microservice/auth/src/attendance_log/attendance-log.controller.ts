@@ -64,4 +64,9 @@ export class AttendanceLogController {
   remove(@Payload() id: string) {
     return this.attendanceLogService.remove(id);
   }
+
+  @MessagePattern(ATTENDANCE_LOG_PATTERN.FIND_LAST_CHECK_IN)
+  async findLastCheckInTime(@Payload() user_id: string) {
+    return await this.attendanceLogService.findLastCheckInTime(user_id);
+  }
 }

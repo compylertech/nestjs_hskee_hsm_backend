@@ -13,10 +13,10 @@ import { AttendanceLogService } from './attendance-log.service';
 
 // controller
 import { AttendanceLogController } from './attendance-log.controller';
-import { UsersModule } from '@app/modules/auth/src/users/users.module';
+import { UserModule } from '../users/users.module';
 
 @Module({
-  imports: [ClientConfigModule],
+  imports: [ClientConfigModule, UserModule],
   controllers: [AttendanceLogController],
   providers: [
     AttendanceLogService,

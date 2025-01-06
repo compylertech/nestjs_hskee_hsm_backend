@@ -16,7 +16,7 @@ import { UsersService } from '../users/users.service';
 export class AttendanceLogController {
   constructor(
     private readonly attendanceLogService: AttendanceLogService,
-    // private readonly userService: UsersService
+    private readonly userService: UsersService
   ) { }
 
   @Post()
@@ -66,9 +66,48 @@ export class AttendanceLogController {
   @ApiResponse({ status: 200, description: 'Successfully fetched attendanceLogs.', type: AttendanceLogDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async guestAttendanceLog(@Body() guestAttendanceLogDto: GuestAttendanceLogDto) {
-    // this.userService.findOne()
-    // return this.attendanceLogService.create(guestAttendanceLogDto);
+    try {
+      const user = await this.userService.findByEmail(guestAttendanceLogDto.email);
+
+      if (!user) {
+        return {
+          message: 'User not found',
+          email: guestAttendanceLogDto.email,
+        };
+      }
+
+      if (user && guestAttendanceLogDto.attendance_type == "check_in") {
+        const attendanceLog = await this.createAttendanceLog({
+          user_id: user.user_id,
+          check_in_time: new Date()
+        });
+
+        return {
+          message: 'Attendance log successfully created',
+          attendanceLog,
+        };
+      }
+
+      if (guestAttendanceLogDto.attendance_type == "check_out") {
+        const attendanceLog = await this.attendanceLogService.findLastCheckInTime(user.user_id);
+
+        await this.update(attendanceLog.attendance_log_id, {
+          user_id: user.user_id,
+          check_out_time: new Date()
+        });
+
+        return {
+          message: 'Attendance log successfully created',
+          attendanceLog,
+        };
+      }
+
+    } catch (error) {
+      console.error('Error creating attendance log:', error);
+      throw new Error('Failed to create attendance log');
+    }
   }
+
 
 
   @Post('attendance_logs/guest-attendance/:id')
@@ -76,7 +115,7 @@ export class AttendanceLogController {
   @ApiResponse({ status: 200, description: 'Successfully fetched attendanceLogs.', type: AttendanceLogDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async guestAttendanceLogID(@Param('id') id: string, @Body() guestAttendanceLogDto: GuestAttendanceLogDto) {
-    // return this.attendanceLogService.create(guestAttendanceLogDto);
+    return this.guestAttendanceLog(guestAttendanceLogDto);
   }
 
 

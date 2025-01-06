@@ -63,6 +63,16 @@ export class AttendanceLogService {
     return plainToInstance(AttendanceLogDto, attendanceLog, { excludeExtraneousValues: false });
   }
 
+  async findLastCheckInTime(user_id: string): Promise<AttendanceLogDto | undefined> {
+    const user = this.attendanceLogRepository.findOne({ where: { user_id: user_id, check_out_time: null} });
+
+    if (!user) {
+      throw new NotFoundException(`User with id ${user_id} not found`);
+    }
+
+    return plainToInstance(AttendanceLogDto, user, { excludeExtraneousValues: false });
+  }
+
   async update(id: string, updateAttendanceLogDto: UpdateAttendanceLogDto): Promise<AttendanceLogDto> {
     const attendanceLog = await this.findEntityById(id);
 

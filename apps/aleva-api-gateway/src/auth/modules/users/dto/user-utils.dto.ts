@@ -25,6 +25,11 @@ export class UserAuthInfoDto {
     @IsOptional()
     is_subscribed_token?: string;
 
+    @ApiProperty({ description: 'Password', example: '', nullable: true })
+    @IsString()
+    @IsOptional()
+    password?: string;
+
     @ApiProperty({ description: 'Whether the user is disabled', example: false })
     @IsBoolean()
     is_disabled?: boolean;

@@ -50,6 +50,7 @@ import { AddressModule } from 'apps/aleva-api-gateway/src/address/modules/addres
       },
       inject: [ClientConfigService]
     }
-  ]
+  ],
+  exports: [UsersService]
 })
 export class UserModule {}

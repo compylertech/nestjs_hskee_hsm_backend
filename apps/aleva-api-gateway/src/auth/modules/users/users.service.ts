@@ -182,16 +182,7 @@ export class UsersService extends BaseService<
       .send<ClientUserDto>(USERS_PATTERNS.FIND_ONE_EMAIL, email)
       .toPromise();
 
-    // fetch answers for each userResponse
-    await Promise.all(
-      [userResponse].map((userResponse) =>
-        this.appendUserResponseWithAnswers(userResponse, new PageOptionsDto()),
-      ),
-    );
-
-    const mappedData = await this.fetchAndMap([userResponse], this.entityIdKey);
-
-    return { ...mappedData[0] };
+    return userResponse;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -206,7 +197,7 @@ export class UsersService extends BaseService<
     const user = await this.updateEntityFields(id, updateUserDto, transformedDto);
     // fetch answers from the forms microservice
     const answers = updateUserDto.answers ? await this.createEntityQuestionnaire(updateUserDto.answers) : [];
-    
+
     return {
       ...user,
       answers: answers
@@ -278,4 +269,5 @@ export class UsersService extends BaseService<
       MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
     ).toPromise();
   }
+
 }

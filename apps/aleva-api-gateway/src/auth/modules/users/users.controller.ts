@@ -23,23 +23,37 @@ export class UsersController {
   ) { }
 
   @Post()
-  @ApiOperation({ summary: 'Create User' })
-  @ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
-  @ApiResponse({ status: 422, description: 'Validation Error' })
-  async create(@Body() createUserDto: CreateUserDto) {
-    let query = await this.usersService.create(createUserDto);
-    
+@ApiOperation({ summary: 'Create User' })
+@ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
+@ApiResponse({ status: 422, description: 'Validation Error' })
+async create(@Body() createUserDto: CreateUserDto) {
+  try {
+    const query = await this.usersService.create(createUserDto);
+    console.log(`query: ${JSON.stringify(query)}`);
+
+    // Check if query indicates failure
+    if (query.status && query.status !== 200) {
+      throw new BadRequestException(`Sign Up Failed: ${query.error || 'Unknown error'}`);
+    }
+
+    // Send welcome email if user creation succeeded
     if (query) {
       await this.usersService.sendWelcomeEmail({
         first_name: query.first_name,
-        last_name: query.last_name, 
-        user_email: query.email, 
-        unsubscribe_link: ''
-      } as WelcomeMailDto)
+        last_name: query.last_name,
+        user_email: query.email,
+        unsubscribe_link: '',
+      } as WelcomeMailDto);
     }
 
+    // Transform and return the created user
     return transformUserToDto(query);
+  } catch (error) {
+    console.error('Error during user creation:', error);
+    throw new BadRequestException('Sign Up Failed: ' + error.message);
   }
+}
+
 
   @Get()
   @ApiOperation({ summary: 'Fetch All Users' })
@@ -73,12 +87,12 @@ export class UsersController {
           return {
             ...answer,
             entity_id: answer.entity_id || id,
-          } 
+          }
         });
       }
 
       let usersQueryResponse = await this.usersService.update(id, updateUserDto);
-      
+
       return transformUserToDto(usersQueryResponse);
 
     } catch (error) {
@@ -95,7 +109,7 @@ export class UsersController {
 
   @Get('/onboarding/:id')
   @ApiOperation({ summary: 'Send onboarding email' })
-  @ApiResponse({ status: 200, description: 'Successfully sent email.'})
+  @ApiResponse({ status: 200, description: 'Successfully sent email.' })
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async sendOnboardingEmail(@Param('id') id: string) {
     let query = await this.usersService.findOne(id);
@@ -106,7 +120,7 @@ export class UsersController {
       if (query) {
         await this.usersService.sendQrCodeEmail({
           first_name: query.first_name,
-          last_name: query.last_name, 
+          last_name: query.last_name,
           user_email: query.email,
           qr_code: '',
           unsubscribe_link: ''

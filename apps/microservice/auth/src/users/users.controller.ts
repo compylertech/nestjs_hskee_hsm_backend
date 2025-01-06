@@ -66,4 +66,9 @@ export class UsersController {
   async remove(@Payload() id: string) {
     await this.usersService.remove(id);
   }
+
+  @MessagePattern(USERS_PATTERNS.FIND_ONE_EMAIL)
+  async findUserByEMail(@Payload() email: string) {
+    return await this.usersService.findUserByEmail(email);
+  }
 }

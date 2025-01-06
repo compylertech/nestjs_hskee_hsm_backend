@@ -14,7 +14,7 @@ export class UpdateAttendanceLogDto {
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  check_in_time: Date;
+  check_in_time?: Date;
 
   @ApiProperty({
     description: 'The check-out time in ISO format',
