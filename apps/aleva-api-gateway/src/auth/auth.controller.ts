@@ -26,8 +26,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Reset Password' })
   @ApiResponse({ status: 200, description: 'Password reset successfully.' })
   @ApiResponse({ status: 400, description: 'Failed to reset password.' })
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authService.resetPassword(resetPasswordDto);
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return await this.authService.resetPassword(resetPasswordDto);
   }
 
 

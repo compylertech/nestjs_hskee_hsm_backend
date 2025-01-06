@@ -22,6 +22,9 @@ import {
   ChangePasswordDto as ClientChangePasswordDto,
   VerifyEmailDto as ClientVerifyEmailDto,
   MailActionDto as ClientMailActionDto,
+
+  MAIL_PATTERN,
+  ResetPasswordMailDto
 } from '@app/contracts';
 
 
@@ -43,12 +46,14 @@ export class AuthService {
     }
   }
 
-  resetPassword(resetPasswordDto: ResetPasswordDto) {
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
     try {
-      return this.authClient.send<{}, ClientResetPasswordDto>(
+      const response = await this.authClient.send<{}, ClientResetPasswordDto>(
         AUTH_PATTERN.RESET_PASSWORD,
         resetPasswordDto,
       );
+      
+      return response;
     } catch (error) {
       throw error;
     }
