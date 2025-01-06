@@ -45,7 +45,7 @@ export class QuestionnaireService {
   async fetchGroupedQuestionnaireData(pageOptionsDto: PageOptionsDto, entityId?: string[]): Promise<any[]> {
     // fetch questionnaire responses
     const responses = await this.questionnaireClient
-      .send<any[] | PageDto<any>>(QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES, { pageOptionsDto, entityId })
+      .send<any[] | PageDto<any[]>>(QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES, { pageOptionsDto, entityId })
       .toPromise();
 
     if (!responses?.data?.length) {
