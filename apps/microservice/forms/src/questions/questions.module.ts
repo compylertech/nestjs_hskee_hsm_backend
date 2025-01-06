@@ -11,9 +11,10 @@ import { EntityQuestionnaireService } from '../entity_questionnaire/entity-quest
 
 // controllers
 import { QuestionsController } from './questions.controller';
+import { Answer } from '../answers/entities/answer.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Question, EntityQuestionnaire])],
+  imports: [TypeOrmModule.forFeature([Question, EntityQuestionnaire, Answer])],
   controllers: [QuestionsController],
   providers: [QuestionsService, EntityQuestionnaireService],
 })

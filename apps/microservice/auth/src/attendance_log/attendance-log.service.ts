@@ -8,7 +8,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { AttendanceLog } from './entities/attendance-log.entity';
 
 // contracts
-import { AttendanceLogDto, CreateAttendanceLogDto, UpdateAttendanceLogDto, UserBaseDto } from '@app/contracts';
+import { AttendanceLogDto, CreateAttendanceLogDto, UpdateAttendanceLogDto } from '@app/contracts';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -17,7 +17,9 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Injectable()
 export class AttendanceLogService {
-  constructor(@InjectRepository(AttendanceLog) private attendanceLogRepository: Repository<AttendanceLog>) { }
+  constructor(
+    @InjectRepository(AttendanceLog) private attendanceLogRepository: Repository<AttendanceLog>
+  ) { }
 
 
   async create(createAttendanceLogDto: CreateAttendanceLogDto): Promise<AttendanceLog> {

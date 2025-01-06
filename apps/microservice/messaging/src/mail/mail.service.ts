@@ -34,7 +34,7 @@ export class MailService {
 
     // send QR code
     async sendQrCodeMail(variables: OnboardingMailDto, recipient: string, subject: string): Promise<void> {
-        return this.sendMail("", variables, recipient, subject);
+        return this.sendMail("./onboardingCompleted.html", variables, recipient, subject);
     }
     
     // welcome

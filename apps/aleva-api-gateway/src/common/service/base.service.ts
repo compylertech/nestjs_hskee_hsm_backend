@@ -72,13 +72,13 @@ export abstract class BaseService<
                     const relatedData = fetchResult[entity[identifierKey]] || [];
                     entity[mapKey] =  relatedData;
                     let flatT  = relatedData.map((item) => item[`${mapKey as string}`]);
-                    console.log(`relatedData: ${JSON.stringify(relatedData)}`)
-                    console.log(`relatedDataMapped: ${JSON.stringify(flatT)}`)
+                    // console.log(`relatedData: ${JSON.stringify(relatedData)}`)
+                    // console.log(`relatedDataMapped: ${JSON.stringify(flatT)}`)
 
                     // recursively fetch and map child relationships if needed
                     if (relatedData.length > 0) {
                         const childIdentifierKey = `entity_${mapKey as string}_id`;
-                        console.log(`childIdentifierKey: ${childIdentifierKey}`)
+                        // console.log(`childIdentifierKey: ${childIdentifierKey}`)
                         const childAuxKey = `entity_${mapKey as string}`;
                         await this.fetchAndMap(relatedData, childIdentifierKey, childAuxKey);
                     }
@@ -168,7 +168,7 @@ export abstract class BaseService<
                         data
                     );
 
-                    console.log(`parentLinkedEntities: ${JSON.stringify(parentLinkedEntities)}`)
+                    // console.log(`parentLinkedEntities: ${JSON.stringify(parentLinkedEntities)}`)
 
                     // process nested entities by using the linked parent IDs
                     const mergedEntities = await Promise.all(
@@ -236,8 +236,10 @@ export abstract class BaseService<
             const { created_at, updated_at, ...linkedWithoutTimestamps } = linked;
 
             return {
-                created: { ...created },
-                linked: { ...linkedWithoutTimestamps } as TEntityDto
+                // created: { ...created },
+                // linked: { ...linkedWithoutTimestamps } as TEntityDto
+                ...created,
+                ...linkedWithoutTimestamps
             };
         });
 
@@ -298,8 +300,8 @@ export abstract class BaseService<
                     {} as Record<string, string[]>
                 );
 
-                console.log(`linkedEntityIdMap for ${entityType}: ${JSON.stringify(linkedEntityIdMap)}`);
-                console.log(`dataToUpdate for ${entityType}: ${JSON.stringify(dataToUpdate)}`);
+                // console.log(`linkedEntityIdMap for ${entityType}: ${JSON.stringify(linkedEntityIdMap)}`);
+                // console.log(`dataToUpdate for ${entityType}: ${JSON.stringify(dataToUpdate)}`);
 
                 // separate new entities and existing entities to update
                 const newEntities = dataToUpdate.filter((entity) => !entity[service.tDtoID]);
@@ -359,7 +361,7 @@ export abstract class BaseService<
     // remove entity linked mappings
     async removeEntityLinks(entityId: string, entityType: TDtoTypeEnum): Promise<void> {
         // ENTITY_PATTERN
-        console.log(`removeEntityLinks : ${this.patterns.DELETE_BY_ENTITY} | ${entityId} | ${entityType} | ${entityType as String}\n`)
+        // console.log(`removeEntityLinks : ${this.patterns.DELETE_BY_ENTITY} | ${entityId} | ${entityType} | ${entityType as String}\n`)
 
         await this.client
             .send<void>(this.patterns.DELETE_BY_ENTITY, { entity_id: entityId, entity_type: entityType })
@@ -373,11 +375,11 @@ export abstract class BaseService<
         // dynamically remove all linked entities for all combinations of entity types and map keys
         await Promise.all(
             this.mappings.flatMap(({ service, entityType, mapKey }) => {
-                console.log(`Processing removal for entity: ${entityId}, type: ${entityType}, mapKey: ${mapKey as String}`);
+                // console.log(`Processing removal for entity: ${entityId}, type: ${entityType}, mapKey: ${mapKey as String}`);
 
                 // generate all possible combinations of mapKeys and remove links
                 return this.mappings.flatMap(({ mapKey: otherMapKey }) => {
-                    console.log(`Deleting: ${service.client["port"]} | ${entityId} | ${entityType} | entity_${otherMapKey as string}`);
+                    // console.log(`Deleting: ${service.client["port"]} | ${entityId} | ${entityType} | entity_${otherMapKey as string}`);
                     return [
                         // remove prefixed entity type for the current mapKey
                         service.removeEntityLinks(entityId, `entity_${otherMapKey as string}`),

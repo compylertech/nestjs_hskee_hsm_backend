@@ -3,12 +3,14 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, HttpCode, Query, Bad
 
 // services
 import { UsersService } from './users.service';
-import { MailService } from '@app/modules/messaging/src/mail/mail.service';
 
 // dto
 import { UserDto } from './dto/user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
+// contracts
+import { OnboardingMailDto, WelcomeMailDto } from '@app/contracts';
 
 // pipes
 import { transformUserToDto } from './pipes/user-transform.pipe';
@@ -17,8 +19,7 @@ import { UserQueryPageOptionDto } from './page-options/page-query.dto';
 @Controller('users')
 export class UsersController {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly mailService: MailService
+    private readonly usersService: UsersService
   ) { }
 
   @Post()
@@ -27,10 +28,16 @@ export class UsersController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async create(@Body() createUserDto: CreateUserDto) {
     let query = await this.usersService.create(createUserDto);
+    
+    if (query) {
+      await this.usersService.sendWelcomeEmail({
+        first_name: query.first_name,
+        last_name: query.last_name, 
+        user_email: query.email, 
+        unsubscribe_link: ''
+      } as WelcomeMailDto)
+    }
 
-    // if (query) {
-    //   this.mailService.sendOnboardingMail()
-    // }
     return transformUserToDto(query);
   }
 
@@ -79,11 +86,40 @@ export class UsersController {
     }
   }
 
-
   @Delete(':id')
   @HttpCode(204)
   @ApiOperation({ summary: 'Delete User' })
   async remove(@Param('id') id: string) {
     await this.usersService.remove(id);
+  }
+
+  @Get('/onboarding/:id')
+  @ApiOperation({ summary: 'Send onboarding email' })
+  @ApiResponse({ status: 200, description: 'Successfully sent email.'})
+  @ApiResponse({ status: 422, description: 'Validation Error' })
+  async sendOnboardingEmail(@Param('id') id: string) {
+    let query = await this.usersService.findOne(id);
+    let qr_code = query.media.filter((item) => item.media_name == "qr_code")
+    console.log(`qr_code: ${JSON.stringify(query.media["media"])}`)
+
+    try {
+      if (query) {
+        await this.usersService.sendQrCodeEmail({
+          first_name: query.first_name,
+          last_name: query.last_name, 
+          user_email: query.email,
+          qr_code: '',
+          unsubscribe_link: ''
+        } as OnboardingMailDto)
+      }
+    } catch (error) {
+      return {
+        message: "Error sending email"
+      }
+    }
+
+    return {
+      message: "Email Sent"
+    }
   }
 }

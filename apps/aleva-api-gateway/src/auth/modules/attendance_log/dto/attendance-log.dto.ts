@@ -22,3 +22,14 @@ export class AttendanceLogDto {
     })
     user_id: string;
 }
+
+export class GuestAttendanceLogDto {
+    @ApiProperty({ description: 'Email of the user', example: 'daniel.q@compyler.io' })
+    email: string;
+
+    @ApiProperty({
+        description: 'The type of attendance',
+        example: 'check_in',
+    })
+    attendance_type: string;
+}

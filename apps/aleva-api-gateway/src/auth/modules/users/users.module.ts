@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 import { ClientProxyFactory } from '@nestjs/microservices';
 
 // constants
-import { FORMS, RBAC } from 'apps/common/config/constants';
-import { FORMS_CLIENT, RBAC_CLIENT } from '../../../common/utils/constants';
+import { FORMS, MAIL, RBAC } from 'apps/common/config/constants';
+import { FORMS_CLIENT, MAIL_CLIENT, RBAC_CLIENT } from '../../../common/utils/constants';
 
 // config
 import { ClientConfigModule, ClientConfigService } from '../../../../../common/config';
@@ -38,6 +38,14 @@ import { AddressModule } from 'apps/aleva-api-gateway/src/address/modules/addres
       provide: FORMS_CLIENT,
       useFactory(configService: ClientConfigService) {
         const clientOptions = configService.getClientOptions(FORMS);
+        return ClientProxyFactory.create(clientOptions);
+      },
+      inject: [ClientConfigService]
+    },
+    {
+      provide: MAIL_CLIENT,
+      useFactory(configService: ClientConfigService) {
+        const clientOptions = configService.getClientOptions(MAIL);
         return ClientProxyFactory.create(clientOptions);
       },
       inject: [ClientConfigService]

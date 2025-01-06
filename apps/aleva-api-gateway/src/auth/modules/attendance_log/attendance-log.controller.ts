@@ -5,21 +5,25 @@ import { Controller, Post, Get, Patch, Delete, Body, Param, Query, HttpCode } fr
 import { AttendanceLogService } from './attendance-log.service';
 
 // dto
-import { AttendanceLogDto } from './dto/attendance-log.dto';
+import { AttendanceLogDto, GuestAttendanceLogDto } from './dto/attendance-log.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import { CreateAttendanceLogDto } from './dto/create-attendance-log.dto';
 import { UpdateAttendanceLogDto } from './dto/update-attendance-log.dto';
+import { UsersService } from '../users/users.service';
 
 @ApiBearerAuth()
 @Controller('attendance-logs')
 export class AttendanceLogController {
-  constructor(private readonly attendanceLogService: AttendanceLogService) { }
+  constructor(
+    private readonly attendanceLogService: AttendanceLogService,
+    // private readonly userService: UsersService
+  ) { }
 
   @Post()
   @ApiOperation({ summary: 'Create Attendance Log' })
   @ApiResponse({ status: 200, description: 'Successfully fetched attendanceLogs.', type: AttendanceLogDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
-  async createAttendance_log(@Body() createAttendanceLogDto: CreateAttendanceLogDto) {
+  async createAttendanceLog(@Body() createAttendanceLogDto: CreateAttendanceLogDto) {
     return this.attendanceLogService.create(createAttendanceLogDto);
   }
 
@@ -56,4 +60,24 @@ export class AttendanceLogController {
   async remove(@Param('id') attendanceLog_id: string) {
     await this.attendanceLogService.remove(attendanceLog_id);
   }
+
+  @Post('attendance_logs/guest-attendance')
+  @ApiOperation({ summary: 'Guest Attendance Log' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched attendanceLogs.', type: AttendanceLogDto })
+  @ApiResponse({ status: 422, description: 'Validation Error' })
+  async guestAttendanceLog(@Body() guestAttendanceLogDto: GuestAttendanceLogDto) {
+    // this.userService.findOne()
+    // return this.attendanceLogService.create(guestAttendanceLogDto);
+  }
+
+
+  @Post('attendance_logs/guest-attendance/:id')
+  @ApiOperation({ summary: 'Guest Attendance Log' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched attendanceLogs.', type: AttendanceLogDto })
+  @ApiResponse({ status: 422, description: 'Validation Error' })
+  async guestAttendanceLogID(@Param('id') id: string, @Body() guestAttendanceLogDto: GuestAttendanceLogDto) {
+    // return this.attendanceLogService.create(guestAttendanceLogDto);
+  }
+
+
 }

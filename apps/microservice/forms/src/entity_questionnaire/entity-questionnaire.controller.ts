@@ -15,7 +15,7 @@ export class EntityQuestionnaireController {
   constructor(private readonly entityquestionnaireService: EntityQuestionnaireService) { }
 
   @MessagePattern(ENTITY_QUESTIONNAIRE_PATTERN.CREATE)
-  async create(@Payload() createEntityQuestionnaireDto: CreateEntityQuestionnaireDto) {
+  async create(@Payload() createEntityQuestionnaireDto: CreateEntityQuestionnaireDto[]) {
     try {
       return await this.entityquestionnaireService.create(createEntityQuestionnaireDto);
     } catch (error) {

@@ -5,6 +5,7 @@ import { plainToInstance } from 'class-transformer';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 
 // entity
+import { Answer } from '../answers/entities/answer.entity';
 import { EntityQuestionnaire } from './entities/entity-questionnaire.entity';
 
 // contracts
@@ -17,14 +18,48 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 
 @Injectable()
 export class EntityQuestionnaireService {
-  constructor(@InjectRepository(EntityQuestionnaire) private entityQuestionnaireRepository: Repository<EntityQuestionnaire>) { }
+  constructor(
+    @InjectRepository(EntityQuestionnaire) private entityQuestionnaireRepository: Repository<EntityQuestionnaire>,
+    @InjectRepository(Answer) private answerRepository: Repository<Answer>
+  ) { }
 
-  async create(createEntityQuestionnaireDto: CreateEntityQuestionnaireDto): Promise<EntityQuestionnaire[]> {
-    const newEntityQuestionnaire = await this.entityQuestionnaireRepository.create(createEntityQuestionnaireDto);
-    const savedEntity = await this.entityQuestionnaireRepository.save(newEntityQuestionnaire);
+  async create(createEntityQuestionnaireDto: CreateEntityQuestionnaireDto []): Promise<EntityQuestionnaire[]> {
 
-    // return transformed entity data
-    const { result } = await this.queryEntityQuestionnaire(savedEntity ? [savedEntity.entity_id] : null);
+   
+    for (const item of createEntityQuestionnaireDto) {
+      if (item.entity_type === 'user') {
+        // check and handle "short_text" or "long_text" answer types
+        if (['short_text', 'long_text'].includes(item.answer_type)) {
+          const newAnswer = this.answerRepository.create({
+            content: item.content,
+            answer_type: item.answer_type
+          });
+
+          const savedAnswer = await this.answerRepository.save(newAnswer);
+
+          // update `answer_id` in the DTO with the newly created `answer_id`
+          item.answer_id = savedAnswer.answer_id;
+          item.entity_id = item.entity_id
+        }
+
+        // delete existing entity-questionnaire entries
+        await this.entityQuestionnaireRepository.delete({
+          questionnaire_id: item.questionnaire_id,
+          question_id: item.question_id,
+          entity_id: item.entity_id,
+        });
+
+      }
+    }
+
+    // create new entries in the database
+    const newEntityQuestionnaires = await this.entityQuestionnaireRepository.create(createEntityQuestionnaireDto);
+    const savedEntities = await this.entityQuestionnaireRepository.save(newEntityQuestionnaires);
+
+    // Fetch the transformed entity data
+    let savedEntityVal = savedEntities[0]?.entity_id ? [savedEntities[0].entity_id] : [savedEntities.entity_id]
+
+    const { result } = await this.queryEntityQuestionnaire(savedEntities ? savedEntityVal : null);
 
     return result;
   }

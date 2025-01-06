@@ -1,6 +1,7 @@
 export const USERS_PATTERNS = {
     FIND_ALL: 'users.findAll',
     FIND_ONE: 'users.findOne',
+    FIND_ONE_EMAIL: 'users.findByEmail',
     CREATE: 'users.create',
     UPDATE: 'users.update',
     REMOVE: 'users.remove',

@@ -14,5 +14,6 @@ import { AnswerController } from './answers.controller';
   imports: [TypeOrmModule.forFeature([Answer])],
   controllers: [AnswerController],
   providers: [AnswerService],
+  exports: [TypeOrmModule]
 })
 export class AnswersModule {}

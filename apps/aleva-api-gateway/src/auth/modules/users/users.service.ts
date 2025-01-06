@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
 // constants
-import { FORMS_CLIENT, RBAC_CLIENT } from '../../../common/utils/constants';
+import { FORMS_CLIENT, MAIL_CLIENT, RBAC_CLIENT } from '../../../common/utils/constants';
 
 // contracts
 import {
@@ -17,6 +17,9 @@ import {
   CreateEntityQuestionnaireDto as ClientCreateEntityQuestionnaireDto,
   EntityMediaTypeEnum,
   EntityAddressTypeEnum,
+  OnboardingMailDto,
+  MAIL_PATTERN,
+  WelcomeMailDto,
 } from '@app/contracts';
 
 // dto
@@ -32,6 +35,7 @@ import { transformGatewayUserDto } from './pipes/user-transform.pipe';
 import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
 import { MediaService } from 'apps/aleva-api-gateway/src/resources/modules/media/media.service';
 import { AddressService } from 'apps/aleva-api-gateway/src/address/modules/address/address.service';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService extends BaseService<
@@ -51,7 +55,8 @@ export class UsersService extends BaseService<
     private readonly mediaService: MediaService,
     private readonly addressService: AddressService,
     @Inject(RBAC_CLIENT) private rbacClient: ClientProxy,
-    @Inject(FORMS_CLIENT) private formsClient: ClientProxy
+    @Inject(FORMS_CLIENT) private formsClient: ClientProxy,
+    @Inject(MAIL_CLIENT) private mailClient: ClientProxy
   ) {
     super(
       'user_id',
@@ -172,6 +177,23 @@ export class UsersService extends BaseService<
     return { ...mappedData[0] };
   }
 
+  async findByEmail(email: string): Promise<ClientUserDto> {
+    const userResponse = await this.rbacClient
+      .send<ClientUserDto>(USERS_PATTERNS.FIND_ONE_EMAIL, email)
+      .toPromise();
+
+    // fetch answers for each userResponse
+    await Promise.all(
+      [userResponse].map((userResponse) =>
+        this.appendUserResponseWithAnswers(userResponse, new PageOptionsDto()),
+      ),
+    );
+
+    const mappedData = await this.fetchAndMap([userResponse], this.entityIdKey);
+
+    return { ...mappedData[0] };
+  }
+
   async update(id: string, updateUserDto: UpdateUserDto) {
     const { media, address, ...updateEntityContract } = updateUserDto;
     const transformedDto = transformGatewayUserDto(updateEntityContract);
@@ -181,11 +203,10 @@ export class UsersService extends BaseService<
     //   USERS_PATTERNS.UPDATE,
     //   { user_id: id, ...transformedDto }
     // ).toPromise();
-    const user =  await this.updateEntityFields(id, updateUserDto, transformedDto);
-
+    const user = await this.updateEntityFields(id, updateUserDto, transformedDto);
     // fetch answers from the forms microservice
     const answers = updateUserDto.answers ? await this.createEntityQuestionnaire(updateUserDto.answers) : [];
-
+    
     return {
       ...user,
       answers: answers
@@ -240,5 +261,21 @@ export class UsersService extends BaseService<
     }
 
     return userResponse;
+  }
+
+  async sendQrCodeEmail(sendOnboardingMailDto: OnboardingMailDto): Promise<any> {
+    const sendOnboardingMail = plainToInstance(OnboardingMailDto, sendOnboardingMailDto);
+
+    return await this.mailClient.send<any, OnboardingMailDto>(
+      MAIL_PATTERN.MAIL_QR_CODE_SEND, sendOnboardingMail
+    ).toPromise();
+  }
+
+  async sendWelcomeEmail(welcomeMailDto: WelcomeMailDto): Promise<any> {
+    const sendWelcomeMail = plainToInstance(WelcomeMailDto, welcomeMailDto);
+
+    return await this.mailClient.send<any, WelcomeMailDto>(
+      MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
+    ).toPromise();
   }
 }
