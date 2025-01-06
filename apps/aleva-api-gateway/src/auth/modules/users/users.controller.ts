@@ -32,8 +32,8 @@ async create(@Body() createUserDto: CreateUserDto) {
     console.log(`query: ${JSON.stringify(query)}`);
 
     // Check if query indicates failure
-    if (query.status && query.status !== 200) {
-      throw new BadRequestException(`Sign Up Failed: ${query.error || 'Unknown error'}`);
+    if (!query.user_id) {
+      throw new BadRequestException(`Sign Up Failed: ${query["error"] || 'Unknown error'}`);
     }
 
     // Send welcome email if user creation succeeded
