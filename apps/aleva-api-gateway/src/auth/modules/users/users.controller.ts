@@ -36,7 +36,8 @@ export class UsersController {
         throw new BadRequestException(`Sign Up Failed: ${query["error"] || 'Unknown error'}`);
       }
 
-      // Send welcome email if user creation succeeded
+      // TODO: send confirmEmail.html
+      // Send verification email if user creation succeeded
       if (query) {
         await this.usersService.sendWelcomeEmail({
           first_name: query.first_name,
@@ -115,8 +116,8 @@ export class UsersController {
     let query = await this.usersService.findOne(id);
     try {
       if (query) {
-        const targetMedia = query.media.find(mediaItem => mediaItem.media?.media_name === "aleva_qr");
-        const contentUrl = targetMedia?.media?.content_url;
+        const targetMedia = query.media.find(mediaItem => mediaItem.media_name === "aleva_qr");
+        const contentUrl = targetMedia?.content_url;
         
         await this.usersService.sendQrCodeEmail({
           first_name: query.first_name,

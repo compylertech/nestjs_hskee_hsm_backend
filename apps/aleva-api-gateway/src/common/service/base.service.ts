@@ -51,41 +51,38 @@ export abstract class BaseService<
         for (const mapItem of this.mappings) {
             const { service, entityType, mapKey } = mapItem;
             const entityServiceType = entityType;
-            console.log(`mapKey: ${mapKey as string}`)
-            console.log(`entityType: ${entityType}`)
-            console.log(`identifierKey: ${identifierKey}`)
-            console.log(`entityChildAuxKey: ${entityChildAuxKey}`)
 
             // extract the entity IDs from the entities array
             const entityIDs = entities.map((entity) => entity[identifierKey]);
-            console.log(`entities: ${JSON.stringify(entities)}`)
-            console.log(`entityIDs: ${JSON.stringify(entityIDs)}`)
 
             // fetch related data
             const fetchResult = await service.fetchByEntityIDs(entityIDs, entityChildAuxKey || entityServiceType);
-            console.log(`fetchResult: ${JSON.stringify(fetchResult)}`)
 
             if (fetchResult) {
 
                 // map the fetched data back to the entities
                 for (const entity of entities) {
                     const relatedData = fetchResult[entity[identifierKey]] || [];
-                    entity[mapKey] =  relatedData;
-                    let flatT  = relatedData.map((item) => item[`${mapKey as string}`]);
-                    // console.log(`relatedData: ${JSON.stringify(relatedData)}`)
-                    // console.log(`relatedDataMapped: ${JSON.stringify(flatT)}`)
+                    const childAuxKey = `entity_${mapKey as string}`;
+                    const childIdentifierKey = `${childAuxKey}_id`;
+
+                    // transform the data
+                    const transformedData = relatedData.map(item => ({
+                        [`${childIdentifierKey}`]: item[`${childIdentifierKey}`],
+                        [`entity_type`]: item[`entity_type`],
+                        [`entity_id`]: item[`entity_id`],
+                        ...item[`${mapKey as string}`]
+                      }));
+                    
+                    entity[mapKey] =  transformedData;
 
                     // recursively fetch and map child relationships if needed
                     if (relatedData.length > 0) {
-                        const childIdentifierKey = `entity_${mapKey as string}_id`;
-                        // console.log(`childIdentifierKey: ${childIdentifierKey}`)
-                        const childAuxKey = `entity_${mapKey as string}`;
-                        await this.fetchAndMap(relatedData, childIdentifierKey, childAuxKey);
+                        await this.fetchAndMap(transformedData, childIdentifierKey, childAuxKey)
                     }
                 }
             }
 
-            
         }
 
         return entities;
@@ -236,8 +233,6 @@ export abstract class BaseService<
             const { created_at, updated_at, ...linkedWithoutTimestamps } = linked;
 
             return {
-                // created: { ...created },
-                // linked: { ...linkedWithoutTimestamps } as TEntityDto
                 ...created,
                 ...linkedWithoutTimestamps
             };

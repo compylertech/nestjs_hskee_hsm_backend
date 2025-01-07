@@ -57,7 +57,7 @@ export class EntityQuestionnaireService {
     const savedEntities = await this.entityQuestionnaireRepository.save(newEntityQuestionnaires);
 
     // Fetch the transformed entity data
-    let savedEntityVal = savedEntities[0]?.entity_id ? [savedEntities[0].entity_id] : [savedEntities.entity_id]
+    let savedEntityVal = savedEntities[0]?.entity_id ? [savedEntities[0].entity_id] : [savedEntities["entity_id"]]
 
     const { result } = await this.queryEntityQuestionnaire(savedEntities ? savedEntityVal : null);
 

@@ -35,9 +35,9 @@ export class AuthService {
     @Inject(MAIL_CLIENT) private mailClient: ClientProxy
   ) { }
 
-  userLogin(authSignInDto: AuthSignInDto) {
+  async userLogin(authSignInDto: AuthSignInDto) {
     try {
-      return this.authClient.send<ClientAuthSignInDto, ClientAuthDto>(
+      return await this.authClient.send<ClientAuthSignInDto, ClientAuthDto>(
         AUTH_PATTERN.USER_LOGIN,
         authSignInDto
       );

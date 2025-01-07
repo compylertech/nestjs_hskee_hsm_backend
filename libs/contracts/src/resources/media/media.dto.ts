@@ -8,6 +8,5 @@ export class MediaDto {
     is_thumbnail: boolean | null;
     caption: string | null;
     description: string | null;
-    media? : MediaDto
   }
   
