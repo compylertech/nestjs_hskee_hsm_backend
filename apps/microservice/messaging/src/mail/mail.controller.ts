@@ -14,7 +14,7 @@ export class MailController {
   @MessagePattern(MAIL_PATTERN.MAIL_ONBOARDING_SEND)
   async sendOnboardingEmail(@Payload() onboardingMailDto: OnboardingMailDto) {
     try {
-      return await this.mailService.sendOnboardingMail(onboardingMailDto, onboardingMailDto.user_email, "Onboarding Email");
+      return await this.mailService.sendOnboardingMail(onboardingMailDto, onboardingMailDto.email, "Onboarding Email");
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -50,7 +50,7 @@ export class MailController {
   @MessagePattern(MAIL_PATTERN.MAIL_QR_CODE_SEND)
   async sendQrCodeEmail(@Payload() qrCodeMailDto: OnboardingMailDto) {
     try {
-      return await this.mailService.sendQrCodeMail(qrCodeMailDto, qrCodeMailDto.user_email, "QR Code Email");
+      return await this.mailService.sendQrCodeMail(qrCodeMailDto, qrCodeMailDto.email, "QR Code Email");
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

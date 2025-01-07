@@ -23,36 +23,36 @@ export class UsersController {
   ) { }
 
   @Post()
-@ApiOperation({ summary: 'Create User' })
-@ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
-@ApiResponse({ status: 422, description: 'Validation Error' })
-async create(@Body() createUserDto: CreateUserDto) {
-  try {
-    const query = await this.usersService.create(createUserDto);
-    console.log(`query: ${JSON.stringify(query)}`);
+  @ApiOperation({ summary: 'Create User' })
+  @ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
+  @ApiResponse({ status: 422, description: 'Validation Error' })
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      const query = await this.usersService.create(createUserDto);
+      console.log(`query: ${JSON.stringify(query)}`);
 
-    // Check if query indicates failure
-    if (!query.user_id) {
-      throw new BadRequestException(`Sign Up Failed: ${query["error"] || 'Unknown error'}`);
+      // Check if query indicates failure
+      if (!query.user_id) {
+        throw new BadRequestException(`Sign Up Failed: ${query["error"] || 'Unknown error'}`);
+      }
+
+      // Send welcome email if user creation succeeded
+      if (query) {
+        await this.usersService.sendWelcomeEmail({
+          first_name: query.first_name,
+          last_name: query.last_name,
+          user_email: query.email,
+          unsubscribe_link: '',
+        } as WelcomeMailDto);
+      }
+
+      // Transform and return the created user
+      return transformUserToDto(query);
+    } catch (error) {
+      console.error('Error during user creation:', error);
+      throw new BadRequestException('Sign Up Failed: ' + error.message);
     }
-
-    // Send welcome email if user creation succeeded
-    if (query) {
-      await this.usersService.sendWelcomeEmail({
-        first_name: query.first_name,
-        last_name: query.last_name,
-        user_email: query.email,
-        unsubscribe_link: '',
-      } as WelcomeMailDto);
-    }
-
-    // Transform and return the created user
-    return transformUserToDto(query);
-  } catch (error) {
-    console.error('Error during user creation:', error);
-    throw new BadRequestException('Sign Up Failed: ' + error.message);
   }
-}
 
 
   @Get()
@@ -113,16 +113,16 @@ async create(@Body() createUserDto: CreateUserDto) {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async sendOnboardingEmail(@Param('id') id: string) {
     let query = await this.usersService.findOne(id);
-    let qr_code = query.media.filter((item) => item.media_name == "qr_code")
-    console.log(`qr_code: ${JSON.stringify(query.media["media"])}`)
-
     try {
       if (query) {
+        const targetMedia = query.media.find(mediaItem => mediaItem.media?.media_name === "aleva_qr");
+        const contentUrl = targetMedia?.media?.content_url;
+        
         await this.usersService.sendQrCodeEmail({
           first_name: query.first_name,
           last_name: query.last_name,
-          user_email: query.email,
-          qr_code: '',
+          email: query.email,
+          qr_code: `${contentUrl}`,
           unsubscribe_link: ''
         } as OnboardingMailDto)
       }

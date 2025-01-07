@@ -61,7 +61,7 @@ export class AttendanceLogController {
     await this.attendanceLogService.remove(attendanceLog_id);
   }
 
-  @Post('attendance_logs/guest-attendance')
+  @Post('guest-attendance')
   @ApiOperation({ summary: 'Guest Attendance Log' })
   @ApiResponse({ status: 200, description: 'Successfully fetched attendanceLogs.', type: AttendanceLogDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
@@ -110,7 +110,7 @@ export class AttendanceLogController {
 
 
 
-  @Post('attendance_logs/guest-attendance/:id')
+  @Post('guest-attendance/:id')
   @ApiOperation({ summary: 'Guest Attendance Log' })
   @ApiResponse({ status: 200, description: 'Successfully fetched attendanceLogs.', type: AttendanceLogDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })

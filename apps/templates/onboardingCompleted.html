@@ -31,7 +31,7 @@
                     <table style="width: 100%; margin-top: 24px; border-spacing: 0;">
                         <tr>
                             <td>
-                                <p style="font-size: 18px; font-weight: 400; line-height: 28px; margin: 0;">Hi <span> {{ user_info.first_name }} {{ user_info.last_name }}</span>,</p>
+                                <p style="font-size: 18px; font-weight: 400; line-height: 28px; margin: 0;">Hi <span> {{ first_name }} {{ last_name }}</span>,</p>
                             </td>
                         </tr>
                         <tr>
@@ -68,14 +68,14 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 14px 0 0 0;">{{ user_info.first_name }}</h1>
-                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 0 0 14px 0;">{{ user_info.last_name }}</h1>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 14px 0 0 0;">{{ first_name }}</h1>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 0 0 14px 0;">{{ last_name }}</h1>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font-size: 14px;">
-                                                        <p style="margin: 0 0 10px;">{{ user_info.email }}</p>
-                                                        <p style="margin: 0 0 10px;"> {{ user_info.phone_number }}</p>
+                                                        <p style="margin: 0 0 10px;">{{ email }}</p>
+                                                        <p style="margin: 0 0 10px;"> {{ phone_number }}</p>
                                                         <!-- <p style="margin: 0;">P.O. Box 2344</p> -->
                                                     </td>
                                                 </tr>
@@ -92,7 +92,7 @@
                             <!-- second card -->
                             <td style="width: 85.6mm; height: 120mm; padding: 20px; background-color: #030301; color: white; text-align: center; vertical-align: middle; display: table-cell;">
                                 <div style="width: 50mm; height: 50mm; background-color: white; padding: 12px; border-radius: 10px; display: inline-block;">
-                                    <img src="{{ user_info.qr_code }}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />
+                                    <img src="{{ qr_code }}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />
                                 </div>
                                 <p style="font-size: small; margin-top: 10px;">Scan QR code for entry</p>
                             </td>
@@ -122,14 +122,14 @@
                                                 </tr>
                                                 <tr>
                                                     <td>
-                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 14px 0 0 0;">{{ user_info.first_name }}</h1>
-                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 0 0 14px 0;">{{ user_info.last_name }}</h1>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 14px 0 0 0;">{{ first_name }}</h1>
+                                                        <h1 style="font-size: 36px; font-weight: 600; margin: 0 0 14px 0;">{{ last_name }}</h1>
                                                     </td>
                                                 </tr>
                                                 <tr>
                                                     <td style="font-size: 14px;">
-                                                        <p style="margin: 0 0 10px;"> {{ user_info.email }} </p>
-                                                        <p style="margin: 0 0 10px;"> {{ user_info.phone_number }} </p>
+                                                        <p style="margin: 0 0 10px;"> {{ email }} </p>
+                                                        <p style="margin: 0 0 10px;"> {{ phone_number }} </p>
                                                         <!-- <p style="margin: 0;">P.O. Box 2344</p> -->
                                                     </td>
                                                 </tr>
@@ -146,7 +146,7 @@
                             <!-- fourth card -->
                             <td style="width: 85.6mm; height: 120mm; padding: 20px; background-color: #F2F1EF; color: #030301; text-align: center; vertical-align: middle; display: table-cell;">
                                 <div style="width: 50mm; height: 50mm; background-color: white; padding: 12px; border-radius: 10px; display: inline-block;">
-                                    <img src="{{ user_info.qr_code }}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />
+                                    <img src="{{ qr_code }}" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain; border-radius: 8px;" />
                                 </div>
                                 <p style="font-size: small; margin-top: 10px;">Scan QR code for entry</p>
                             </td>
@@ -162,7 +162,7 @@
                         <tr>
                             <td>
                                 <p style="margin: 20px 0;">
-                                    This email was sent to <a href="mailto:{{ user_info.email }}">{{ user_info.email }}</a>. If you'd prefer not to receive updates from Aleva Daycare, you can <a href="{{ unsubscribe_link }}">unsubscribe here</a>.
+                                    This email was sent to <a href="mailto:{{ email }}">{{ email }}</a>. If you'd prefer not to receive updates from Aleva Daycare, you can <a href="{{ unsubscribe_link }}">unsubscribe here</a>.
                                 </p>
                             </td>
                         </tr>
