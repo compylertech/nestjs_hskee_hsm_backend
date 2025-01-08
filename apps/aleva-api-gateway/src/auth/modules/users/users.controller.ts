@@ -10,11 +10,11 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 // contracts
-import { OnboardingMailDto } from '@app/contracts';
+import { OnboardingMailDto, UserDto as UserContractDto, WelcomeMailDto } from '@app/contracts';
 
 // pipes
 import { transformUserToDto } from './pipes/user-transform.pipe';
-import { UserQueryPageOptionDto } from './page-options/page-query.dto';
+import { UserOnboardingPageOptionDto, UserQueryPageOptionDto } from './page-options/page-query.dto';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
@@ -26,20 +26,32 @@ export class UsersController {
   @ApiOperation({ summary: 'Create User' })
   @ApiResponse({ status: 200, description: 'Successfully fetched users.', type: UserDto })
   @ApiResponse({ status: 422, description: 'Validation Error' })
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: CreateUserDto, @Query() tagDto: UserOnboardingPageOptionDto) {
     try {
       const existingUser = await this.usersService.findByEmail(createUserDto.email);
-      
+
       if (existingUser && existingUser["data"]) {
         return existingUser;
       }
 
       // create a new user
-      const query = await this.usersService.create(createUserDto);
+      const query = await this.usersService.create(createUserDto, tagDto.tag as string);
 
-      // check if query indicates failure
-      if (!query.user_id) {
-        throw new BadRequestException(`Sign Up Failed: ${query["error"] || 'Unknown error'}`);
+      try {
+        // send onboarding mail 
+        if (tagDto.tag as string == "onboarding") {
+          await this.usersService.sendWelcomeEmail({
+            first_name: query.first_name,
+            last_name: query.last_name,
+            email: query.email,
+            user_id: query.user_id
+          } as WelcomeMailDto);
+
+        }
+      } catch (error) {
+        return {
+          message: "Error sending email"
+        }
       }
 
       // transform and return the created user
@@ -109,19 +121,9 @@ export class UsersController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async sendOnboardingEmail(@Param('id') id: string) {
     let query = await this.usersService.findOne(id);
-    try {
-      if (query) {
-        const targetMedia = query.media.find(mediaItem => mediaItem.media_name === "aleva_qr");
-        const contentUrl = targetMedia?.content_url;
 
-        await this.usersService.sendQrCodeEmail({
-          first_name: query.first_name,
-          last_name: query.last_name,
-          email: query.email,
-          qr_code: `${contentUrl}`,
-          unsubscribe_link: ''
-        } as OnboardingMailDto)
-      }
+    try {
+      await this.sendOnboardingMail(query);
     } catch (error) {
       return {
         message: "Error sending email"
@@ -130,6 +132,21 @@ export class UsersController {
 
     return {
       message: "Email Sent"
+    }
+  }
+
+  private async sendOnboardingMail(query: UserContractDto) {
+    if (query) {
+      const targetMedia = query.media.find(mediaItem => mediaItem.media_name === "aleva_qr");
+      const contentUrl = targetMedia?.content_url;
+
+      await this.usersService.sendQrCodeEmail({
+        first_name: query.first_name,
+        last_name: query.last_name,
+        email: query.email,
+        qr_code: `${contentUrl}`,
+        unsubscribe_link: ''
+      } as OnboardingMailDto);
     }
   }
 }

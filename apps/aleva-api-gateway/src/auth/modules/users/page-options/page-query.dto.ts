@@ -14,3 +14,11 @@ export class UserQueryPageOptionDto extends PageOptionsDto {
     return ((this.page ?? 1) - 1) * (this.limit ?? 10);
   }
 }
+
+
+export class UserOnboardingPageOptionDto {
+  @ApiPropertyOptional({ description: 'User type of a user' })
+  @IsString()
+  @IsOptional()
+  tag?: string;
+}

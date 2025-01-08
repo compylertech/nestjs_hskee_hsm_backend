@@ -11,7 +11,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { User } from './entities/user.entity';
 
 // contracts
-import { UserDto, CreateUserDto, UpdateUserDto, UserBaseDto, ConfirmMailDto, WelcomeMailDto, ResetPasswordDto, ResetPasswordMailDto } from '@app/contracts';
+import { UserDto, CreateUserDto, UpdateUserDto, UserBaseDto, ConfirmMailDto, WelcomeMailDto, ResetPasswordDto, ResetPasswordMailDto, OnboardingMailDto } from '@app/contracts';
 
 // service
 import { MailService } from '@app/modules/messaging/src/mail/mail.service';
@@ -33,7 +33,7 @@ export class UsersService {
     @InjectRepository(User) private userRepository: Repository<User>
   ) { }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto, tag: string = null): Promise<User> {
     createUserDto.verification_token = uuidv4();
     createUserDto.is_verified = false;
 
@@ -45,12 +45,14 @@ export class UsersService {
     const verificationLink = `${apiUrl}/auth/verify-email?email=${user.email}&token=${user.verification_token}`;
 
     // send verification link
-    await this.mailService.sendVerificationMail({
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      verify_link: verificationLink
-    } as ConfirmMailDto);
+    if (!tag || typeof tag !== 'string') {
+      await this.mailService.sendVerificationMail({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        verify_link: verificationLink
+      } as ConfirmMailDto);
+    }
 
     return user;
   }

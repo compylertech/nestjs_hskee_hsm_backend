@@ -15,9 +15,11 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
   @MessagePattern(USERS_PATTERNS.CREATE)
-  async create(@Payload() createUserDto: CreateUserDto) {
+  async create(@Payload() payload: { createUserDto: CreateUserDto; tag?: string }) {
     try {
-      return await this.usersService.create(createUserDto);
+      const { createUserDto, tag = null } = payload;
+      
+      return await this.usersService.create(createUserDto, tag ? tag : null);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

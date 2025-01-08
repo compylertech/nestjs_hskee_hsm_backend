@@ -115,7 +115,7 @@ export abstract class BaseService<
     }
 
     // create new entity
-    async create(createDto: TApiCreateDto): Promise<TDto> {
+    async create(createDto: TApiCreateDto, tag: string = null): Promise<TDto> {
         const createContract: TApiCreateDto = { ...createDto };
 
         return await this.client.send<TDto, TCreateDto>(this.patterns.CREATE, createContract).toPromise();

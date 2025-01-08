@@ -14,7 +14,7 @@ export class MailController {
   @MessagePattern(MAIL_PATTERN.MAIL_ONBOARDING_SEND)
   async sendOnboardingEmail(@Payload() onboardingMailDto: OnboardingMailDto) {
     try {
-      return await this.mailService.sendOnboardingMail(onboardingMailDto, onboardingMailDto.email, "Onboarding Email");
+      return await this.mailService.sendOnboardingMail(onboardingMailDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

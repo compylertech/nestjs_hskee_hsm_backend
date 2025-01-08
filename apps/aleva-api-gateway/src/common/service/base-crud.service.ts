@@ -12,7 +12,7 @@ export abstract class BaseCrudService<
     constructor(
         private readonly dtoIdKey: string,
         protected readonly client: ClientProxy,
-        private readonly crudService: CrudService<any, any, any, TDto, any, any>
+        private readonly crudService: CrudService<any, any, any, TDto, TCreateDto, any>
     ) {}
 
     /**

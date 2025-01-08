@@ -43,7 +43,7 @@ export class MailService {
     }
 
     // onboarding
-    async sendOnboardingMail(variables: OnboardingMailDto, recipient: string, subject: string): Promise<void> {
-        return this.sendMail("./welcome.html", variables, recipient, subject);
+    async sendOnboardingMail(variables: OnboardingMailDto): Promise<void> {
+        return this.sendMail("./welcome.html", variables, variables.email,  "Onboarding Email");
     }
 }

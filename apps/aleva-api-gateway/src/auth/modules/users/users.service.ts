@@ -96,13 +96,13 @@ export class UsersService extends BaseService<
   //     ).toPromise();
   // }
 
-  async create(createDto: CreateUserDto): Promise<ClientUserDto> {
+  async create(createDto: CreateUserDto, tag: string = null): Promise<ClientUserDto> {
     const { media, address, ...createUserDtoContract } = createDto;
     const transformedDto = transformGatewayUserDto(createUserDtoContract);
 
     // create the entity
     const entityResponse = await this.rbacClient
-      .send<ClientUserDto, ClientCreateUserDto>(USERS_PATTERNS.CREATE, transformedDto)
+      .send<ClientUserDto, { createUserDto: CreateUserDto; tag?: string }>(USERS_PATTERNS.CREATE, {createUserDto: transformedDto as CreateUserDto, tag: tag})
       .toPromise();
 
     const fieldResponses = await this.createEntityFields(entityResponse[this.entityIdKey], createDto);
@@ -219,6 +219,14 @@ export class UsersService extends BaseService<
 
     return await this.mailClient.send<any, OnboardingMailDto>(
       MAIL_PATTERN.MAIL_QR_CODE_SEND, sendOnboardingMail
+    ).toPromise();
+  }
+
+  async sendWelcomeEmail(sendWelcomeMailDto: WelcomeMailDto): Promise<any> {
+    const sendWelcomeMail = plainToInstance(WelcomeMailDto, sendWelcomeMailDto);
+
+    return await this.mailClient.send<any, WelcomeMailDto>(
+      MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
     ).toPromise();
   }
 
