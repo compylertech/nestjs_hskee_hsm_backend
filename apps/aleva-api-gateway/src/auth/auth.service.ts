@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -21,20 +22,20 @@ import {
   ResetPasswordDto as ClientResetPasswordDto,
   ChangePasswordDto as ClientChangePasswordDto,
   VerifyEmailDto as ClientVerifyEmailDto,
-  MailActionDto as ClientMailActionDto,
-
-  MAIL_PATTERN,
-  ResetPasswordMailDto
+  MailActionDto as ClientMailActionDto
 } from '@app/contracts';
-
 
 @Injectable()
 export class AuthService {
   constructor(
+    private configService: ConfigService,
     @Inject(AUTH_CLIENT) private authClient: ClientProxy,
     @Inject(MAIL_CLIENT) private mailClient: ClientProxy
   ) { }
 
+  async getFrontEndBaseUrl() : Promise<string> {
+    return this.configService.get<string>('FE_BASE_URL');
+  }
   async userLogin(authSignInDto: AuthSignInDto) {
     try {
       return await this.authClient.send<ClientAuthSignInDto, ClientAuthDto>(

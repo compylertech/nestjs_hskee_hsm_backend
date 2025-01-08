@@ -28,11 +28,9 @@ export class UsersController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async create(@Body() createUserDto: CreateUserDto) {
     try {
-      const existingUser = this.usersService.findByEmail(createUserDto.email);
-      console.log(`${JSON.stringify(existingUser)}`)
-
-      if (existingUser || existingUser["data"]) {
-        console.log("here")
+      const existingUser = await this.usersService.findByEmail(createUserDto.email);
+      
+      if (existingUser && existingUser["data"]) {
         return existingUser;
       }
 

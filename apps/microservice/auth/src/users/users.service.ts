@@ -2,6 +2,7 @@ import * as bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import { In, Repository } from 'typeorm';
 import { isUUID } from 'class-validator';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { plainToInstance } from 'class-transformer';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
@@ -22,11 +23,13 @@ import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import { UserQueryPageOptionDto } from 'apps/aleva-api-gateway/src/auth/modules/users/page-options/page-query.dto';
 
 
+
 @Injectable()
 export class UsersService {
 
   constructor(
     private mailService: MailService,
+    private configService: ConfigService,
     @InjectRepository(User) private userRepository: Repository<User>
   ) { }
 
@@ -36,14 +39,17 @@ export class UsersService {
 
     const newUser = await this.userRepository.create(createUserDto);
     const user = await this.userRepository.save(newUser);
-    const verification_link = `http://127.0.0.1:3000/auth/verify-email?email=${user.email}&token=${user.verification_token}`;
+
+    // verification link
+    const apiUrl = this.configService.get<string>('API_URL');
+    const verificationLink = `${apiUrl}/auth/verify-email?email=${user.email}&token=${user.verification_token}`;
 
     // send verification link
     await this.mailService.sendVerificationMail({
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      verify_link: verification_link
+      verify_link: verificationLink
     } as ConfirmMailDto);
 
     return user;
