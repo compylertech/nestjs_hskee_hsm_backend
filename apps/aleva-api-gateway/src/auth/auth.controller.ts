@@ -1,5 +1,6 @@
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 // decorators
 import { Public } from 'apps/common/decorators/public.decorator';
@@ -43,8 +44,15 @@ export class AuthController {
   @ApiOperation({ summary: 'Verify Email' })
   @ApiResponse({ status: 200, description: 'Email verified successfully.' })
   @ApiResponse({ status: 400, description: 'Failed to verify email.' })
-  async verifyEmail(@Query() query: VerifyEmailDto) {
-    return await this.authService.verifyEmail(query);
+  async verifyEmail(@Query() query: VerifyEmailDto, @Res() res: Response) {
+    const verificationResult = await this.authService.verifyEmail(query);
+
+    // Redirect to the desired URL based on the result
+    if (verificationResult) {
+      return res.redirect('https://aleva.compyler.io/');
+    } else {
+      return res.redirect('/404');
+    }
   }
 
   @Get('/mail-unsubscribe')

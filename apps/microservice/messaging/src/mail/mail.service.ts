@@ -23,13 +23,13 @@ export class MailService {
     }
 
     // forgot password
-    async sendPasswordResetMail(variables: ResetPasswordMailDto, recipient: string, subject: string): Promise<void> {
-        return this.sendMail("./passwordReset.html", variables, recipient, subject);
+    async sendPasswordResetMail(variables: ResetPasswordMailDto): Promise<void> {
+        return this.sendMail("./passwordReset.html", variables, variables.email, "Password Reset Email");
     }
 
     // verify email
-    async sendVerificationMail(variables: ConfirmMailDto, recipient: string, subject: string): Promise<void> {
-        return this.sendMail("./confirmEmail.html", variables, recipient, subject);
+    async sendVerificationMail(variables: ConfirmMailDto): Promise<void> {
+        return this.sendMail("./confirmEmail.html", variables, variables.email, "User Verification Email");
     }
 
     // send QR code
@@ -38,12 +38,12 @@ export class MailService {
     }
     
     // welcome
-    async sendWelcomeMail(variables: WelcomeMailDto, recipient: string, subject: string): Promise<void> {
-        return this.sendMail("./welcome.html", variables, recipient, subject);
+    async sendWelcomeMail(variables: WelcomeMailDto): Promise<void> {
+        return this.sendMail("./welcome.html", variables, variables.email, "Welcome Email");
     }
 
     // onboarding
     async sendOnboardingMail(variables: OnboardingMailDto, recipient: string, subject: string): Promise<void> {
-        return this.sendMail("./onboarding.html", variables, recipient, subject);
+        return this.sendMail("./welcome.html", variables, recipient, subject);
     }
 }

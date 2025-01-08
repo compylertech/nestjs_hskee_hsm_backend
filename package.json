@@ -51,7 +51,7 @@
     "ts-transformer-keys": "^0.4.4",
     "typeorm": "^0.3.20",
     "typeorm-polymorphic": "^1.0.0",
-    "uuid": "^11.0.3"
+    "uuid": "^11.0.4"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

@@ -31,6 +31,11 @@ export interface ChangePasswordDto {
 export interface VerifyEmailDto {
   email: string;
   token: string;
+  first_name?: string;
+  last_name?: string;
+  verify_link?: string;
+  unsubscribe_link?: string;
+  bcc?: string;
 }
 
 

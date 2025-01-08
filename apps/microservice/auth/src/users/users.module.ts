@@ -12,9 +12,10 @@ import { UsersController } from './users.controller';
 
 // subscribers
 import { UserSubscriber } from './subscribers/users.subscribers';
+import { MailModule } from '@app/modules/messaging/src/mail/mail.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User])],
+  imports: [TypeOrmModule.forFeature([User]), MailModule],
   controllers: [UsersController],
   providers: [UsersService, UserSubscriber],
   exports: [UsersService]

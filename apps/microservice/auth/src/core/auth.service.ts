@@ -36,7 +36,7 @@ export class AuthService {
     async validateUser(input: AuthDto): Promise<AuthSignInDto | null> {
         const user = await this.usersService.findUserByEmail(input.email)
 
-        if (user && bcrypt.compareSync(input.password, user.password)) {
+        if (user && bcrypt.compareSync(input.password, user.password) && user.is_verified) {
             return {
                 userId: user.user_id,
                 email: user.email,
@@ -56,7 +56,7 @@ export class AuthService {
 
         const accessToken = await this.jwtService.signAsync(tokenPayload);
 
-        return { accessToken, email: user.email, userId: user.userId, firstName: user.firstName, lastName: user.lastName}
+        return { accessToken, email: user.email, userId: user.userId, firstName: user.firstName, lastName: user.lastName }
     }
 
     async resetPassword(input: ResetPasswordDto): Promise<{ message: string } | any> {
@@ -67,7 +67,7 @@ export class AuthService {
         } catch (error) {
             throw new BadRequestException(`Error resetting password: ${error.message}`);
         }
-        
+
         return { message: 'Password reset successfully' };
     }
 
@@ -88,18 +88,18 @@ export class AuthService {
         }
 
         await this.usersService.updatePassword(user.user_id, input.newPassword);
-        
+
         return { message: 'Password changed successfully' };
     }
 
     // Handles email verification
     async verifyEmail(token: string): Promise<{ message: string }> {
         const isValidToken = await this.usersService.verifyEmailToken(token);
+        
         if (!isValidToken) {
             throw new UnauthorizedException('Invalid or expired token');
         }
 
-        await this.usersService.markEmailAsVerified(token);
         return { message: 'Email verified successfully' };
     }
 

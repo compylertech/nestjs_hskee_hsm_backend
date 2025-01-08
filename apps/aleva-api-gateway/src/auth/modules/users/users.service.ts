@@ -20,6 +20,7 @@ import {
   OnboardingMailDto,
   MAIL_PATTERN,
   WelcomeMailDto,
+  ConfirmMailDto,
 } from '@app/contracts';
 
 // dto
@@ -177,12 +178,12 @@ export class UsersService extends BaseService<
     return { ...mappedData[0] };
   }
 
-  async findByEmail(email: string): Promise<ClientUserDto> {
+  async findByEmail(email: string): Promise<ClientUserDto | undefined> {
     const userResponse = await this.rbacClient
       .send<ClientUserDto>(USERS_PATTERNS.FIND_ONE_EMAIL, email)
       .toPromise();
 
-    return userResponse;
+    return userResponse || null;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
@@ -218,14 +219,6 @@ export class UsersService extends BaseService<
 
     return await this.mailClient.send<any, OnboardingMailDto>(
       MAIL_PATTERN.MAIL_QR_CODE_SEND, sendOnboardingMail
-    ).toPromise();
-  }
-
-  async sendWelcomeEmail(welcomeMailDto: WelcomeMailDto): Promise<any> {
-    const sendWelcomeMail = plainToInstance(WelcomeMailDto, welcomeMailDto);
-
-    return await this.mailClient.send<any, WelcomeMailDto>(
-      MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
     ).toPromise();
   }
 

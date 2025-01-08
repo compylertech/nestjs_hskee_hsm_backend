@@ -10,7 +10,10 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { User } from './entities/user.entity';
 
 // contracts
-import { UserDto, CreateUserDto, UpdateUserDto, UserBaseDto } from '@app/contracts';
+import { UserDto, CreateUserDto, UpdateUserDto, UserBaseDto, ConfirmMailDto, WelcomeMailDto, ResetPasswordDto, ResetPasswordMailDto } from '@app/contracts';
+
+// service
+import { MailService } from '@app/modules/messaging/src/mail/mail.service';
 
 // page-meta
 import { PageDto } from 'apps/common/dto/page.dto';
@@ -18,16 +21,32 @@ import { PageMetaDto } from 'apps/common/dto/page-meta.dto';
 import { PageOptionsDto } from 'apps/common/dto/page-optional.dto';
 import { UserQueryPageOptionDto } from 'apps/aleva-api-gateway/src/auth/modules/users/page-options/page-query.dto';
 
+
 @Injectable()
 export class UsersService {
+
   constructor(
+    private mailService: MailService,
     @InjectRepository(User) private userRepository: Repository<User>
   ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const newUser = this.userRepository.create(createUserDto);
+    createUserDto.verification_token = uuidv4();
+    createUserDto.is_verified = false;
 
-    return this.userRepository.save(newUser);
+    const newUser = await this.userRepository.create(createUserDto);
+    const user = await this.userRepository.save(newUser);
+    const verification_link = `http://127.0.0.1:3000/auth/verify-email?email=${user.email}&token=${user.verification_token}`;
+
+    // send verification link
+    await this.mailService.sendVerificationMail({
+      first_name: user.first_name,
+      last_name: user.last_name,
+      email: user.email,
+      verify_link: verification_link
+    } as ConfirmMailDto);
+
+    return user;
   }
 
   async findAll(pageOptionsDto: UserQueryPageOptionDto): Promise<PageDto<UserDto>> {
@@ -55,8 +74,8 @@ export class UsersService {
       queryBuilder.andWhere('user.is_rejected = :is_rejected', { is_rejected: true });
     }
     queryBuilder.orderBy('user.created_at', pageOptionsDto.order)
-    .skip(options.skip)
-    .take(options.limit);
+      .skip(options.skip)
+      .take(options.limit);
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();
@@ -120,7 +139,8 @@ export class UsersService {
     const user = this.userRepository.findOne({ where: { email: email } });
 
     if (!user) {
-      throw new NotFoundException(`User with email ${email} not found`);
+      return null
+      // throw new NotFoundException(`User with email ${email} not found`);
     }
 
     return plainToInstance(UserDto, user, { excludeExtraneousValues: false });
@@ -143,7 +163,7 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
-    user.password =  bcrypt.hashSync(newPassword, 10);
+    user.password = bcrypt.hashSync(newPassword, 10);
     user.reset_token = "";
     await this.userRepository.save(user);
   }
@@ -158,12 +178,36 @@ export class UsersService {
 
     user.reset_token = uuidv4();
     await this.userRepository.save(user);
+
+    // send reset token link
+    if (user) {
+      await this.mailService.sendPasswordResetMail({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        reset_link: ''
+      } as ResetPasswordMailDto);
+    }
   }
 
   // verify email token
-  async verifyEmailToken(token: string): Promise<boolean> {
+  async verifyEmailToken(token: string): Promise<User | boolean> {
     const user = await this.userRepository.findOne({ where: { verification_token: token } });
-    return !!user;
+
+    // mark email as verified
+    await this.markEmailAsVerified(token);
+
+    // send welcome email
+    if (user) {
+      await this.mailService.sendWelcomeMail({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        user_id: user.user_id
+      } as WelcomeMailDto);
+    }
+
+    return user || null;
   }
 
   // mark email as verified
@@ -175,6 +219,7 @@ export class UsersService {
     }
 
     user.is_verified = true;
+    user.verification_token = "";
     await this.userRepository.save(user);
   }
 

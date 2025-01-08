@@ -59,7 +59,7 @@ export class AuthService {
     }
   }
 
- async changePassword(changePasswordDto: ChangePasswordDto) {
+  async changePassword(changePasswordDto: ChangePasswordDto) {
     try {
       return await this.authClient.send<{}, ClientChangePasswordDto>(
         AUTH_PATTERN.CHANGE_PASSWORD,
@@ -75,7 +75,7 @@ export class AuthService {
       return await this.authClient.send<{}, ClientVerifyEmailDto>(
         AUTH_PATTERN.VERIFY_EMAIL,
         verifyEmailDto,
-      );
+      ).toPromise();
     } catch (error) {
       throw error;
     }

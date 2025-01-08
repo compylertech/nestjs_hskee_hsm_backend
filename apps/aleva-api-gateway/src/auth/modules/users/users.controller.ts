@@ -10,7 +10,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 // contracts
-import { OnboardingMailDto, WelcomeMailDto } from '@app/contracts';
+import { OnboardingMailDto } from '@app/contracts';
 
 // pipes
 import { transformUserToDto } from './pipes/user-transform.pipe';
@@ -28,26 +28,23 @@ export class UsersController {
   @ApiResponse({ status: 422, description: 'Validation Error' })
   async create(@Body() createUserDto: CreateUserDto) {
     try {
-      const query = await this.usersService.create(createUserDto);
-      console.log(`query: ${JSON.stringify(query)}`);
+      const existingUser = this.usersService.findByEmail(createUserDto.email);
+      console.log(`${JSON.stringify(existingUser)}`)
 
-      // Check if query indicates failure
+      if (existingUser || existingUser["data"]) {
+        console.log("here")
+        return existingUser;
+      }
+
+      // create a new user
+      const query = await this.usersService.create(createUserDto);
+
+      // check if query indicates failure
       if (!query.user_id) {
         throw new BadRequestException(`Sign Up Failed: ${query["error"] || 'Unknown error'}`);
       }
 
-      // TODO: send confirmEmail.html
-      // Send verification email if user creation succeeded
-      if (query) {
-        await this.usersService.sendWelcomeEmail({
-          first_name: query.first_name,
-          last_name: query.last_name,
-          user_email: query.email,
-          unsubscribe_link: '',
-        } as WelcomeMailDto);
-      }
-
-      // Transform and return the created user
+      // transform and return the created user
       return transformUserToDto(query);
     } catch (error) {
       console.error('Error during user creation:', error);
@@ -118,7 +115,7 @@ export class UsersController {
       if (query) {
         const targetMedia = query.media.find(mediaItem => mediaItem.media_name === "aleva_qr");
         const contentUrl = targetMedia?.content_url;
-        
+
         await this.usersService.sendQrCodeEmail({
           first_name: query.first_name,
           last_name: query.last_name,

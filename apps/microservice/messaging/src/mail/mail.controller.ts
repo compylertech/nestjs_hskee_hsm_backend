@@ -5,7 +5,7 @@ import { MessagePattern, Payload, RpcException } from '@nestjs/microservices';
 import { MailService } from './mail.service';
 
 // contracts
-import { MAIL_PATTERN, OnboardingMailDto, ResetPasswordMailDto, WelcomeMailDto } from '@app/contracts';
+import { ConfirmMailDto, MAIL_PATTERN, OnboardingMailDto, ResetPasswordMailDto, WelcomeMailDto } from '@app/contracts';
 
 @Controller('mail')
 export class MailController {
@@ -26,7 +26,7 @@ export class MailController {
   @MessagePattern(MAIL_PATTERN.MAIL_WELCOME_SEND)
   async sendWelcomeEmail(@Payload() welcomeMailDto: WelcomeMailDto) {
     try {
-      return await this.mailService.sendWelcomeMail(welcomeMailDto, welcomeMailDto.user_email, "Welcome Email");
+      return await this.mailService.sendWelcomeMail(welcomeMailDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -38,11 +38,23 @@ export class MailController {
   @MessagePattern(MAIL_PATTERN.MAIL_RESET_PASSWORD_SEND)
   async sendPasswordResetEmail(@Payload() passwordResetMailDto: ResetPasswordMailDto) {
     try {
-      return await this.mailService.sendPasswordResetMail(passwordResetMailDto, passwordResetMailDto.user_email, "Password Reset Email");
+      return await this.mailService.sendPasswordResetMail(passwordResetMailDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
         message: error.message || 'Error sending password reset mail!',
+      });
+    }
+  }
+
+  @MessagePattern(MAIL_PATTERN.MAIL_VERIFICATION_SEND)
+  async sendVerificationMail(@Payload() verificationMailDto: ConfirmMailDto) {
+    try {
+      return await this.mailService.sendVerificationMail(verificationMailDto);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 400,
+        message: error.message || 'Error sending verification email!',
       });
     }
   }
