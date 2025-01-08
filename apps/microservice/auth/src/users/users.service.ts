@@ -185,13 +185,17 @@ export class UsersService {
     user.reset_token = uuidv4();
     await this.userRepository.save(user);
 
+    // reset link
+    const feBaseUrl = this.configService.get<string>('FE_BASE_URL');
+    const resetLink = `${feBaseUrl}/account/change-password?email=${user.email}&token=${user.reset_token}`;
+
     // send reset token link
     if (user) {
       await this.mailService.sendPasswordResetMail({
         first_name: user.first_name,
         last_name: user.last_name,
         email: user.email,
-        reset_link: ''
+        reset_link: resetLink
       } as ResetPasswordMailDto);
     }
   }
