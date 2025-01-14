@@ -1,0 +1,56 @@
+{
+    "files.exclude": {
+        // Exclude all top-level folders except "apis"
+        // "**/.vscode": true,
+        "**/node_modules": true,
+        // "**/dist": true,
+        // "apps": true,
+        // "**/auth-api": true,
+        // "**/micro.txt": true,
+        // "**/readme.txt": true,
+        // "**/bookstore": true,
+        // "**/ltp_backend_nestjs": true,
+        // "**/misc": true,
+        // "**/my-podcast-api": true,
+        // "nest-cli.json": true,
+        // "package-lock.json": true,
+        // "package.json": true,
+        // "setup-nestjs.sh": true,
+        // "users_model_example.zip": true,
+        // "**nest-typeorm-books-api": true,
+
+        // Inside "apis", exclude everything except "aleva-api"
+        "address": true,
+        "aleva-api": false,
+
+        // // Inside "aleva-api", exclude everything except the specified folders/files
+        // "*": true,
+        "libs": false,
+        "scripts": false,
+        "nest-cli.json": false,
+        "tsconfig.build.json": false,
+        "tsconfig.json": false,
+        "start-services.js": false,
+
+        // Inside "apps", exclude everything except "aleva-api-gateway"
+        // "apps/*": true,
+
+        // Inside "aleva-api-gateway", exclude everything except the specified folders
+        "apps/aleva-api-gateway/*": false,
+        // "apps/aleva-api-gateway/common": false,
+        // "apps/aleva-api-gateway/microservice": false,
+        // "apps/resources": false,
+        // "apps/aleva-api-gateway/templates": false
+
+        // Hide individual files in "aleva-api"
+        // "*.json": true,
+        // "*.js": true,
+        ".eslintrc.js": true,
+        // ".env": true,
+        ".gitignore": true,
+        ".prettierrc": true,
+        "README.md": true,
+        "package.json": true,
+        "package-lock.json": true
+    }
+}

@@ -60,9 +60,9 @@ export class QuestionsController {
   }
 
   @MessagePattern(QUESTION_PATTERN.UPDATE)
-  update(@Payload() updateQuestionDto: UpdateQuestionDto) {
+  async update(@Payload() updateQuestionDto: UpdateQuestionDto) {
     try {
-      return this.questionsService.update(updateQuestionDto.question_id, updateQuestionDto);
+      return await this.questionsService.update(updateQuestionDto.question_id, updateQuestionDto);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,
@@ -72,7 +72,7 @@ export class QuestionsController {
   }
 
   @MessagePattern(QUESTION_PATTERN.DELETE)
-  remove(@Payload() id: string) {
-    return this.questionsService.remove(id);
+  async remove(@Payload() id: string) {
+    await this.questionsService.remove(id);
   }
 }
