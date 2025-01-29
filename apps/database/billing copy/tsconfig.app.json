@@ -2,8 +2,8 @@
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
     "declaration": false,
-    "outDir": "../../../dist/apps/microservice/properties"
+    "outDir": "../../../dist/apps/microservice/billing"
   },
-  "include": ["src/**/*", "../auth/src/**/entities/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
 }

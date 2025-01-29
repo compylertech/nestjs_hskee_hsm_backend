@@ -24,7 +24,6 @@ export class UnitModule {
   constructor(private readonly propertyUnitAssocService: PropertyUnitAssocService) { }
 
   onModuleInit() {
-    // set the shared service in the entity
     Unit.setPropertyUnitAssocService(this.propertyUnitAssocService);
   }
 }

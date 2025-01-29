@@ -3,6 +3,7 @@ import { Question } from './question.entity';
 
 @Entity('answers')
 export class Answer {
+  [x: string]: any;
   @PrimaryGeneratedColumn('uuid')
   answer_id: string;
 
