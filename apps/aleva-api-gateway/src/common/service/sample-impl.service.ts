@@ -27,6 +27,7 @@
 
 // // Base
 // import { BaseCrudService } from 'apps/aleva-api-gateway/src/common/service/base-crud.service';
+// import { CrudService } from './crud.service';
 
 // @Injectable()
 // export class PropertyService extends BaseCrudService<
@@ -58,7 +59,13 @@
 //             mapKey: 'amenities',
 //           },
 //           {
-//             service: mediaService,
+//               _service: mediaService,
+//               get service() {
+//                   return this._service;
+//               },
+//               set service(value) {
+//                   this._service = value;
+//               },
 //             entityType: EntityMediaTypeEnum.PROPERTY,
 //             mapKey: 'media',
 //           },

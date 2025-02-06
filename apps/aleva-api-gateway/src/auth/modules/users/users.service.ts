@@ -1,3 +1,4 @@
+import { plainToInstance } from 'class-transformer';
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 
@@ -21,6 +22,7 @@ import {
   MAIL_PATTERN,
   WelcomeMailDto,
   ConfirmMailDto,
+  EntityQuestionnaireTypeEnum,
 } from '@app/contracts';
 
 // dto
@@ -33,14 +35,16 @@ import { CreateEntityQuestionnaireDto } from '../../../forms//modules/questionna
 import { transformGatewayUserDto } from './pipes/user-transform.pipe';
 
 // services
-import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
 import { MediaService } from 'apps/aleva-api-gateway/src/resources/modules/media/media.service';
 import { AddressService } from 'apps/aleva-api-gateway/src/address/modules/address/address.service';
-import { plainToInstance } from 'class-transformer';
+
+import { CrudService } from 'apps/aleva-api-gateway/src/common/service/crud-impl.service';
+import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base-impl-crud.service';
+import { EntityQuestionnaireService } from 'apps/aleva-api-gateway/src/forms/modules/entity-questionnaire/entity-questionnaire.service';
 
 @Injectable()
 export class UsersService extends BaseService<
-  EntityMediaTypeEnum | EntityAddressTypeEnum,
+  EntityAddressTypeEnum | EntityMediaTypeEnum | EntityQuestionnaireTypeEnum,
   CreateUserDto,
   UpdateUserDto,
   ClientUserDto,
@@ -50,17 +54,54 @@ export class UsersService extends BaseService<
   null
 > {
 
-  private readonly entityIdKey = 'user_id';
+  mapKeys: string[];
 
   constructor(
     private readonly mediaService: MediaService,
     private readonly addressService: AddressService,
+    private readonly entityQuestionnaireService: EntityQuestionnaireService,
     @Inject(RBAC_CLIENT) private rbacClient: ClientProxy,
     @Inject(FORMS_CLIENT) private formsClient: ClientProxy,
     @Inject(MAIL_CLIENT) private mailClient: ClientProxy
   ) {
-    super(
-      'user_id',
+    const entityIdKey: string = 'user_id';
+    const mappings: Array<{
+      service: CrudService<
+        EntityAddressTypeEnum | EntityMediaTypeEnum | EntityQuestionnaireTypeEnum,
+        CreateUserDto, UpdateUserDto,
+        ClientUserDto, ClientCreateUserDto, ClientUpdateUserDto,
+        null, null> | any;
+      entityType: EntityAddressTypeEnum | EntityMediaTypeEnum | EntityQuestionnaireTypeEnum;
+      mapKey: keyof ClientUserDto;
+    }> = [
+        {
+          service: mediaService.crudService,
+          entityType: EntityMediaTypeEnum.USER,
+          mapKey: 'media',
+        },
+        {
+          service: addressService.crudService,
+          entityType: EntityAddressTypeEnum.USER,
+          mapKey: 'address',
+        },
+        {
+          service: entityQuestionnaireService.crudService,
+          entityType: EntityQuestionnaireTypeEnum.USER,
+          mapKey: 'answers',
+        }
+      ]
+
+    const crudService = new CrudService<
+      EntityAddressTypeEnum | EntityMediaTypeEnum | EntityQuestionnaireTypeEnum,
+      CreateUserDto,
+      UpdateUserDto,
+      ClientUserDto,
+      ClientCreateUserDto,
+      ClientUpdateUserDto,
+      null,
+      null
+    >(
+      entityIdKey,
       rbacClient,
       {
         ...USERS_PATTERNS,
@@ -68,114 +109,24 @@ export class UsersService extends BaseService<
         DELETE_BY_ENTITY: ''
       },
       null,
-      [
-        {
-          service: mediaService,
-          entityType: EntityMediaTypeEnum.USER,
-          mapKey: 'media',
-        },
-        {
-          service: addressService,
-          entityType: EntityAddressTypeEnum.USER,
-          mapKey: 'address',
-        },
-      ]
+      mappings
     );
+    super(entityIdKey, rbacClient, crudService);
+
+    this.mapKeys = mappings.map(({ mapKey }) => mapKey as string);
   }
-
-  // constructor(
-  //   @Inject(RBAC_CLIENT) private rbacClient: ClientProxy,
-  //   @Inject(FORMS_CLIENT) private formsClient: ClientProxy
-  // ) { }
-
-  // async create(createUserDto: CreateUserDto) {
-  //   const transformedDto = transformGatewayUserDto(createUserDto);
-  //   return await this.rbacClient
-  //     .send<ClientUserDto, ClientCreateUserDto>(
-  //       USERS_PATTERNS.CREATE, transformedDto
-  //     ).toPromise();
-  // }
 
   async create(createDto: CreateUserDto, tag: string = null): Promise<ClientUserDto> {
-    const { media, address, ...createUserDtoContract } = createDto;
-    const transformedDto = transformGatewayUserDto(createUserDtoContract);
+    const createContractDto = Object.entries(createDto).reduce((acc, [key, value]) => {
+      if (!this.mapKeys.includes(key)) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as CreateUserDto);
 
-    // create the entity
-    const entityResponse = await this.rbacClient
-      .send<ClientUserDto, { createUserDto: CreateUserDto; tag?: string }>(USERS_PATTERNS.CREATE, {createUserDto: transformedDto as CreateUserDto, tag: tag})
-      .toPromise();
-
-    const fieldResponses = await this.createEntityFields(entityResponse[this.entityIdKey], createDto);
-
-    // merge all responses
-    return { ...entityResponse, ...fieldResponses };
-  }
-
-
-  // async findAll(pageOptionsDto: PageOptionsDto) {
-  //   const userResponses = await this.rbacClient.send<ClientUserDto[]>(
-  //     USERS_PATTERNS.FIND_ALL,
-  //     pageOptionsDto,
-  //   ).toPromise();
-
-  // // fetch answers for each userResponse
-  // await Promise.all(
-  //   userResponses["data"].map((userResponse) =>
-  //     this.appendUserResponseWithAnswers(userResponse, pageOptionsDto),
-  //   ),
-  // );
-
-  //   return userResponses
-  // }
-
-  async findAll(pageOptionsDto: PageOptionsDto): Promise<ClientUserDto[]> {
-    const entityResponse = await this.rbacClient.send<ClientUserDto[]>(
-      USERS_PATTERNS.FIND_ALL,
-      pageOptionsDto
-    ).toPromise();
-
-    // fetch answers for each userResponse
-    await Promise.all(
-      entityResponse["data"].map((userResponse) =>
-        this.appendUserResponseWithAnswers(userResponse, pageOptionsDto),
-      ),
-    );
-
-    const mappedData = await this.fetchAndMap(entityResponse["data"], this.entityIdKey);
-
-    return { ...entityResponse, ...mappedData };
-  }
-
-  // async findOne(id: string) {
-  //   const userResponse = await this.rbacClient.send<ClientUserDto>(
-  //     USERS_PATTERNS.FIND_ONE,
-  //     id
-  //   ).toPromise();
-
-  // fetch answers for each userResponse
-  // await Promise.all(
-  //   [userResponse].map((userResponse) =>
-  //     this.appendUserResponseWithAnswers(userResponse, new PageOptionsDto()),
-  //   ),
-  // );
-  // return userResponse;
-  // }
-
-  async findOne(userID: string): Promise<ClientUserDto> {
-    const userResponse = await this.rbacClient
-      .send<ClientUserDto>(USERS_PATTERNS.FIND_ONE, userID)
-      .toPromise();
-
-    // fetch answers for each userResponse
-    await Promise.all(
-      [userResponse].map((userResponse) =>
-        this.appendUserResponseWithAnswers(userResponse, new PageOptionsDto()),
-      ),
-    );
-
-    const mappedData = await this.fetchAndMap([userResponse], this.entityIdKey);
-
-    return { ...mappedData[0] };
+    const transformedDto = transformGatewayUserDto(createContractDto);
+    const result = await super.create(transformedDto as CreateUserDto);
+    return result;
   }
 
   async findByEmail(email: string): Promise<ClientUserDto | undefined> {
@@ -186,34 +137,6 @@ export class UsersService extends BaseService<
     return userResponse || null;
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const { media, address, ...updateEntityContract } = updateUserDto;
-    const transformedDto = transformGatewayUserDto(updateEntityContract);
-
-    // update users 
-    // const user = await this.rbacClient.send<ClientUserDto, ClientUpdateUserDto>(
-    //   USERS_PATTERNS.UPDATE,
-    //   { user_id: id, ...transformedDto }
-    // ).toPromise();
-    const user = await this.updateEntityFields(id, updateUserDto, transformedDto);
-    // fetch answers from the forms microservice
-    const answers = updateUserDto.answers ? await this.createEntityQuestionnaire(updateUserDto.answers) : [];
-
-    return {
-      ...user,
-      answers: answers
-    }
-  }
-
-  async remove(id: string): Promise<void> {
-    // return await this.rbacClient.send<void>(
-    //   USERS_PATTERNS.REMOVE,
-    //   id
-    // ).toPromise();;
-    await this.removeEntityFields(id);
-
-  }
-
   async sendQrCodeEmail(sendOnboardingMailDto: OnboardingMailDto): Promise<any> {
     const sendOnboardingMail = plainToInstance(OnboardingMailDto, sendOnboardingMailDto);
 
@@ -222,53 +145,11 @@ export class UsersService extends BaseService<
     ).toPromise();
   }
 
-  async sendWelcomeEmail(sendWelcomeMailDto: WelcomeMailDto): Promise<any> {
-    const sendWelcomeMail = plainToInstance(WelcomeMailDto, sendWelcomeMailDto);
+  // async sendWelcomeEmail(sendWelcomeMailDto: WelcomeMailDto): Promise<any> {
+  //   const sendWelcomeMail = plainToInstance(WelcomeMailDto, sendWelcomeMailDto);
 
-    return await this.mailClient.send<any, WelcomeMailDto>(
-      MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
-    ).toPromise();
-  }
-
-  // communicate with forms microservice
-  private async createEntityQuestionnaire(
-    createEntityQuestionnaireDto: CreateEntityQuestionnaireDto[]
-  ): Promise<EntityQuestionnaireDto[]> {
-
-    return await this.formsClient.send<EntityQuestionnaireDto[], ClientCreateEntityQuestionnaireDto[]>(
-      ENTITY_QUESTIONNAIRE_PATTERN.CREATE,
-      createEntityQuestionnaireDto
-    ).toPromise();
-  }
-
-  private async appendUserResponseWithAnswers(userResponse: ClientUserDto, pageOptionsDto: PageOptionsDto): Promise<ClientUserDto> {
-    const userId = userResponse.user_id;
-
-    try {
-      const userAnswers = await this.formsClient
-        .send<any[]>(QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES, {
-          pageOptionsDto,
-          entityId: [userId],
-        })
-        .toPromise();
-
-      if (
-        userAnswers &&
-        userAnswers["data"] &&
-        Array.isArray(userAnswers["data"]) &&
-        userAnswers["data"].length > 0 &&
-        userAnswers["data"][0]["questionnaires"]
-      ) {
-        userResponse.answers = userAnswers["data"][0]["questionnaires"];
-      } else {
-        userResponse.answers = [];
-      }
-    } catch (error) {
-      console.error(`Failed to fetch answers for user_id: ${userId}`, error);
-      userResponse.answers = [];
-    }
-
-    return userResponse;
-  }
-
+  //   return await this.mailClient.send<any, WelcomeMailDto>(
+  //     MAIL_PATTERN.MAIL_WELCOME_SEND, sendWelcomeMail
+  //   ).toPromise();
+  // }
 }

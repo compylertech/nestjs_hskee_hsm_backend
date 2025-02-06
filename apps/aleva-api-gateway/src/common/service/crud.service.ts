@@ -6,7 +6,7 @@ type ConsolidatedEntity<TDto, TEntityDto> = {
     linked?: TEntityDto;
   };
   
-export abstract class CrudService<
+export class CrudService<
     TDtoTypeEnum,
     TApiCreateDto,
     TApiUpdateDto,

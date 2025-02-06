@@ -131,12 +131,15 @@ export class EntityQuestionnaireService {
       .leftJoinAndSelect('entity_questionnaire.question', 'question')
       .leftJoinAndSelect('entity_questionnaire.answer', 'answer')
       .where('entity_questionnaire.entity_type = :entityType', { entityType: 'user' })
-      .orderBy('questionnaire.created_at', 'DESC');
+      
 
     // handle multiple entityIds
     if (entityIds && entityIds.length > 0) {
       queryBuilder.andWhere('entity_questionnaire.entity_id IN (:...entityIds)', { entityIds });
     }
+
+    // order
+    queryBuilder.orderBy('questionnaire.created_at', 'DESC');
 
     // execute the query to get records
     const entityQuestionnaireRecords = await queryBuilder.getMany();

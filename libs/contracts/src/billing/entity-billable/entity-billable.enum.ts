@@ -3,6 +3,11 @@ export enum BillableTypeEnum {
     VARIABLE = 'variable',
 }
 
+export enum BillableTypeEnum {
+    UTILITIES = 'utilities',
+    MAINTENANCE_REQUESTS = 'maintenance_requests'
+}
+
 export enum EntityBillableTypeEnum {
     PROPERTY = "property",
     UNITS = "units",

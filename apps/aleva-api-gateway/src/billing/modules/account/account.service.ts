@@ -23,7 +23,8 @@ import { CreateAccountDto } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 
 // service
-import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
+import { CrudService } from 'apps/aleva-api-gateway/src/common/service/crud-impl.service';
+import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base-impl-crud.service';
 import { AddressService } from 'apps/aleva-api-gateway/src/address/modules/address/address.service';
 
 
@@ -42,9 +43,19 @@ export class AccountService extends BaseService<
 
   constructor(
     private readonly addressService: AddressService,
-    @Inject(BILLING_CLIENT) private readonly accountClient: ClientProxy
+    @Inject(BILLING_CLIENT) accountClient: ClientProxy
   ) {
-    super(
+
+    const crudService = new CrudService<
+      EntityAccountTypeEnum | EntityAddressTypeEnum,
+      CreateAccountDto,
+      UpdateAccountDto,
+      ClientAccountDto,
+      ClientCreateAccountDto,
+      ClientUpdateAccountDto,
+      ClientEntityAccountDto,
+      ClientCreateEntityAccountDto
+    >(
       'account_id',
       accountClient,
       {
@@ -55,26 +66,14 @@ export class AccountService extends BaseService<
       ClientCreateEntityAccountDto,
       [
         {
-          service: addressService,
+          service: addressService.crudService,
           entityType: EntityAddressTypeEnum.ACCOUNT,
           mapKey: 'address',
         }
       ]
     );
+
+    super('account_id', accountClient, crudService);
   }
 
-  async create(createAccountDto: CreateAccountDto): Promise<ClientAccountDto> {
-    const { address, ...createAccountContract } = createAccountDto;
-
-    // create the entity
-    const entityResponse = await this.accountClient
-      .send<ClientAccountDto, ClientCreateAccountDto>(ACCOUNT_PATTERN.CREATE, createAccountContract)
-      .toPromise();
-
-    const fieldResponses = await this.createEntityFields(entityResponse[this.entityIdKey], createAccountDto);
-
-    // merge all responses
-    return { ...entityResponse, ...fieldResponses };
-  }
 }
-

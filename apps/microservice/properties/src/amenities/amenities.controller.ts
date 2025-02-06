@@ -30,6 +30,7 @@ export class AmenitiesController {
   @MessagePattern(AMENITIES_PATTERN.FIND_ALL)
   async findAll(@Payload() pageOptionsDto: PageOptionsDto) {
     try {
+      console.log("FINDALL")
       return await this.amenitiesService.findAll(pageOptionsDto);
     } catch (error) {
       throw new RpcException({
@@ -41,6 +42,7 @@ export class AmenitiesController {
 
   @MessagePattern(AMENITIES_PATTERN.FIND_ONE)
   async findOne(@Payload() id: string) {
+    console.log("findOne")
     try {
       return await this.amenitiesService.findOne(id);
     } catch (error) {
@@ -54,13 +56,12 @@ export class AmenitiesController {
   @MessagePattern(AMENITIES_PATTERN.FIND_BY_ENTITIES)
   async findByEntities(@Payload() payload: { entity_ids: string[]; entity_type: string }) {
     const { entity_ids, entity_type } = payload;
-
     try {
       if (!Object.values(EntityAmenityTypeEnum).includes(entity_type as EntityAmenityTypeEnum)) {
         return
       }
-
-      return await this.amenitiesService.findByEntity(entity_ids, entity_type as EntityAmenityTypeEnum)
+      
+      return await this.amenitiesService.findByEntity(entity_ids, entity_type as EntityAmenityTypeEnum);
     } catch (error) {
       throw new RpcException({
         statusCode: 400,

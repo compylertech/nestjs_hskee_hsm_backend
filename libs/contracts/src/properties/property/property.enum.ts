@@ -15,4 +15,5 @@ export enum PropertyAssignmentType {
     handler = "handler",
     landlord = "landlord",
     contractor = "contractor",
+    reservation = "reservation"
 }

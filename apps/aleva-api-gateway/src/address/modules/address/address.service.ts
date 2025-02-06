@@ -22,7 +22,8 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 
 // service
-import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
+import { CrudService } from 'apps/aleva-api-gateway/src/common/service/crud-impl.service';
+import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base-impl-crud.service';
 
 
 @Injectable()
@@ -36,12 +37,20 @@ export class AddressService extends BaseService<
   ClientEntityAddressDto,
   ClientCreateEntityAddressDto
 > {
-  private readonly entityIdKey = 'address_id';
-
   constructor(
     @Inject(ADDRESS_CLIENT) addressClient: ClientProxy
   ) {
-    super(
+
+    const crudService = new CrudService<
+      EntityAddressTypeEnum,
+      CreateAddressDto,
+      UpdateAddressDto,
+      ClientAddressDto,
+      ClientCreateAddressDto,
+      ClientUpdateAddressDto,
+      ClientEntityAddressDto,
+      ClientCreateEntityAddressDto
+    >(
       'address_id',
       addressClient,
       {
@@ -52,6 +61,7 @@ export class AddressService extends BaseService<
       ClientCreateEntityAddressDto,
       []
     );
+
+    super('address_id', addressClient, crudService);
   }
 }
-

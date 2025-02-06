@@ -4,4 +4,6 @@ export const ENTITY_QUESTIONNAIRE_PATTERN = {
   CREATE: 'entityQuestionnaire.create',
   UPDATE: 'entityQuestionnaire.update',
   DELETE: 'entityQuestionnaire.delete',
+  FIND_BY_ENTITY: 'entityQuestionnaire.findByEntity',
+  DELETE_BY_ENTITY: 'entityQuestionnaire.deleteByEntity'
 }

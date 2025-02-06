@@ -29,9 +29,7 @@ import {
 export class AuthService {
   constructor(
     private configService: ConfigService,
-    @Inject(AUTH_CLIENT) private authClient: ClientProxy,
-    @Inject(MAIL_CLIENT) private mailClient: ClientProxy
-  ) { }
+    @Inject(AUTH_CLIENT) private authClient: ClientProxy  ) { }
 
   async getFrontEndBaseUrl() : Promise<string> {
     return this.configService.get<string>('FE_BASE_URL');

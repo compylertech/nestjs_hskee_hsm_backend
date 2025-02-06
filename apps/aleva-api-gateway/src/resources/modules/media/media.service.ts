@@ -23,7 +23,8 @@ import { CreateMediaDto } from './dto/create-media.dto';
 import { UpdateMediaDto } from './dto/update-media.dto';
 
 // service
-import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base.service';
+import { CrudService } from 'apps/aleva-api-gateway/src/common/service/crud-impl.service';
+import { BaseService } from 'apps/aleva-api-gateway/src/common/service/base-impl-crud.service';
 
 
 @Injectable()
@@ -37,19 +38,21 @@ export class MediaService extends BaseService<
   ClientEntityMediaDto,
   ClientCreateEntityMediaDto
 > {
-  private readonly entityIdKey = 'media_id';
-
   constructor(@Inject(RESOURCE_CLIENT) mediaClient: ClientProxy) {
     super(
       'media_id',
       mediaClient,
-      {
-        ...MEDIA_PATTERN,
-        LINK_ENTITY: ENTITY_MEDIA_PATTERN.CREATE,
-        DELETE_BY_ENTITY: ENTITY_MEDIA_PATTERN.DELETE_BY_ENTITY
-      },
-      ClientCreateEntityMediaDto,
-      []
+      new CrudService(
+        'media_id',
+        mediaClient,
+        {
+          ...MEDIA_PATTERN,
+          LINK_ENTITY: ENTITY_MEDIA_PATTERN.CREATE,
+          DELETE_BY_ENTITY: ENTITY_MEDIA_PATTERN.DELETE_BY_ENTITY
+        },
+        ClientCreateEntityMediaDto,
+        []
+      )
     );
   }
 }

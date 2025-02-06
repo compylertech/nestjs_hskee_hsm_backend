@@ -30,7 +30,7 @@ export abstract class BaseService<
             service: BaseService<any, any, any, any, any, any, any, any>;
             entityType: TDtoTypeEnum;
             mapKey: keyof TDto;
-        }>
+        }> | any
     ) { }
 
     private getDtoKeys(): string[] {

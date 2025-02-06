@@ -12,6 +12,8 @@ export * from '@app/contracts/forms/questionnaire/update-questionnaire.dto'
 
 export * from '@app/contracts/forms/entity-questionnaire/entity-questionnaire.dto'
 export * from '@app/contracts/forms/entity-questionnaire/create-entity-questionnaire.dto'
+export * from '@app/contracts/forms/entity-questionnaire/entity-questionnaire.enum'
+export * from '@app/contracts/forms/entity-questionnaire/entity-questionnaire.patterns'
 export * from '@app/contracts/forms/entity-questionnaire/update-entity-questionnaire.dto'
 
 export * from '@app/contracts/forms/answers/answer.dto'
@@ -40,6 +42,7 @@ export * from '@app/contracts/auth/entity-company/update-entity-company.dto'
 export * from '@app/contracts/auth/entity-company/entity-company.dto'
 export * from '@app/contracts/auth/entity-company/entity-company.pattern'
 export * from '@app/contracts/auth/entity-company/entity-company.enum'
+
 // Events
 export * from '@app/contracts/booking/calendar-event/calendar-event.dto'
 export * from '@app/contracts/booking/calendar-event/create-calendar-event.dto'
@@ -103,6 +106,14 @@ export * from '@app/contracts/billing/entity-billable/create-entity-billable.dto
 export * from '@app/contracts/billing/entity-billable/update-entity-billable.dto'
 export * from '@app/contracts/billing/entity-billable/entity-billable.pattern'
 export * from '@app/contracts/billing/entity-billable/entity-billable.enum'
+
+// Contract
+export * from '@app/contracts/contract/contract/contract.enum'
+
+// Transaction
+export * from '@app/contracts/billing/transaction/payment-status/payment-status.enum';
+export * from '@app/contracts/billing/transaction/payment-type/payment-type.enum';
+export * from '@app/contracts/billing/transaction/transaction-type/transaction-type.enum';
 
 // Properties
 export * from '@app/contracts/properties/property/property.dto'

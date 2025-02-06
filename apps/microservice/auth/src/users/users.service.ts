@@ -44,7 +44,7 @@ export class UsersService {
     const apiUrl = this.configService.get<string>('API_URL');
     const verificationLink = `${apiUrl}/auth/verify-email?email=${user.email}&token=${user.verification_token}`;
 
-    // send verification link
+    // send verification mail
     if (!tag || typeof tag !== 'string') {
       await this.mailService.sendVerificationMail({
         first_name: user.first_name,
@@ -52,6 +52,17 @@ export class UsersService {
         email: user.email,
         verify_link: verificationLink
       } as ConfirmMailDto);
+    }
+
+    // send onboarding mail
+    if (tag as string == "onboarding") {
+      await this.mailService.sendWelcomeMail({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        email: user.email,
+        user_id: user.user_id
+      } as WelcomeMailDto);
+
     }
 
     return user;

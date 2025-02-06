@@ -52,11 +52,11 @@ export class QuestionnaireController {
   }
 
   @MessagePattern(QUESTIONNAIRE_PATTERN.GET_ENTITY_RESPONSES)
-  async fetchGroupedQuestionnaireData(@Payload() payload: { pageOptionsDto: PageOptionsDto; entityId?: string []}) {
+  async fetchGroupedQuestionnaireData(@Payload() payload: { pageOptionsDto: PageOptionsDto; entityId?: string [], entityType?: string}) {
     try {
-      const { pageOptionsDto, entityId } = payload;
-      const { result, queryBuilder } = await this.entityQuestionnaireService.queryEntityQuestionnaire(entityId);
-
+      const { pageOptionsDto, entityId, entityType } = payload;
+      const { result, queryBuilder } = await this.entityQuestionnaireService.queryEntityQuestionnaire(entityId || payload["entity_ids"]);
+      
       // get item count for pagination
       const itemCount = await queryBuilder.getCount();
 

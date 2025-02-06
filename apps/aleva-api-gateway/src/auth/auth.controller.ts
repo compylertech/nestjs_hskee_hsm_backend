@@ -48,7 +48,7 @@ export class AuthController {
     const verificationResult = await this.authService.verifyEmail(query);
     const frontendUrl = await this.authService.getFrontEndBaseUrl();
 
-    // Redirect to the desired URL based on the result
+    // redirect to the desired URL based on the result
     if (verificationResult) {
       return res.redirect(`${frontendUrl}`);
     } else {

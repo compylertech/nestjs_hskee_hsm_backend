@@ -14,11 +14,13 @@ import { UsersController } from './users.controller';
 // services
 import { UsersService } from './users.service';
 import { QuestionnaireService } from 'apps/aleva-api-gateway/src/forms/modules/questionnaire/questionnaire.service';
+import { EntityQuestionnaireService } from 'apps/aleva-api-gateway/src/forms/modules/entity-questionnaire/entity-questionnaire.service';
 
 // module
 import { MailModule } from '@app/modules/messaging/src/mail/mail.module';
 import { MediaModule } from 'apps/aleva-api-gateway/src/resources/modules/media/media.module';
 import { AddressModule } from 'apps/aleva-api-gateway/src/address/modules/address/address.module';
+// import { EntityQuestionnaireModule } from 'apps/aleva-api-gateway/src/forms/modules/entity-questionnaire/entity-questionnaire.service';
 
 @Module({
   imports: [ClientConfigModule, MediaModule, AddressModule, MailModule],
@@ -26,6 +28,7 @@ import { AddressModule } from 'apps/aleva-api-gateway/src/address/modules/addres
   providers: [
     UsersService,
     QuestionnaireService,
+    EntityQuestionnaireService,
     {
       provide: RBAC_CLIENT,
       useFactory(configService: ClientConfigService) {

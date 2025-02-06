@@ -37,22 +37,22 @@ export class UsersController {
       // create a new user
       const query = await this.usersService.create(createUserDto, tagDto.tag as string);
 
-      try {
-        // send onboarding mail 
-        if (tagDto.tag as string == "onboarding") {
-          await this.usersService.sendWelcomeEmail({
-            first_name: query.first_name,
-            last_name: query.last_name,
-            email: query.email,
-            user_id: query.user_id
-          } as WelcomeMailDto);
+      // try {
+      //   // // send onboarding mail 
+      //   // if (tagDto.tag as string == "onboarding") {
+      //   //   await this.usersService.sendWelcomeEmail({
+      //   //     first_name: query.first_name,
+      //   //     last_name: query.last_name,
+      //   //     email: query.email,
+      //   //     user_id: query.user_id
+      //   //   } as WelcomeMailDto);
 
-        }
-      } catch (error) {
-        return {
-          message: "Error sending email"
-        }
-      }
+      //   // }
+      // } catch (error) {
+      //   return {
+      //     message: "Error sending email"
+      //   }
+      // }
 
       // transform and return the created user
       return transformUserToDto(query);
